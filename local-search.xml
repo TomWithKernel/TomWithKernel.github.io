@@ -4,19 +4,6 @@
   
   
   <entry>
-    <title></title>
-    <link href="/README/"/>
-    <url>/README/</url>
-    
-    <content type="html"><![CDATA[<h1 id="kernel"><a href="#kernel" class="headerlink" title="kernel"></a>kernel</h1><p>Some learning methods about the linux kernel</p><h2 id="How-to-debug-kernel"><a href="#How-to-debug-kernel" class="headerlink" title="How to debug kernel"></a>How to debug kernel</h2><ul><li><a href="./dbg_meth/crash.md">crash</a></li></ul><p>crash can help you analyze kernel dump files, you can know the status of the kernel when the system crashes, including running processes, CPU register content, stack information, and so on</p><ul><li><a href="./dbg_meth/gdb.md">gdb</a></li></ul><p>gdb can help you execute code line by line during program execution, set breakpoints, view the value of variables, and check the function call stack, including dynamically allocated memory and stack memory</p><ul><li><a href="./dbg_meth/kdump.md">kdump</a></li></ul><p>When the system crashes, kdump collects core dump information and saves it to the disk. When a critical error occurs or the system crashes, kdump automatically collects core dump information, including key information about the system status, such as memory image, CPU register status, and process information</p><h2 id="some-config"><a href="#some-config" class="headerlink" title="some config"></a>some config</h2><ul><li><a href="./config">you can refer here</a>These configurations will help you get started quickly.&#x2F;config)</li></ul><h2 id="Some-tools-commands"><a href="#Some-tools-commands" class="headerlink" title="Some tools commands"></a>Some tools commands</h2><ul><li><a href="./commands/vim_command.md">vim</a><a href="./commands/ctags.md">ctags</a></li></ul>]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>内存条是工具</title>
     <link href="/dbg_meth/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/"/>
     <url>/dbg_meth/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/</url>
