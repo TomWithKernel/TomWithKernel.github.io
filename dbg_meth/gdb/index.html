@@ -1,0 +1,837 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="gdb编译程序加参数时生成调试信息 g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的    选项 解析    g 该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息   ggdb 使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gdb">
+<meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/gdb/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="gdb编译程序加参数时生成调试信息 g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的    选项 解析    g 该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息   ggdb 使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
+<meta property="article:modified_time" content="2024-08-15T02:14:18.310Z">
+<meta property="article:author" content="Tom">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>gdb - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="gdb"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-10 10:09" pubdate>
+          2024年5月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">gdb</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h1><p><strong>编译程序加参数时生成调试信息</strong></p>
+<p>g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>解析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g</td>
+<td>该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息</td>
+</tr>
+<tr>
+<td>ggdb</td>
+<td>使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx)</td>
+</tr>
+</tbody></table>
+<p>g也是分级别的</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>解析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>g1</td>
+<td>级别1（-g1）不包含局部变量和与行号有关的调试信息，因此只能够用于回溯跟踪和堆栈转储之用。回溯跟踪指的是监视程序在运行过程中的函数调用历史，堆栈转储则是一种以原始的十六进制格式保存程序执行环境的方法，两者都是经常用到的调试手段</td>
+</tr>
+<tr>
+<td>g2</td>
+<td>这是默认的级别，此时产生的调试信息包括扩展的符号表、行号、局部或外部变量信息</td>
+</tr>
+<tr>
+<td>g3</td>
+<td>包含级别2中的所有调试信息，以及源代码中定义的宏</td>
+</tr>
+</tbody></table>
+<h2 id="gdb调试常用命令解析"><a href="#gdb调试常用命令解析" class="headerlink" title="gdb调试常用命令解析"></a><strong>gdb调试常用命令解析</strong></h2><h3 id="b"><a href="#b" class="headerlink" title="b"></a>b</h3><p>break 断点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">break</span> 函数名<br><span class="hljs-built_in">break</span> 行号<br><span class="hljs-built_in">break</span> 文件名：行号<br><span class="hljs-built_in">break</span> 文件名：函数名<br><span class="hljs-built_in">break</span> +偏移量<br><span class="hljs-built_in">break</span> -偏移量<br><span class="hljs-built_in">break</span> *地址<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb)b iseq_compile            在函数处加断点<br>(gdb)b compile.c:516           在文件名和行号处加断点<br>(gdb)b +3                      设置偏移量<br>(gdb)b *0x88116fd6             在某地址处加断点<br>(gdb)b                         如果不指定位置，就是在下一行代码上设置断点<br></code></pre></td></tr></table></figure>
+
+<p>设置好的断点可以通过 info break 查看</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info <span class="hljs-built_in">break</span><br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x00007febd6225bd9 ../sysdeps/unix/sysv/linux/poll.c:29<br></code></pre></td></tr></table></figure>
+
+<h3 id="disable-enable"><a href="#disable-enable" class="headerlink" title="disable | enable"></a>disable | enable</h3><p>临时禁用和启用断点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info b<br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x00007f218fcb1bd9 ../sysdeps/unix/sysv/linux/poll.c:29<br>(gdb) disa<br><span class="hljs-built_in">disable</span>      disassemble  <br>(gdb) <span class="hljs-built_in">disable</span> 1<br>(gdb) <span class="hljs-built_in">enable</span> 1<br></code></pre></td></tr></table></figure>
+
+<h3 id="r"><a href="#r" class="headerlink" title="r"></a>r</h3><p>run 开始运行</p>
+<h3 id="bt"><a href="#bt" class="headerlink" title="bt"></a>bt</h3><p>backtrace 命令可以在遇到断点而停止执行时显示栈帧</p>
+<p><code>bt N</code>只显示开头N个栈帧</p>
+<p><code>bt -N</code>只显示最后N个栈帧</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) bt<br><span class="hljs-comment">#0  0x00007f218fcb1bd9 in __GI___poll (fds=0x7f218400a060, nfds=2, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:29</span><br><span class="hljs-comment">#1  0x00007f218ff851f6 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br><span class="hljs-comment">#2  0x00007f218ff85582 in g_main_loop_run () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br><span class="hljs-comment">#3  0x0000563b79c85395 in ?? ()</span><br><span class="hljs-comment">#4  0x00007f218fbe71fb in __libc_start_main (main=0x563b79c84640, argc=1, argv=0x7ffff90918c8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, </span><br>    stack_end=0x7ffff90918b8) at ../csu/libc-start.c:308<br><span class="hljs-comment">#5  0x0000563b79c85ffa in ?? ()</span><br></code></pre></td></tr></table></figure>
+
+<p><code>bt full</code> 不仅显示backtrace，还显示局部变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) bt full<br><span class="hljs-comment">#0  0x00007f218fcb1bd9 in __GI___poll (fds=0x7f218400a060, nfds=2, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:29</span><br>        resultvar = 18446744073709551100<br>        sc_cancel_oldtype = 0<br>        sc_ret = &lt;optimized out&gt;<br><span class="hljs-comment">#1  0x00007f218ff851f6 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br>No symbol table info available.<br><span class="hljs-comment">#2  0x00007f218ff85582 in g_main_loop_run () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br>No symbol table info available.<br><span class="hljs-comment">#3  0x0000563b79c85395 in ?? ()</span><br>No symbol table info available.<br><span class="hljs-comment">#4  0x00007f218fbe71fb in __libc_start_main (main=0x563b79c84640, argc=1, argv=0x7ffff90918c8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, </span><br>    stack_end=0x7ffff90918b8) at ../csu/libc-start.c:308<br>        self = &lt;optimized out&gt;<br>        result = &lt;optimized out&gt;<br>        unwind_buf = &#123;cancel_jmp_buf = &#123;&#123;jmp_buf = &#123;0, 3044201088132136217, 94813446234064, 140737371510976, 0, 0, 8770247100387114265, 8649937328162159897&#125;, <br>              mask_was_saved = 0&#125;&#125;, priv = &#123;pad = &#123;0x0, 0x0, 0x7ffff90918d8, 0x7f21902b2190&#125;, data = &#123;prev = 0x0, cleanup = 0x0, canceltype = -116844328&#125;&#125;&#125;<br>        not_first_call = &lt;optimized out&gt;<br><span class="hljs-comment">#5  0x0000563b79c85ffa in ?? ()</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="p"><a href="#p" class="headerlink" title="p"></a>p</h3><p>print显示变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) p result<br><span class="hljs-variable">$1</span> = <span class="hljs-string">&#x27;\000&#x27;</span> &lt;repeats 113 <span class="hljs-built_in">times</span>&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="info-reg"><a href="#info-reg" class="headerlink" title="info reg"></a>info reg</h3><p>显示寄存器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info reg<br>rax            0xfffffffffffffdfc  -516<br>rbx            0x7f218400a060      139781925281888<br>rcx            0x7f218fcb1bd9      139782123101145<br>rdx            0xffffffff          4294967295<br>rsi            0x2                 2<br>rdi            0x7f218400a060      139781925281888<br>rbp            0x2                 0x2<br>rsp            0x7ffff90913e0      0x7ffff90913e0<br>r8             0x0                 0<br>r9             0x1                 1<br></code></pre></td></tr></table></figure>
+
+<p>在寄存器之前添加 $，即可以显示各个寄存器的内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) p <span class="hljs-variable">$rip</span><br><span class="hljs-variable">$2</span> = (void (*)()) 0x7f218fcb1bd9 &lt;__GI___poll+73&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="x"><a href="#x" class="headerlink" title="x"></a>x</h3><p>查看内存地址保存的值</p>
+<p><code>(gdb) x/nfu addr</code></p>
+<p>n 是一个正整数，表示显示内存的长度，也就是说从当前地址向后显示几个地址的内容。<br>f 表示显示的格式，参见上面。如果地址所指的是字符串，那么格式可以是s，如果地十是<br>指令地址，那么格式可以是i。<br>u 表示从当前地址往后请求的字节数，如果不指定的话，GDB默认是4个bytes。u参数可<br>以用下面的字符来代替，b表示单字节，h表示双字节，w表示四字节，g表示八字节。当<br>我们指定了字节长度后，GDB会从指内存定的内存地址开始，读写指定字节，并把其当作<br>一个值取出来。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) x/3uh 0x54320 //从内存地址0x54320读取内容，h表示以双字节为一个单位，3表示三个单位，u表示按十六进制显示。<br></code></pre></td></tr></table></figure>
+
+<p><code>x/i $rip</code>   显示汇编指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) x/i <span class="hljs-variable">$rip</span><br>=&gt; 0x7f218fcb1bd9 &lt;__GI___poll+73&gt;:     cmp    <span class="hljs-variable">$0xfffffffffffff000</span>,%rax<br></code></pre></td></tr></table></figure>
+
+<p>显示寄存器可以使用的格式：<br>格式                说明<br>x                   显示为十六进制数<br>d                   显示为十进制数<br>u                   显示为无符号十进制数<br>o                   显示为八进制数<br>t                   显示为二进制数，t的由来是two<br>a                   地址<br>c                   显示为字符(ASCII)<br>f                   浮点小数<br>s                   显示为字符串<br>i                   显示为机器语言(仅在显示内存的X命令中可以使用)</p>
+<h3 id="n"><a href="#n" class="headerlink" title="n"></a>n</h3><p>执行下一行语句</p>
+<h3 id="s"><a href="#s" class="headerlink" title="s"></a>s</h3><p>单步进入，遇到函数的话就会进入函数的内部，再一行一行的执行。执行完当前函数返回到调用它的函数</p>
+<h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><p>continue，继续执行，程序会在遇到断点后再次暂停运行，如果没有遇到断点就会一直运行到结束</p>
+<p>continue 次数<br>指定次数可以忽略断点，例如，continue 5则5次遇断点不停止，第六次遇到断点才停止执行</p>
+<h3 id="finish"><a href="#finish" class="headerlink" title="finish"></a>finish</h3><p>跳出当前函数，这里，运行程序，直到当前函数运行完毕返回再停止。例如进入的单步执行如果已经进入了某函数，可以退出该函数返回到它的调用函数中</p>
+<h3 id="forward-search-reverse-search"><a href="#forward-search-reverse-search" class="headerlink" title="forward-search  |  reverse-search"></a>forward-search  |  reverse-search</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) forward-search     //向前面搜索。 <br>(gdb) reverse-search    //从当前行的开始向后搜索<br></code></pre></td></tr></table></figure>
+
+<h3 id="watch"><a href="#watch" class="headerlink" title="watch"></a>watch</h3><p>&lt;表达式&gt;  发生变化时暂停运行</p>
+<h3 id="awatch"><a href="#awatch" class="headerlink" title="awatch"></a>awatch</h3><p>&lt;表达式&gt;  被访问，改变时暂停运行</p>
+<h3 id="rwatch"><a href="#rwatch" class="headerlink" title="rwatch"></a>rwatch</h3><p>&lt;表达式&gt;  被访问时暂停运行</p>
+<h3 id="info-locals"><a href="#info-locals" class="headerlink" title="info locals"></a>info locals</h3><p>打印出当前函数中所有局部变量以及值</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info locals<br>resultvar = 18446744073709551100<br>sc_cancel_oldtype = 0<br>sc_ret = &lt;optimized out&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="d"><a href="#d" class="headerlink" title="d"></a>d</h3><p>delete 删除断点和监视点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info b<br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br>4       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br><br>--&gt;删除1号断点<br>(gdb) d 1<br>(gdb) info b<br>Num     Type           Disp Enb Address            What<br>4       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br></code></pre></td></tr></table></figure>
+
+<h3 id="set-variable"><a href="#set-variable" class="headerlink" title="set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;"></a>set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb)p options<br><span class="hljs-variable">$7</span> =1<br>(gdb)<span class="hljs-built_in">set</span> varaable options = 0<br>(gdb)p options <br><span class="hljs-variable">$8</span> = 0<br></code></pre></td></tr></table></figure>
+
+<h3 id="disassemble"><a href="#disassemble" class="headerlink" title="disassemble"></a>disassemble</h3><p>用于反汇编函数或指定地址范围的代码，以显示对应的汇编指令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;address&gt; &lt;+offset&gt;:  &lt;assembly_instruction&gt;  &lt;operands&gt;<br><br>&lt;address&gt;：指令的地址<br>&lt;+offset&gt;：相对于函数或代码块开始处的偏移量<br>&lt;assembly_instruction&gt;：汇编指令的助记符<br>&lt;operands&gt;：汇编指令的操作数<br>在输出中，箭头 =&gt; 表示当前执行的指令<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">disassemble ：默认情况下，会反汇编当前执行点所在的函数或指定地址处的代码。<br>disassemble function_name ：反汇编指定函数的代码。<br>disassemble /m address ：从指定地址开始反汇编代码，/m 选项可用于指定反汇编的长度<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) disassemble <br>Dump of assembler code <span class="hljs-keyword">for</span> <span class="hljs-keyword">function</span> __GI___poll:<br>   0x00007f218fcb1b90 &lt;+0&gt;:     lea    0xc6b59(%rip),%rax        <span class="hljs-comment"># 0x7f218fd786f0 &lt;__libc_multiple_threads&gt;</span><br>   0x00007f218fcb1b97 &lt;+7&gt;:     mov    (%rax),%eax<br>   0x00007f218fcb1b99 &lt;+9&gt;:     <span class="hljs-built_in">test</span>   %eax,%eax<br>   0x00007f218fcb1b9b &lt;+11&gt;:    jne    0x7f218fcb1bb0 &lt;__GI___poll+32&gt;<br>   0x00007f218fcb1b9d &lt;+13&gt;:    mov    <span class="hljs-variable">$0x7</span>,%eax<br>   0x00007f218fcb1ba2 &lt;+18&gt;:    syscall <br>   0x00007f218fcb1ba4 &lt;+20&gt;:    cmp    <span class="hljs-variable">$0xfffffffffffff000</span>,%rax<br>   0x00007f218fcb1baa &lt;+26&gt;:    ja     0x7f218fcb1c00 &lt;__GI___poll+112&gt;<br>   0x00007f218fcb1bac &lt;+28&gt;:    retq   <br>   0x00007f218fcb1bad &lt;+29&gt;:    nopl   (%rax)<br>   0x00007f218fcb1bb0 &lt;+32&gt;:    push   %r12<br>   0x00007f218fcb1bb2 &lt;+34&gt;:    mov    %edx,%r12d<br>   0x00007f218fcb1bb5 &lt;+37&gt;:    push   %rbp<br>   0x00007f218fcb1bb6 &lt;+38&gt;:    mov    %rsi,%rbp<br>   0x00007f218fcb1bb9 &lt;+41&gt;:    push   %rbx<br>   0x00007f218fcb1bba &lt;+42&gt;:    mov    %rdi,%rbx<br>   0x00007f218fcb1bbd &lt;+45&gt;:    sub    <span class="hljs-variable">$0x10</span>,%rsp<br>   0x00007f218fcb1bc1 &lt;+49&gt;:    callq  0x7f218fcc9a60 &lt;__libc_enable_asynccancel&gt;<br>   0x00007f218fcb1bc6 &lt;+54&gt;:    mov    %r12d,%edx<br>   0x00007f218fcb1bc9 &lt;+57&gt;:    mov    %rbp,%rsi<br>   0x00007f218fcb1bcc &lt;+60&gt;:    mov    %rbx,%rdi<br>   0x00007f218fcb1bcf &lt;+63&gt;:    mov    %eax,%r8d<br>   0x00007f218fcb1bd2 &lt;+66&gt;:    mov    <span class="hljs-variable">$0x7</span>,%eax<br>   0x00007f218fcb1bd7 &lt;+71&gt;:    syscall <br>=&gt; 0x00007f218fcb1bd9 &lt;+73&gt;:    cmp    <span class="hljs-variable">$0xfffffffffffff000</span>,%rax<br>   0x00007f218fcb1bdf &lt;+79&gt;:    ja     0x7f218fcb1c12 &lt;__GI___poll+130&gt;<br>   0x00007f218fcb1be1 &lt;+81&gt;:    mov    %r8d,%edi<br>   0x00007f218fcb1be4 &lt;+84&gt;:    mov    %eax,0xc(%rsp)<br>   0x00007f218fcb1be8 &lt;+88&gt;:    callq  0x7f218fcc9ac0 &lt;__libc_disable_asynccancel&gt;<br>   0x00007f218fcb1bed &lt;+93&gt;:    mov    0xc(%rsp),%eax<br>   0x00007f218fcb1bf1 &lt;+97&gt;:    add    <span class="hljs-variable">$0x10</span>,%rsp<br>   0x00007f218fcb1bf5 &lt;+101&gt;:   pop    %rbx<br>   0x00007f218fcb1bf6 &lt;+102&gt;:   pop    %rbp<br>   0x00007f218fcb1bf7 &lt;+103&gt;:   pop    %r12<br>   0x00007f218fcb1bf9 &lt;+105&gt;:   retq   <br>   0x00007f218fcb1bfa &lt;+106&gt;:   nopw   0x0(%rax,%rax,1)<br>   0x00007f218fcb1c00 &lt;+112&gt;:   mov    0xc1269(%rip),%rdx        <span class="hljs-comment"># 0x7f218fd72e70</span><br>   0x00007f218fcb1c07 &lt;+119&gt;:   neg    %eax<br>   0x00007f218fcb1c09 &lt;+121&gt;:   mov    %eax,%fs:(%rdx)<br>   0x00007f218fcb1c0c &lt;+124&gt;:   mov    <span class="hljs-variable">$0xffffffff</span>,%eax<br>   0x00007f218fcb1c11 &lt;+129&gt;:   retq   <br>   0x00007f218fcb1c12 &lt;+130&gt;:   mov    0xc1257(%rip),%rdx        <span class="hljs-comment"># 0x7f218fd72e70</span><br>   0x00007f218fcb1c19 &lt;+137&gt;:   neg    %eax<br>   0x00007f218fcb1c1b &lt;+139&gt;:   mov    %eax,%fs:(%rdx)<br>   0x00007f218fcb1c1e &lt;+142&gt;:   mov    <span class="hljs-variable">$0xffffffff</span>,%eax<br>   0x00007f218fcb1c23 &lt;+147&gt;:   jmp    0x7f218fcb1be1 &lt;__GI___poll+81&gt;<br>End of assembler dump.<br></code></pre></td></tr></table></figure>
+
+<h3 id="commands"><a href="#commands" class="headerlink" title="commands"></a>commands</h3><p>可以定义在断点中断后执行的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">commands 断点编号<br>	命令<br>	...<br>	end<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info b<br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x00007f218fcb1bd9 ../sysdeps/unix/sysv/linux/poll.c:29<br>(gdb) <span class="hljs-built_in">command</span> 1 <br>Type commands <span class="hljs-keyword">for</span> breakpoint(s) 1, one per line.<br>End with a line saying just <span class="hljs-string">&quot;end&quot;</span>.<br>&gt;p <span class="hljs-variable">$rip</span><br>&gt;end<br></code></pre></td></tr></table></figure>
+
+<h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><p>命令用于显示源代码，当没有参数时，它会显示当前执行代码的周围区域</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">list：显示当前执行点周围的源代码。<br>list function_name：显示特定函数的源代码。<br>list filename:linenum：显示特定文件中特定行号的源代码。<br>list start, end：显示指定范围内的源代码行<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) list<br>24      <span class="hljs-keyword">in</span> ../sysdeps/unix/sysv/linux/poll.c<br></code></pre></td></tr></table></figure>
+
+<h3 id="display"><a href="#display" class="headerlink" title="display"></a>display</h3><p>用于设置要在每次程序停止时自动显示的表达式的值，持续监视特定变量或表达式的值</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) display x<br>1: x = 5<br>(gdb) display *ptr<br>2: *ptr = 0x7fff5fbff7f<br>(gdb) display result<br>3: result = 42<br>(gdb) display a &gt; b<br>4: a &gt; b = <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<p>用undisplay取消</p>
+<h3 id="until"><a href="#until" class="headerlink" title="until"></a>until</h3><p>进行指定位置跳转，执行完区间代码</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/dbg-meth/" class="category-chain-item">dbg_meth</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>gdb</div>
+      <div>https://tomwithkernel.github.io/dbg_meth/gdb/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/dbg_meth/crash/" title="crash">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">crash</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/dbg_meth/kdump/" title="kdump">
+                        <span class="hidden-mobile">kdump</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

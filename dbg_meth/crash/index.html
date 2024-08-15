@@ -1,0 +1,776 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux  btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 123456789101112131415161718192021222324252627">
+<meta property="og:type" content="article">
+<meta property="og:title" content="crash">
+<meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/crash/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux  btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 123456789101112131415161718192021222324252627">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
+<meta property="article:modified_time" content="2024-08-15T02:14:08.658Z">
+<meta property="article:author" content="Tom">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>crash - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="crash"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-10 10:09" pubdate>
+          2024年5月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">crash</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Crash"><a href="#Crash" class="headerlink" title="Crash"></a>Crash</h1><p>一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等</p>
+<h3 id="进入crash环境"><a href="#进入crash环境" class="headerlink" title="进入crash环境"></a>进入crash环境</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> -s<br>crash /lib/debug/vmlinux<br></code></pre></td></tr></table></figure>
+
+<h3 id="bt"><a href="#bt" class="headerlink" title="bt"></a>bt</h3><p>backtrace打印内核栈回溯信息，bt pid 打印指定进程栈信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; bt 1942<br>PID: 1942   TASK: ffff88068c957300  CPU: 2   COMMAND: <span class="hljs-string">&quot;bash&quot;</span><br> <span class="hljs-comment">#0 [ffff88062b8f7b48] machine_kexec at ffffffff81051e9b</span><br> <span class="hljs-comment">#1 [ffff88062b8f7ba8] crash_kexec at ffffffff810f27e2</span><br> <span class="hljs-comment">#2 [ffff88062b8f7c78] oops_end at ffffffff81689948</span><br> <span class="hljs-comment">#3 [ffff88062b8f7ca0] no_context at ffffffff816793f1</span><br> <span class="hljs-comment">#4 [ffff88062b8f7cf0] __bad_area_nosemaphore at ffffffff81679487</span><br> <span class="hljs-comment">#5 [ffff88062b8f7d38] bad_area_nosemaphore at ffffffff816795f1</span><br> <span class="hljs-comment">#6 [ffff88062b8f7d48] __do_page_fault at ffffffff8168c6ce</span><br> <span class="hljs-comment">#7 [ffff88062b8f7da8] do_page_fault at ffffffff8168c863</span><br> <span class="hljs-comment">#8 [ffff88062b8f7dd0] page_fault at ffffffff81688b48</span><br>    [exception RIP: sysrq_handle_crash+22]<br>    RIP: ffffffff813baf16  RSP: ffff88062b8f7e80  RFLAGS: 00010046<br>    RAX: 000000000000000f  RBX: ffffffff81a7b180  RCX: 0000000000000000<br>    RDX: 0000000000000000  RSI: ffff88086ec8f6c8  RDI: 0000000000000063<br>    RBP: ffff88062b8f7e80   R8: 0000000000000092   R9: 0000000000000e37<br>    R10: 0000000000000e36  R11: 0000000000000003  R12: 0000000000000063<br>    R13: 0000000000000246  R14: 0000000000000004  R15: 0000000000000000<br>    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018<br> <span class="hljs-comment">#9 [ffff88062b8f7e88] __handle_sysrq at ffffffff813bb6d2</span><br><span class="hljs-comment">#10 [ffff88062b8f7ec0] write_sysrq_trigger at ffffffff813bbbaf</span><br><span class="hljs-comment">#11 [ffff88062b8f7ed8] proc_reg_write at ffffffff812494bd</span><br><span class="hljs-comment">#12 [ffff88062b8f7ef8] vfs_write at ffffffff811dee9d</span><br><span class="hljs-comment">#13 [ffff88062b8f7f38] sys_write at ffffffff811df93f</span><br><span class="hljs-comment">#14 [ffff88062b8f7f80] system_call_fastpath at ffffffff81691049</span><br>    RIP: 00007fb320bcb500  RSP: 00007ffde533c198  RFLAGS: 00000246<br>    RAX: 0000000000000001  RBX: ffffffff81691049  RCX: ffffffffffffffff<br>    RDX: 0000000000000002  RSI: 00007fb3214eb000  RDI: 0000000000000001<br>    RBP: 00007fb3214eb000   R8: 000000000000000a   R9: 00007fb3214d5740<br>    R10: 0000000000000001  R11: 0000000000000246  R12: 0000000000000001<br>    R13: 0000000000000002  R14: 00007fb320e9f400  R15: 0000000000000002<br>    ORIG_RAX: 0000000000000001  CS: 0033  SS: 002b<br></code></pre></td></tr></table></figure>
+
+<p>解析：</p>
+<p>可以看到最后几步触发了缺页异常，进入crash_kexec的流程，最后调用 machine_kexec()。这通常是一个硬件相关的函数。它会引导启动捕获内核，从而完成 kdump 的过程。<br>代码就是走到了sysrq_handle_crash函数首地址+0x22这段命令的时候，触发的缺页异常。</p>
+<p>注意：</p>
+<p>这里，对应x86-64汇编，应用层下来的系统调用对应的6个参数存放的寄存器依次对应：rdi、rsi、rdx、rcx、r8、r9。对于多于6个参数的，仍存储在栈上。</p>
+<h3 id="log"><a href="#log" class="headerlink" title="log"></a>log</h3><p>打印vmcore所在的系统内核dmesg日志信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; <span class="hljs-built_in">log</span><br>[    0.000000] Linux version 4.19.0-amd64-desktop (uos@x86-compile-PC) (gcc version 8.3.0 (Uos 8.3.0.5-1+dde)) (c42ec32bb9fc) <span class="hljs-comment">#6300 SMP Fri Dec 15 13:53:22 CST 2023</span><br>[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-4.19.0-amd64-desktop root=UUID=826567d9-9352-4ab2-a268-e23345c606df ro video=efifb:nobgrt splash quiet DEEPIN_GFXMODE= ima_appraise=off libahci.ignore_sss=1<br>[    0.000000] KERNEL supported cpus:<br>[    0.000000]   Intel GenuineIntel<br>[    0.000000]   AMD AuthenticAMD<br>[    0.000000]   Hygon HygonGenuine<br>[    0.000000]   Centaur CentaurHauls<br>[    0.000000]   zhaoxin   Shanghai  <br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: <span class="hljs-string">&#x27;x87 floating point registers&#x27;</span><br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: <span class="hljs-string">&#x27;SSE registers&#x27;</span><br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: <span class="hljs-string">&#x27;AVX registers&#x27;</span><br>[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256<br>[    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using <span class="hljs-string">&#x27;compacted&#x27;</span> format.<br>[    0.000000] BIOS-provided physical RAM map:<br>[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x0000000000086fff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000000087000-0x0000000000087fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000000088000-0x000000000009ffff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000000a0000-0x00000000000bffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x0000000009afffff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000009b00000-0x0000000009dfffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000009e00000-0x0000000009efffff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000009f00000-0x0000000009f0afff] ACPI NVS<br>[    0.000000] BIOS-e820: [mem 0x0000000009f0b000-0x00000000970f8fff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000970f9000-0x0000000097af8fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000097af9000-0x00000000add0efff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000add0f000-0x00000000aee8efff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000aee8f000-0x00000000af77efff] ACPI NVS<br>[    0.000000] BIOS-e820: [mem 0x00000000af77f000-0x00000000af7fefff] ACPI data<br>[    0.000000] BIOS-e820: [mem 0x00000000af7ff000-0x00000000af7fffff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000af800000-0x00000000afffffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000f8000000-0x00000000fbffffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fdc00000-0x00000000fec00fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fec10000-0x00000000fec10fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fed80000-0x00000000fed80fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fee00000-0x00000000fee00fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000ff800000-0x00000000fff3ffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000040effffff] usable<br>[    0.000000] BIOS-e820: [mem 0x000000040f000000-0x000000044effffff] reserved<br>[    0.000000] NX (Execute Disable) protection: active<br>[    0.000000] e820: update [mem 0x94db8018-0x94dc5457] usable ==&gt; usable<br>[    0.000000] e820: update [mem 0x94db8018-0x94dc5457] usable ==&gt; usable<br>[    0.000000] extended physical RAM map:<br></code></pre></td></tr></table></figure>
+
+<h3 id="dis"><a href="#dis" class="headerlink" title="dis"></a>dis</h3><p><code>dis -l (function+offset) 10</code> 反汇编出指令所在代码，10代表打印该指定位置开始的10行信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; dis -l do_sys_poll 10<br>/home/uos/code/workspace/kernel/gerrit-V20-kernel-pipeline/x86-kernel/fs/select.c: 928<br>0xffffffff8f681540 &lt;do_sys_poll&gt;:       nopl   0x0(%rax,%rax,1) [FTRACE NOP]<br>0xffffffff8f681545 &lt;do_sys_poll+5&gt;:     push   %rbp<br>0xffffffff8f681546 &lt;do_sys_poll+6&gt;:     mov    %rsp,%rbp<br>0xffffffff8f681549 &lt;do_sys_poll+9&gt;:     push   %r15<br>0xffffffff8f68154b &lt;do_sys_poll+11&gt;:    push   %r14<br>0xffffffff8f68154d &lt;do_sys_poll+13&gt;:    push   %r13<br>0xffffffff8f68154f &lt;do_sys_poll+15&gt;:    mov    %esi,%r13d<br>0xffffffff8f681552 &lt;do_sys_poll+18&gt;:    push   %r12<br>0xffffffff8f681554 &lt;do_sys_poll+20&gt;:    push   %rbx<br>0xffffffff8f681555 &lt;do_sys_poll+21&gt;:    and    <span class="hljs-variable">$0xfffffffffffffff0</span>,%rsp<br></code></pre></td></tr></table></figure>
+
+<h3 id="mod"><a href="#mod" class="headerlink" title="mod"></a>mod</h3><p>mod 查看当时内核加载的所有内核模块信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; mod<br>     MODULE       NAME                 SIZE    OBJECT        FILE<br>ffffffffc01ee200  button               20480   (not loaded)  [CONFIG_KALLSYMS]<br>ffffffffc0211f00  hid                  139264  (not loaded)  [CONFIG_KALLSYMS]<br>ffffffffc021a0c0  ecb                  16384   (not loaded)  [CONFIG_KALLSYMS]<br></code></pre></td></tr></table></figure>
+
+<h3 id="sym"><a href="#sym" class="headerlink" title="sym"></a>sym</h3><p><code>sym 00007fb320bcb500 (内存地址)</code>   转换指定符号为其虚拟地址，显示系统中对应的符号表信息，并且具体到源代码的那一行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; sym ffffffffc07c5024<br>ffffffffc07c5024 (t) my_openat+36 [my_test_lkm] /mnt/hgfs/test_ko/lkm-test05/my_lkm.c: 25<br></code></pre></td></tr></table></figure>
+
+<h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3><p>ps 打印内核崩溃时，正常的进程信息</p>
+<p>带 &gt; 标识代表是活跃的进程，ps pid打印某指定进程的状态信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; ps 27005<br>   PID    PPID  CPU       TASK        ST  %MEM     VSZ    RSS  COMM<br>&gt; 27005   7783   1  ffff997b388ae180  RU   0.2   91732   4124  pickup<br>&gt; <br>查看指定进程的进程树，显示进程父子关系（ps -p pid） <br>crash&gt; ps -p 85151<br>PID: 0      TASK: ffffffff818b6420  CPU: 0   COMMAND: <span class="hljs-string">&quot;swapper/0&quot;</span><br> PID: 1      TASK: ffff881f91dae040  CPU: 28  COMMAND: <span class="hljs-string">&quot;init&quot;</span><br>  PID: 14544  TASK: ffff881f8d7b05c0  CPU: 11  COMMAND: <span class="hljs-string">&quot;init.tfa&quot;</span><br>   PID: 85138  TASK: ffff880bab01a400  CPU: 8   COMMAND: <span class="hljs-string">&quot;tfactl&quot;</span><br>    PID: 85151  TASK: ffff880b7a728380  CPU: 17  COMMAND: <span class="hljs-string">&quot;perl&quot;</span><br>ps -t [pid]: 显示进程运行时间<br></code></pre></td></tr></table></figure>
+
+<h3 id="files"><a href="#files" class="headerlink" title="files"></a>files</h3><p>files pid 打印指定进程所打开的文件信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; files 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>ROOT: /    CWD: /<br> FD       FILE            DENTRY           INODE       TYPE PATH<br>  0 ffff8bac747f8900 ffff8bac7f00a000 ffff8bac7d02bad0 CHR  /dev/null<br>  1 ffff8bac747f9e00 ffff8bac7a23cd80 ffff8bac7abb5570 SOCK UNIX<br>  2 ffff8bac747f9e00 ffff8bac7a23cd80 ffff8bac7abb5570 SOCK UNIX<br>  3 ffff8bac794fdc00 ffff8bac7a0fd980 ffff8bac7ca64000 UNKN [eventfd]<br>  4 ffff8bac794fd700 ffff8bac7a0fc780 ffff8bac7a1771e0 FIFO <br>  5 ffff8bac794fde00 ffff8bac7a0fc780 ffff8bac7a1771e0 FIFO <br>  6 ffff8bac794fd400 ffff8bac66e9ecc0 ffff8bac7a1ec928 REG  /var/var/log/lightdm/lightdm.log<br>  7 ffff8bac794fc700 ffff8bac66e9e000 ffff8bac7ca64000 UNKN [eventfd]<br>  8 ffff8bac74d4d300 ffff8bac7a3ad680 ffff8bac7988d1a8 DIR  /var/var/lib/lightdm/data<br>  9 ffff8bac78f1d700 ffff8bac7a08cb40 ffff8bac7a090b30 SOCK UNIX<br> 10 ffff8bac73e40500 ffff8bac7985aa80 ffff8bac7ca64000 UNKN [eventfd]<br> 11 ffff8bac731c6b00 ffff8bac775a8000 ffff8bac7abfee30 SOCK UNIX<br> 15 ffff8bac74670900 ffff8bac7772e000 ffff8bac7aa704c0 FIFO <br> 16 ffff8bac74670e00 ffff8bac7772ef00 ffff8bac7aa72860 FIFO <br> 22 ffff8bac69130900 ffff8bac7772f500 ffff8bac7aa710a0 FIFO<br></code></pre></td></tr></table></figure>
+
+<h3 id="vm"><a href="#vm" class="headerlink" title="vm"></a>vm</h3><p>vm pid 打印某指定进程当时虚拟内存基本信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; vm 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>       MM               PGD          RSS    TOTAL_VM<br>ffff8bac695bf700  ffff8bac6ce42000  9504k   309268k <br>      VMA           START       END     FLAGS FILE<br>ffff8bac71486a90 563c12926000 563c1292d000 8000871 /usr/sbin/lightdm<br>ffff8bac714872b0 563c1292d000 563c12957000 8000875 /usr/sbin/lightdm<br>ffff8bac71486750 563c12957000 563c1296a000 8000871 /usr/sbin/lightdm<br>ffff8bac71487110 563c1296b000 563c1296c000 8100871 /usr/sbin/lightdm<br>ffff8bac713be340 563c1296c000 563c1296d000 8100873 /usr/sbin/lightdm<br>ffff8bac713be5b0 563c13820000 563c138ae000 8100073 <br>ffff8bac6ce94270 7fa728000000 7fa72802d000 8200073<br></code></pre></td></tr></table></figure>
+
+<h3 id="task"><a href="#task" class="headerlink" title="task"></a>task</h3><p>task 查看当前进程或指定进程task_struct和thread_info的信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; task 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>struct task_struct &#123;<br>  thread_info = &#123;<br>    flags = 0, <br>    status = 0<br>  &#125;, <br>  state = 1, <br>  stack = 0xffffa530038c4000, <br>  usage = &#123;<br>    counter = 2<br>  &#125;, <br>  flags = 4194560, <br>  ptrace = 0, <br>  wake_entry = &#123;<br>    next = 0x0<br>  &#125;, <br>  on_cpu = 0, <br>  cpu = 0, <br>  wakee_flips = 16, <br>  wakee_flip_decay_ts = 4295264801, <br>  last_wakee = 0xffff8bac7d2c1e80, <br>	.................<br></code></pre></td></tr></table></figure>
+
+<h3 id="kmem"><a href="#kmem" class="headerlink" title="kmem"></a>kmem</h3><p><code>kmem -i</code> 查看内存整体使用情况</p>
+<p><code>kmem -s</code>  查看slab使用情况</p>
+<p><code>kmem [addr]</code> 搜索地址所属的内存结构</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; kmem -i<br>                 PAGES        TOTAL      PERCENTAGE<br>    TOTAL MEM  3847813      14.7 GB         ----<br>         FREE  2437856       9.3 GB   63% of TOTAL MEM<br>         USED  1409957       5.4 GB   36% of TOTAL MEM<br>       SHARED   197787     772.6 MB    5% of TOTAL MEM<br>      BUFFERS    43217     168.8 MB    1% of TOTAL MEM<br>       CACHED   984251       3.8 GB   25% of TOTAL MEM<br>         SLAB    73599     287.5 MB    1% of TOTAL MEM<br><br>   TOTAL HUGE        0            0         ----<br>    HUGE FREE        0            0    0% of TOTAL HUGE<br><br>   TOTAL SWAP  3971839      15.2 GB         ----<br>    SWAP USED        0            0    0% of TOTAL SWAP<br>    SWAP FREE  3971839      15.2 GB  100% of TOTAL SWAP<br><br> COMMIT LIMIT  5895745      22.5 GB         ----<br>    COMMITTED  1660064       6.3 GB   28% of TOTAL LIMIT<br></code></pre></td></tr></table></figure>
+
+<h3 id="struct"><a href="#struct" class="headerlink" title="struct"></a>struct</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">struct [struct]              //查看结构体成员变量<br>struct -o [struct]           //显示结构体中成员的偏移<br>struct [struct] [address]    //显示对应地址结构体的值<br>[struct] [address]           //简化形式显示对应地址结构体的值<br>[struct] [address] -xo       //打印结构体定义和大小<br>[struct].member[address]     //显示某个成员的值<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; struct dentry<br>struct dentry &#123;<br>    unsigned int d_flags;<br>    seqcount_t d_seq;<br>    struct hlist_bl_node d_hash;<br>    struct dentry *d_parent;<br>    struct qstr d_name;<br>    struct inode *d_inode;<br>    unsigned char d_iname[32];<br>    struct lockref d_lockref;<br>    const struct dentry_operations *d_op;<br>    struct super_block *d_sb;<br>    unsigned long d_time;<br>    void *d_fsdata;<br>    union &#123;<br>        struct list_head d_lru;<br>        wait_queue_head_t *d_wait;<br>    &#125;;<br>    struct list_head d_child;<br>    struct list_head d_subdirs;<br>    union &#123;<br>        struct hlist_node d_alias;<br>        struct hlist_bl_node d_in_lookup_hash;<br>        struct callback_head d_rcu;<br>    &#125; d_u;<br>&#125;<br>SIZE: 192<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; struct -o dentry<br>struct dentry &#123;<br>    [0] unsigned int d_flags;<br>    [4] seqcount_t d_seq;<br>    [8] struct hlist_bl_node d_hash;<br>   [24] struct dentry *d_parent;<br>   [32] struct qstr d_name;<br>   [48] struct inode *d_inode;<br>   [56] unsigned char d_iname[32];<br>   [88] struct lockref d_lockref;<br>   [96] const struct dentry_operations *d_op;<br>  [104] struct super_block *d_sb;<br>  [112] unsigned long d_time;<br>  [120] void *d_fsdata;<br>        union &#123;<br>  [128]     struct list_head d_lru;<br>  [128]     wait_queue_head_t *d_wait;<br>        &#125;;<br>  [144] struct list_head d_child;<br>  [160] struct list_head d_subdirs;<br>        union &#123;<br>            struct hlist_node d_alias;<br>            struct hlist_bl_node d_in_lookup_hash;<br>            struct callback_head d_rcu;<br>  [176] &#125; d_u;<br>&#125;<br>SIZE: 192<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; struct  dentry.d_name<br>struct dentry &#123;<br>   [32] struct qstr d_name;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; struct dentry ffffffff8fbed352<br>struct dentry &#123;<br>  d_flags = 3905390920, <br>  d_seq = &#123;<br>    sequence = 4287371206<br>  &#125;, <br>  d_hash = &#123;<br>    next = 0x9d8bf8349c78949, <br>    pprev = 0x450850f000000<br>  &#125;, <br>  d_parent = 0x334865d0458b4800, <br>  d_name = &#123;<br>    &#123;<br>      &#123;<br>        <span class="hljs-built_in">hash</span> = 2630916, <br>        len = 2232352768<br>      &#125;, <br>      hash_len = 9587882131697706244<br>    &#125;, <br>    name = 0x30c4834800000562 &lt;Address 0x30c4834800000562 out of bounds&gt;<br>  &#125;, <br>  d_inode = 0x415e415d415c415b,<br></code></pre></td></tr></table></figure>
+
+<p>如果要查看二阶指针的值，可以通过rd命令需要先获取一级指针的值，然后再用struct 结构体名 + addr获取具体的值</p>
+<h3 id="rd"><a href="#rd" class="headerlink" title="rd"></a>rd</h3><p>读取内存内容</p>
+<p><code>rd [addr] [len]</code>                    &#x2F;&#x2F;查看指定地址，长度为len的内存<br><code>rd -S [addr][len]</code>                &#x2F;&#x2F;尝试将地址转换为对应的符号<br><code>rd [addr] -e [addr]</code>            &#x2F;&#x2F;查看指定内存区域内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; rd ffffffff8fbed352 32<br>ffffffff8fbed352:  ff8c17c6e8c78948 09d8bf8349c78949   H.......I..I....<br>ffffffff8fbed362:  000450850f000000 334865d0458b4800   .....P...H.E.eH3<br>ffffffff8fbed372:  850f000000282504 30c4834800000562   .%(.....b...H..0<br>ffffffff8fbed382:  415e415d415c415b 2140c0c748c35d5f   [A\A]A^A_].H..@!<br>ffffffff8fbed392:  1e3c050348650002 00000b8c80837042   ..eH..&lt;.Bp......<br>ffffffff8fbed3a2:  f641fffffd88e901 0f01000007412484   ......A..<span class="hljs-variable">$A</span>.....<br>ffffffff8fbed3b2:  0009bafffffdf785 df8948e6894c0000   ..........L..H..<br>ffffffff8fbed3c2:  44c741ff8c49f9e8 f641000000006c24   ..I..A.D<span class="hljs-variable">$l</span>....A.<br>ffffffff8fbed3d2:  0f02000004c82484 44f6410000032785   .$.......<span class="hljs-string">&#x27;...A.D</span><br><span class="hljs-string">ffffffff8fbed3e2:  fffdcc840f202424 8b495de8e7894cff   $$ ......L...]I.</span><br><span class="hljs-string">ffffffff8fbed3f2:  0fc08548c68949ff 3c408bfffffdb884   .I..H.........@&lt;</span><br><span class="hljs-string">ffffffff8fbed402:  4c00022140c5c749 4890509720c52c03   I..@!..L.,. .P.H</span><br><span class="hljs-string">ffffffff8fbed412:  486500022140c0c7 394970421db80503   ..@!..eH....BpI9</span><br><span class="hljs-string">ffffffff8fbed422:  6500000456850fc5 00015cc025048b48   ...V...eH..%.\..</span><br><span class="hljs-string">ffffffff8fbed432:  00044b840fc63949 0000079c868d4900   I9...K...I......</span><br><span class="hljs-string">ffffffff8fbed442:  e8b8458948c78948 3475c08500005b12   H..H.E...[....u4</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="p"><a href="#p" class="headerlink" title="p"></a>p</h3><p>p命令可以用来打印出表达式或者变量的值</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; p __schedule<br>__schedule = <span class="hljs-variable">$1</span> = <br> &#123;void (bool)&#125; 0xffffffff8fbed0b0<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/dbg-meth/" class="category-chain-item">dbg_meth</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>crash</div>
+      <div>https://tomwithkernel.github.io/dbg_meth/crash/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/dbg_meth/bpftrace/" title="bpftrace">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">bpftrace</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/dbg_meth/gdb/" title="gdb">
+                        <span class="hidden-mobile">gdb</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
