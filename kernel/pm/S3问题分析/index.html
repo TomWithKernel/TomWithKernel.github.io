@@ -19,22 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志  我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导">
+    <meta name="description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志   我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="S3 问题根因分析技术文档">
 <meta property="og:url" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志  我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导">
+<meta property="og:description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志   我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/img/k4e-iml.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/img/S3%E5%BE%85%E6%9C%BA.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/img/k4e-iml1.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/img/122-irq.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png">
 <meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-08-15T02:12:48.411Z">
+<meta property="article:modified_time" content="2024-08-19T06:46:02.148Z">
 <meta property="article:author" content="Tom">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/img/k4e-iml.png">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png">
   
   
   
@@ -240,7 +240,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          889 字
+          887 字
         
       </span>
     
@@ -307,11 +307,13 @@
 <li>联想昭阳k4e-iml 待机自动唤醒</li>
 </ul>
 <p>首先我们看一下日志</p>
-<p><img src="/./img/k4e-iml.png" srcset="/img/loading.gif" lazyload alt="k4e-iml"></p>
+<img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" srcset="/img/loading.gif" lazyload class="" title="log">
+
 <p>我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze</p>
 <p>一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导致S3停止</p>
 <h3 id="S3-待机流程"><a href="#S3-待机流程" class="headerlink" title="S3 待机流程"></a>S3 待机流程</h3><p>我们先来了解一下S3的流程是怎么样的</p>
-<p><img src="/./img/S3%E5%BE%85%E6%9C%BA.png" srcset="/img/loading.gif" lazyload alt="S3待机"></p>
+<img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" srcset="/img/loading.gif" lazyload class="" title="S3待机流程">
+
 <p>如上图所示，这是S3待机过程的流程图，简单介绍一下：</p>
 <ul>
 <li>state_store：处理系统进入不同的电源状态</li>
@@ -329,16 +331,18 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_system_irq_wakeup</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq_number)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><br>	raw_spin_lock_irqsave(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">0</span>] = irq_number;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">1</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">1</span>] = irq_number;<br>	<span class="hljs-keyword">else</span><br>		irq_number = <span class="hljs-number">0</span>;<br><br>	raw_spin_unlock_irqrestore(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (irq_number)<br>		pm_system_wakeup();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>在这个函数里面我们可以添加printk打印出中断号，或者可以使用bpftrace工具进行打印，kprobe:pm_system_irq_wakeup</p>
-<p><img src="/./img/k4e-iml1.png" srcset="/img/loading.gif" lazyload alt="k4e-iml"></p>
+<img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" srcset="/img/loading.gif" lazyload class="" title="int">
+
 <p>此时发现中断号为122，接下来通过cat &#x2F;proc&#x2F;interrupts 查看这个中断相应的中断处理程序</p>
-<p><img src="/./img/122-irq.png" srcset="/img/loading.gif" lazyload alt="k4e-iml"></p>
+<img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" srcset="/img/loading.gif" lazyload class="" title="irq">
+
 <p>此中断所挂载的相关中断处理程序是aerdrv和pcie-dpc，这2个中断处理程序主要负责处理pcie上面的错误信号的</p>
 <p>通过lspci -tv查看到这个pcie总线上挂载了一张amd的显卡，此时基本可以判断问题出在显卡驱动上面</p>
 <h3 id="AER和DPC"><a href="#AER和DPC" class="headerlink" title="AER和DPC"></a>AER和DPC</h3><ul>
 <li>AER：是一种用于检测和报告PCIe设备中发生的错误的机制。它允许PCIe设备检测到并报告各种类型的错误，如非致命的、可恢复的以及严重的错误。AER在PCIe设备上实现了一组寄存器和相应的错误通知机制，可以通过读取这些寄存器来获取关于错误的信息。使用AER，系统能够更好地监控和处理PCIe设备的错误情况，以提高数据完整性和可靠性。</li>
 <li>DPC：是一种用于处理PCIe链路中错误情况的机制。当PCIe链路上的一个设备发送错误信号时，DPC机制允许系统针对该错误进行处理，以避免错误的传播和影响其他设备。具体而言，DPC机制会隔离出故障设备，从而限制错误的影响范围，确保其他设备继续正常工作。</li>
 </ul>
-<p>$\color{yellow} DPC机制依赖于AER提供的错误信息来进行错误处理$</p>
+<p><u>DPC机制依赖于AER提供的错误信息来进行错误处理</u></p>
 <p>由于后期任务较多，该问题当时并未深究amdgpu驱动为何报错，不过知道了中断处理程序上报的错误，最后采用pcie_ports&#x3D;compat进行规避。</p>
 <figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">pcie_ports</span>=	[<span class="hljs-type">PCIE</span>] <span class="hljs-type">PCIe</span> <span class="hljs-keyword">port</span> services handling:<br>	native	Use native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span> hotplug)<br>		even if the platform doesn&#x27;t give the OS permission to<br>		use them.  This may cause conflicts if the platform<br>		also tries to use these services.<br>	dpc-native	Use native PCIe service for DPC only.  May<br>			cause conflicts if firmware uses AER or DPC.<br>	compat	Disable native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span><br>		hotplug).<br></code></pre></td></tr></table></figure>
 
@@ -426,9 +430,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/kernel/linux/" title="linux kernel 基础知识">
+                      <a href="/kernel/ioctl/ioctl/" title="ioctl">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">linux kernel 基础知识</span>
+                        <span class="hidden-mobile">ioctl</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -436,8 +440,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/kernel/pm/Suspend/" title="Suspend (kernel 5.10)">
-                        <span class="hidden-mobile">Suspend (kernel 5.10)</span>
+                      <a href="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" title="内存管理">
+                        <span class="hidden-mobile">内存管理</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
