@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png">
 <meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-08-19T06:46:02.148Z">
+<meta property="article:modified_time" content="2024-08-20T01:32:05.928Z">
 <meta property="article:author" content="Tom">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png">
@@ -342,7 +342,10 @@
 <li>AER：是一种用于检测和报告PCIe设备中发生的错误的机制。它允许PCIe设备检测到并报告各种类型的错误，如非致命的、可恢复的以及严重的错误。AER在PCIe设备上实现了一组寄存器和相应的错误通知机制，可以通过读取这些寄存器来获取关于错误的信息。使用AER，系统能够更好地监控和处理PCIe设备的错误情况，以提高数据完整性和可靠性。</li>
 <li>DPC：是一种用于处理PCIe链路中错误情况的机制。当PCIe链路上的一个设备发送错误信号时，DPC机制允许系统针对该错误进行处理，以避免错误的传播和影响其他设备。具体而言，DPC机制会隔离出故障设备，从而限制错误的影响范围，确保其他设备继续正常工作。</li>
 </ul>
-<p><u>DPC机制依赖于AER提供的错误信息来进行错误处理</u></p>
+<div class="note note-warning">
+            <p>DPC机制依赖于AER提供的错误信息来进行错误处理</p>
+          </div>
+
 <p>由于后期任务较多，该问题当时并未深究amdgpu驱动为何报错，不过知道了中断处理程序上报的错误，最后采用pcie_ports&#x3D;compat进行规避。</p>
 <figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">pcie_ports</span>=	[<span class="hljs-type">PCIE</span>] <span class="hljs-type">PCIe</span> <span class="hljs-keyword">port</span> services handling:<br>	native	Use native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span> hotplug)<br>		even if the platform doesn&#x27;t give the OS permission to<br>		use them.  This may cause conflicts if the platform<br>		also tries to use these services.<br>	dpc-native	Use native PCIe service for DPC only.  May<br>			cause conflicts if firmware uses AER or DPC.<br>	compat	Disable native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span><br>		hotplug).<br></code></pre></td></tr></table></figure>
 

@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>ftrace</title>
+    <link href="/dbg_meth/ftrace/"/>
+    <url>/dbg_meth/ftrace/</url>
+    
+    <content type="html"><![CDATA[<h3 id="什么是ftrace"><a href="#什么是ftrace" class="headerlink" title="什么是ftrace"></a>什么是ftrace</h3><p>​ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。</p><p>​<code>ftrace</code> 的主要功能：</p><ol><li><strong>函数跟踪</strong> (<code>function tracing</code>):<ul><li>可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。</li><li>例如，可以跟踪某个特定函数的调用频率及其调用者。</li></ul></li><li><strong>函数调用图</strong> (<code>function graph tracing</code>):<ul><li>记录函数调用的完整调用栈。与简单的函数跟踪不同，函数调用图会显示函数的调用关系以及调用链中的每个函数的执行时间。</li></ul></li><li><strong>系统调用跟踪</strong>:<ul><li>可以跟踪所有的系统调用或特定的系统调用，从而了解用户空间程序如何与内核交互。</li></ul></li><li><strong>调度器跟踪</strong>:<ul><li><code>ftrace</code> 可以记录和分析调度器行为，比如任务切换、任务调度延迟等，帮助分析多任务系统中的调度性能。</li></ul></li><li><strong>事件跟踪</strong>:<ul><li><code>ftrace</code> 支持各种内核事件的跟踪（例如，IRQ 处理、中断、软中断等），并允许用户定义和过滤感兴趣的事件。</li></ul></li></ol><p>传统的ftrace操作较为繁琐，需要向多个文件写入信息，当前我们紧介绍ftrace前端工具：trace-cmd</p><h3 id="trace-cmd"><a href="#trace-cmd" class="headerlink" title="trace-cmd"></a>trace-cmd</h3><ul><li><p>trace-cmd record：记录实时跟踪数据并将其写入trace.dat 文件</p></li><li><p>trace-cmd report：读取 trace.dat 文件并将二进制数据转换为可读的 ASCII 文本格式。</p></li><li><p>trace-cmd start：开始跟踪但不记录到 trace.dat 文件。</p></li><li><p>trace-cmd stop：停止跟踪。</p></li><li><p>trace-cmd extract：从内核缓冲区提取数据并创建 trace.dat 文件。</p></li><li><p>trace-cmd reset：禁用所有跟踪并恢复系统性能。</p></li><li><p>查看可用追踪器</p></li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd list -t<br>hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<br></code></pre></td></tr></table></figure><ul><li>查看可跟踪的函数</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -f | grep mmap<br><br>xen_hvm_exit_mmap<br>xen_dup_mmap<br>xen_exit_mmap<br>ldt_arch_exit_mmap<br>__ia32_compat_sys_ia32_mmap<br>...<br></code></pre></td></tr></table></figure><ul><li>查看可跟踪的事件</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -e | grep snd<br><br>asoc:snd_soc_bias_level_start<br>asoc:snd_soc_bias_level_done<br>asoc:snd_soc_dapm_start<br>asoc:snd_soc_dapm_done<br>...<br></code></pre></td></tr></table></figure><ul><li>查看函数调用栈</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function -l do_mmap --func-stack<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">使用 ctrl-c 退出trace-cmd时，会在当前目录生成 trace.dat文件,使用report读取trace.dat</span><br>uos@uos-PC [~] ➜  trace-cmd report | head -20<br><br>CPU 0 is empty<br>cpus=16<br>    explorer.exe-14504 [008] 1274475.231218: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231223: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231269: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231271: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231285: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231286: kernel_stack:         &lt;stack trace&gt;<br><br></code></pre></td></tr></table></figure><p>命令解释：</p><ul><li><p><code>-p</code>：指定当前的 tracer，类似 <code>echo function &gt; current_tracer</code>，可以是支持的 tracer 中的任意一个</p></li><li><p><code>-l</code>：指定跟踪的函数，可以设置多个，类似 <code>echo function_name &gt; set_ftrace_filter</code></p></li><li><p><code>--func-stack</code>：记录被跟踪函数的调用栈</p></li><li><p>-n 指定不跟踪的函数</p><ul><li>比如：<code>trace-cmd record -p function -l &#39;dev*&#39; -n dev_attr_show</code></li><li>设置跟踪所有 dev 开头的函数，但是不跟踪 <code>dev_attr_show</code></li></ul></li><li><p><code>-g</code>：指定 function_graph tracer 跟踪的 函数，类似 <code>echo function_name &gt; set_graph_function</code></p></li><li><p><code>-O</code>：设置 options，比如设置 <code>options/func_stack_trace</code> 可以用 <code>-O func_stack_trace</code>，在 optoin 名称前加上 <code>no</code> 就是将 option 清 0</p></li><li><p><code>-P</code>：设置跟踪的进程</p></li></ul><p>注意，function_graph tracer 同时支持 <code>-l/-g</code> 参数，但是两者是有区别的，他们区别的本质还是 <code>set_ftrace_filter</code> 与 <code>set_graph_function</code> 的区别。</p><ul><li><code>-l</code> 表示被跟踪的函数是叶子函数，不会跟踪其内部的调用子函数。</li><li><code>-g</code> 会跟踪函数内部调用的子函数。</li></ul><p>​默认情况下，<code>trace-cmd</code> 的 <code>function_graph</code> 会记录所有嵌套的函数调用。可以通过设置 <code>--max-graph-depth</code> 来限制跟踪深度。例如要将深度设置为 2，可以使用以下命令：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph --max-graph-depth 2 -P 1656<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>dbg_meth</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>内存调试工具</title>
     <link href="/dbg_meth/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/"/>
     <url>/dbg_meth/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/</url>
@@ -17,6 +42,12 @@
       
     </categories>
     
+    
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
     
   </entry>
   
@@ -40,7 +71,7 @@
     <link href="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/"/>
     <url>/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/</url>
     
-    <content type="html"><![CDATA[<h2 id="S3-问题根因分析技术文档"><a href="#S3-问题根因分析技术文档" class="headerlink" title="S3 问题根因分析技术文档"></a>S3 问题根因分析技术文档</h2><h3 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h3><ul><li>x8610705.10</li><li>联想昭阳k4e-iml 待机自动唤醒</li></ul><p>首先我们看一下日志</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" class="" title="log"><p>我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze</p><p>一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导致S3停止</p><h3 id="S3-待机流程"><a href="#S3-待机流程" class="headerlink" title="S3 待机流程"></a>S3 待机流程</h3><p>我们先来了解一下S3的流程是怎么样的</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" class="" title="S3待机流程"><p>如上图所示，这是S3待机过程的流程图，简单介绍一下：</p><ul><li>state_store：处理系统进入不同的电源状态</li><li>pm_suspend：suspend入口</li><li>suspend_prepare：suspend前的一些准备工作</li><li>suspend_freeze_processes：冻结用户进程以及内核线程</li><li>suspend_devices_and_enter：开始进行挂起设备</li><li>suspend_enter：关闭设备中断，关闭辅助cpu，检查irq事件，CPU进入suspend</li></ul><h3 id="处理问题"><a href="#处理问题" class="headerlink" title="处理问题"></a>处理问题</h3><p>问题是它唤醒了，在知道了S3的流程以后，他在哪里检测唤醒事件呢？pm_wakeup_pending，没错就是这里，我们查看此部分代码</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">pm_wakeup_pending</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><span class="hljs-type">bool</span> ret = <span class="hljs-literal">false</span>;<br><br>raw_spin_lock_irqsave(&amp;events_lock, flags);<br><span class="hljs-keyword">if</span> (events_check_enabled) &#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> cnt, inpr;<br><br>split_counters(&amp;cnt, &amp;inpr);<br>ret = (cnt != saved_count || inpr &gt; <span class="hljs-number">0</span>);<br>events_check_enabled = !ret;<br>&#125;<br>raw_spin_unlock_irqrestore(&amp;events_lock, flags);<br><br><span class="hljs-keyword">if</span> (ret) &#123;<br>pm_pr_dbg(<span class="hljs-string">&quot;Wakeup pending, aborting suspend\n&quot;</span>);<br>pm_print_active_wakeup_sources();<br>&#125;<br><br><span class="hljs-keyword">return</span> ret || <span class="hljs-type">atomic_read</span>(&amp;pm_abort_suspend) &gt; <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure><p>发现他在检测到中断事件的时候就会return  false，暂停S3的操作</p><p>具体检测irq函数为pm_system_irq_wakeup</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_system_irq_wakeup</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq_number)</span><br>&#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><br>raw_spin_lock_irqsave(&amp;wakeup_irq_lock, flags);<br><br><span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span>)<br>wakeup_irq[<span class="hljs-number">0</span>] = irq_number;<br><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">1</span>] == <span class="hljs-number">0</span>)<br>wakeup_irq[<span class="hljs-number">1</span>] = irq_number;<br><span class="hljs-keyword">else</span><br>irq_number = <span class="hljs-number">0</span>;<br><br>raw_spin_unlock_irqrestore(&amp;wakeup_irq_lock, flags);<br><br><span class="hljs-keyword">if</span> (irq_number)<br>pm_system_wakeup();<br>&#125;<br></code></pre></td></tr></table></figure><p>在这个函数里面我们可以添加printk打印出中断号，或者可以使用bpftrace工具进行打印，kprobe:pm_system_irq_wakeup</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" class="" title="int"><p>此时发现中断号为122，接下来通过cat &#x2F;proc&#x2F;interrupts 查看这个中断相应的中断处理程序</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" class="" title="irq"><p>此中断所挂载的相关中断处理程序是aerdrv和pcie-dpc，这2个中断处理程序主要负责处理pcie上面的错误信号的</p><p>通过lspci -tv查看到这个pcie总线上挂载了一张amd的显卡，此时基本可以判断问题出在显卡驱动上面</p><h3 id="AER和DPC"><a href="#AER和DPC" class="headerlink" title="AER和DPC"></a>AER和DPC</h3><ul><li>AER：是一种用于检测和报告PCIe设备中发生的错误的机制。它允许PCIe设备检测到并报告各种类型的错误，如非致命的、可恢复的以及严重的错误。AER在PCIe设备上实现了一组寄存器和相应的错误通知机制，可以通过读取这些寄存器来获取关于错误的信息。使用AER，系统能够更好地监控和处理PCIe设备的错误情况，以提高数据完整性和可靠性。</li><li>DPC：是一种用于处理PCIe链路中错误情况的机制。当PCIe链路上的一个设备发送错误信号时，DPC机制允许系统针对该错误进行处理，以避免错误的传播和影响其他设备。具体而言，DPC机制会隔离出故障设备，从而限制错误的影响范围，确保其他设备继续正常工作。</li></ul><p><u>DPC机制依赖于AER提供的错误信息来进行错误处理</u></p><p>由于后期任务较多，该问题当时并未深究amdgpu驱动为何报错，不过知道了中断处理程序上报的错误，最后采用pcie_ports&#x3D;compat进行规避。</p><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">pcie_ports</span>=[<span class="hljs-type">PCIE</span>] <span class="hljs-type">PCIe</span> <span class="hljs-keyword">port</span> services handling:<br>nativeUse native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span> hotplug)<br>even if the platform doesn&#x27;t give the OS permission to<br>use them.  This may cause conflicts if the platform<br>also tries to use these services.<br>dpc-nativeUse native PCIe service for DPC only.  May<br>cause conflicts if firmware uses AER or DPC.<br>compatDisable native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span><br>hotplug).<br></code></pre></td></tr></table></figure><p>compat参数用于禁用原生的 PCIe 服务，包括 PME、AER、DPC 和 PCIe 热插拔功能，忽略该错误进行规避。</p>]]></content>
+    <content type="html"><![CDATA[<h2 id="S3-问题根因分析技术文档"><a href="#S3-问题根因分析技术文档" class="headerlink" title="S3 问题根因分析技术文档"></a>S3 问题根因分析技术文档</h2><h3 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h3><ul><li>x8610705.10</li><li>联想昭阳k4e-iml 待机自动唤醒</li></ul><p>首先我们看一下日志</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" class="" title="log"><p>我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze</p><p>一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导致S3停止</p><h3 id="S3-待机流程"><a href="#S3-待机流程" class="headerlink" title="S3 待机流程"></a>S3 待机流程</h3><p>我们先来了解一下S3的流程是怎么样的</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" class="" title="S3待机流程"><p>如上图所示，这是S3待机过程的流程图，简单介绍一下：</p><ul><li>state_store：处理系统进入不同的电源状态</li><li>pm_suspend：suspend入口</li><li>suspend_prepare：suspend前的一些准备工作</li><li>suspend_freeze_processes：冻结用户进程以及内核线程</li><li>suspend_devices_and_enter：开始进行挂起设备</li><li>suspend_enter：关闭设备中断，关闭辅助cpu，检查irq事件，CPU进入suspend</li></ul><h3 id="处理问题"><a href="#处理问题" class="headerlink" title="处理问题"></a>处理问题</h3><p>问题是它唤醒了，在知道了S3的流程以后，他在哪里检测唤醒事件呢？pm_wakeup_pending，没错就是这里，我们查看此部分代码</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">pm_wakeup_pending</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><span class="hljs-type">bool</span> ret = <span class="hljs-literal">false</span>;<br><br>raw_spin_lock_irqsave(&amp;events_lock, flags);<br><span class="hljs-keyword">if</span> (events_check_enabled) &#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> cnt, inpr;<br><br>split_counters(&amp;cnt, &amp;inpr);<br>ret = (cnt != saved_count || inpr &gt; <span class="hljs-number">0</span>);<br>events_check_enabled = !ret;<br>&#125;<br>raw_spin_unlock_irqrestore(&amp;events_lock, flags);<br><br><span class="hljs-keyword">if</span> (ret) &#123;<br>pm_pr_dbg(<span class="hljs-string">&quot;Wakeup pending, aborting suspend\n&quot;</span>);<br>pm_print_active_wakeup_sources();<br>&#125;<br><br><span class="hljs-keyword">return</span> ret || <span class="hljs-type">atomic_read</span>(&amp;pm_abort_suspend) &gt; <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure><p>发现他在检测到中断事件的时候就会return  false，暂停S3的操作</p><p>具体检测irq函数为pm_system_irq_wakeup</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_system_irq_wakeup</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq_number)</span><br>&#123;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><br>raw_spin_lock_irqsave(&amp;wakeup_irq_lock, flags);<br><br><span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span>)<br>wakeup_irq[<span class="hljs-number">0</span>] = irq_number;<br><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">1</span>] == <span class="hljs-number">0</span>)<br>wakeup_irq[<span class="hljs-number">1</span>] = irq_number;<br><span class="hljs-keyword">else</span><br>irq_number = <span class="hljs-number">0</span>;<br><br>raw_spin_unlock_irqrestore(&amp;wakeup_irq_lock, flags);<br><br><span class="hljs-keyword">if</span> (irq_number)<br>pm_system_wakeup();<br>&#125;<br></code></pre></td></tr></table></figure><p>在这个函数里面我们可以添加printk打印出中断号，或者可以使用bpftrace工具进行打印，kprobe:pm_system_irq_wakeup</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" class="" title="int"><p>此时发现中断号为122，接下来通过cat &#x2F;proc&#x2F;interrupts 查看这个中断相应的中断处理程序</p><img src="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" class="" title="irq"><p>此中断所挂载的相关中断处理程序是aerdrv和pcie-dpc，这2个中断处理程序主要负责处理pcie上面的错误信号的</p><p>通过lspci -tv查看到这个pcie总线上挂载了一张amd的显卡，此时基本可以判断问题出在显卡驱动上面</p><h3 id="AER和DPC"><a href="#AER和DPC" class="headerlink" title="AER和DPC"></a>AER和DPC</h3><ul><li>AER：是一种用于检测和报告PCIe设备中发生的错误的机制。它允许PCIe设备检测到并报告各种类型的错误，如非致命的、可恢复的以及严重的错误。AER在PCIe设备上实现了一组寄存器和相应的错误通知机制，可以通过读取这些寄存器来获取关于错误的信息。使用AER，系统能够更好地监控和处理PCIe设备的错误情况，以提高数据完整性和可靠性。</li><li>DPC：是一种用于处理PCIe链路中错误情况的机制。当PCIe链路上的一个设备发送错误信号时，DPC机制允许系统针对该错误进行处理，以避免错误的传播和影响其他设备。具体而言，DPC机制会隔离出故障设备，从而限制错误的影响范围，确保其他设备继续正常工作。</li></ul><div class="note note-warning">            <p>DPC机制依赖于AER提供的错误信息来进行错误处理</p>          </div><p>由于后期任务较多，该问题当时并未深究amdgpu驱动为何报错，不过知道了中断处理程序上报的错误，最后采用pcie_ports&#x3D;compat进行规避。</p><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">pcie_ports</span>=[<span class="hljs-type">PCIE</span>] <span class="hljs-type">PCIe</span> <span class="hljs-keyword">port</span> services handling:<br>nativeUse native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span> hotplug)<br>even if the platform doesn&#x27;t give the OS permission to<br>use them.  This may cause conflicts if the platform<br>also tries to use these services.<br>dpc-nativeUse native PCIe service for DPC only.  May<br>cause conflicts if firmware uses AER or DPC.<br>compatDisable native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span><br>hotplug).<br></code></pre></td></tr></table></figure><p>compat参数用于禁用原生的 PCIe 服务，包括 PME、AER、DPC 和 PCIe 热插拔功能，忽略该错误进行规避。</p>]]></content>
     
     
     <categories>
@@ -139,6 +170,12 @@
     </categories>
     
     
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
+    
   </entry>
   
   
@@ -157,6 +194,12 @@
       
     </categories>
     
+    
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
     
   </entry>
   
@@ -177,6 +220,12 @@
     </categories>
     
     
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
+    
   </entry>
   
   
@@ -196,6 +245,12 @@
     </categories>
     
     
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
+    
   </entry>
   
   
@@ -214,6 +269,12 @@
       
     </categories>
     
+    
+    <tags>
+      
+      <tag>dbg_meth</tag>
+      
+    </tags>
     
   </entry>
   
