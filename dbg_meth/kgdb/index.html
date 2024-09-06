@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://tomwithkernel.github.io/dbg_meth/kgdb/grub.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/dbg_meth/kgdb/kgdb_bug.png">
 <meta property="article:published_time" content="2024-09-05T02:44:35.000Z">
-<meta property="article:modified_time" content="2024-09-05T09:16:45.295Z">
+<meta property="article:modified_time" content="2024-09-06T02:10:46.779Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="dbg_meth">
 <meta name="twitter:card" content="summary_large_image">
@@ -239,7 +239,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          2.1k 字
         
       </span>
     
@@ -250,7 +250,7 @@
         
         
         
-          17 分钟
+          18 分钟
         
       </span>
     
@@ -406,6 +406,8 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">(gdb) add-auto-load-safe-path ./	#指定./路径为可信的路径，便于gdb执行启动的python脚本<br>(gdb) file vmlinux					#指定符号文件<br>(gdb) source vmlinux-gdb.py			#执行./vmlinux-gdb.py添加环境用于kgdb的命令扩展<br>(gdb) target remote localhost:5551<br></code></pre></td></tr></table></figure>
 
 <h3 id="kgdb扩展命令"><a href="#kgdb扩展命令" class="headerlink" title="kgdb扩展命令"></a>kgdb扩展命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">(gdb) lx-<br>lx-clk-summary        lx-device-list-class  lx-iomem              lx-ps<br>lx-cmdline            lx-device-list-tree   lx-ioports            lx-symbols<br>lx-configdump         lx-dmesg              lx-list-check         lx-timerlist<br>lx-cpus               lx-fdtdump            lx-lsmod              lx-version<br>lx-device-list-bus    lx-genpd-summary      lx-mounts  <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs shell">(gdb) apropos lx<br>function lx_clk_core_lookup -- Find struct clk_core by name<br>function lx_current -- Return current task<br>function lx_device_find_by_bus_name -- Find struct device by bus and name (both strings)<br>function lx_device_find_by_class_name -- Find struct device by class and name (both strings)<br>function lx_module -- Find module by name and return the module variable<br>function lx_per_cpu -- Return per-cpu variable<br>function lx_rb_first -- Lookup and return a node from an RBTree<br>function lx_rb_last -- Lookup and return a node from an RBTree<br>function lx_rb_next -- Lookup and return a node from an RBTree<br>function lx_rb_prev -- Lookup and return a node from an RBTree<br>function lx_task_by_pid -- Find Linux task by PID and return the task_struct variable<br>function lx_thread_info -- Calculate Linux thread_info from task variable<br>function lx_thread_info_by_pid -- Calculate Linux thread_info from task variable found by pid<br>lx-clk-summary -- Print clk tree summary<br>lx-cmdline --  Report the Linux Commandline used in the current kernel<br>lx-configdump -- Output kernel config to the filename specified as the command<br>lx-cpus -- List CPU status arrays<br>lx-device-list-bus -- Print devices on a bus (or all buses if not specified)<br>lx-device-list-class -- Print devices in a class (or all classes if not specified)<br>lx-device-list-tree -- Print a device and its children recursively<br>lx-dmesg -- Print Linux kernel log buffer<br>lx-fdtdump -- Output Flattened Device Tree header and dump FDT blob to the filename<br>lx-genpd-summary -- Print genpd summary<br>lx-iomem -- Identify the IO memory resource locations defined by the kernel<br>lx-ioports -- Identify the IO port resource locations defined by the kernel<br>lx-list-check -- Verify a list consistency<br>lx-lsmod -- List currently loaded modules<br>lx-mounts -- Report the VFS mounts of the current process namespace<br>lx-ps -- Dump Linux tasks<br>lx-symbols -- (Re-)load symbols of Linux kernel and currently loaded modules<br>lx-timerlist -- Print /proc/timer_list<br>lx-version --  Report the Linux Version of the current kernel<br></code></pre></td></tr></table></figure>
 
 <p>对于<code>(gdb) lx-symbols</code>时出现：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">Python Exception &lt;class &#x27;gdb.MemoryError&#x27;&gt; Cannot access memory at address<br></code></pre></td></tr></table></figure>

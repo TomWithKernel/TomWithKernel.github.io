@@ -27,7 +27,7 @@
 <meta property="og:description" content="gdb编译程序加参数时生成调试信息 g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的    选项 解析    g 该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息   ggdb 使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-08-23T02:08:02.751Z">
+<meta property="article:modified_time" content="2024-09-06T01:59:51.390Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="dbg_meth">
 <meta name="twitter:card" content="summary_large_image">
@@ -236,7 +236,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.1k 字
+          2.2k 字
         
       </span>
     
@@ -247,7 +247,7 @@
         
         
         
-          18 分钟
+          19 分钟
         
       </span>
     
@@ -357,7 +357,7 @@
 <p><code>bt full</code> 不仅显示backtrace，还显示局部变量</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) bt full<br><span class="hljs-comment">#0  0x00007f218fcb1bd9 in __GI___poll (fds=0x7f218400a060, nfds=2, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:29</span><br>        resultvar = 18446744073709551100<br>        sc_cancel_oldtype = 0<br>        sc_ret = &lt;optimized out&gt;<br><span class="hljs-comment">#1  0x00007f218ff851f6 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br>No symbol table info available.<br><span class="hljs-comment">#2  0x00007f218ff85582 in g_main_loop_run () from /lib/x86_64-linux-gnu/libglib-2.0.so.0</span><br>No symbol table info available.<br><span class="hljs-comment">#3  0x0000563b79c85395 in ?? ()</span><br>No symbol table info available.<br><span class="hljs-comment">#4  0x00007f218fbe71fb in __libc_start_main (main=0x563b79c84640, argc=1, argv=0x7ffff90918c8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, </span><br>    stack_end=0x7ffff90918b8) at ../csu/libc-start.c:308<br>        self = &lt;optimized out&gt;<br>        result = &lt;optimized out&gt;<br>        unwind_buf = &#123;cancel_jmp_buf = &#123;&#123;jmp_buf = &#123;0, 3044201088132136217, 94813446234064, 140737371510976, 0, 0, 8770247100387114265, 8649937328162159897&#125;, <br>              mask_was_saved = 0&#125;&#125;, priv = &#123;pad = &#123;0x0, 0x0, 0x7ffff90918d8, 0x7f21902b2190&#125;, data = &#123;prev = 0x0, cleanup = 0x0, canceltype = -116844328&#125;&#125;&#125;<br>        not_first_call = &lt;optimized out&gt;<br><span class="hljs-comment">#5  0x0000563b79c85ffa in ?? ()</span><br></code></pre></td></tr></table></figure>
 
-<h3 id="p"><a href="#p" class="headerlink" title="p"></a>p</h3><p>print显示变量</p>
+<h3 id="p"><a href="#p" class="headerlink" title="p"></a>p</h3><p>print，显示变量</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) p result<br><span class="hljs-variable">$1</span> = <span class="hljs-string">&#x27;\000&#x27;</span> &lt;repeats 113 <span class="hljs-built_in">times</span>&gt;<br></code></pre></td></tr></table></figure>
 
 <h3 id="info-reg"><a href="#info-reg" class="headerlink" title="info reg"></a>info reg</h3><p>显示寄存器</p>
@@ -374,9 +374,57 @@
 <p><code>x/i $rip</code>   显示汇编指令</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) x/i <span class="hljs-variable">$rip</span><br>=&gt; 0x7f218fcb1bd9 &lt;__GI___poll+73&gt;:     cmp    <span class="hljs-variable">$0xfffffffffffff000</span>,%rax<br></code></pre></td></tr></table></figure>
 
-<p>显示寄存器可以使用的格式：<br>格式                说明<br>x                   显示为十六进制数<br>d                   显示为十进制数<br>u                   显示为无符号十进制数<br>o                   显示为八进制数<br>t                   显示为二进制数，t的由来是two<br>a                   地址<br>c                   显示为字符(ASCII)<br>f                   浮点小数<br>s                   显示为字符串<br>i                   显示为机器语言(仅在显示内存的X命令中可以使用)</p>
-<h3 id="n"><a href="#n" class="headerlink" title="n"></a>n</h3><p>执行下一行语句</p>
-<h3 id="s"><a href="#s" class="headerlink" title="s"></a>s</h3><p>单步进入，遇到函数的话就会进入函数的内部，再一行一行的执行。执行完当前函数返回到调用它的函数</p>
+<p>显示寄存器可以使用的格式：</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>x</td>
+<td>显示为十六进制数</td>
+</tr>
+<tr>
+<td>d</td>
+<td>显示为十进制数</td>
+</tr>
+<tr>
+<td>u</td>
+<td>显示为无符号十进制数</td>
+</tr>
+<tr>
+<td>o</td>
+<td>显示为八进制数</td>
+</tr>
+<tr>
+<td>t</td>
+<td>显示为二进制数，t的由来是two</td>
+</tr>
+<tr>
+<td>a</td>
+<td>地址</td>
+</tr>
+<tr>
+<td>c</td>
+<td>显示为字符(ASCII)</td>
+</tr>
+<tr>
+<td>f</td>
+<td>浮点小数</td>
+</tr>
+<tr>
+<td>s</td>
+<td>显示为字符串</td>
+</tr>
+<tr>
+<td>i</td>
+<td>显示为机器语言(仅在显示内存的X命令中可以使用)</td>
+</tr>
+</tbody></table>
+<h3 id="n"><a href="#n" class="headerlink" title="n"></a>n</h3><p>next，执行下一行语句，不进入函数</p>
+<h3 id="s"><a href="#s" class="headerlink" title="s"></a>s</h3><p>step，单步进入，遇到函数的话就会进入函数的内部，再一行一行的执行。执行完当前函数返回到调用它的函数</p>
 <h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><p>continue，继续执行，程序会在遇到断点后再次暂停运行，如果没有遇到断点就会一直运行到结束</p>
 <p>continue 次数<br>指定次数可以忽略断点，例如，continue 5则5次遇断点不停止，第六次遇到断点才停止执行</p>
 <h3 id="finish"><a href="#finish" class="headerlink" title="finish"></a>finish</h3><p>跳出当前函数，这里，运行程序，直到当前函数运行完毕返回再停止。例如进入的单步执行如果已经进入了某函数，可以退出该函数返回到它的调用函数中</p>
@@ -391,7 +439,8 @@
 <h3 id="d"><a href="#d" class="headerlink" title="d"></a>d</h3><p>delete 删除断点和监视点</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info b<br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br>4       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br><br>--&gt;删除1号断点<br>(gdb) d 1<br>(gdb) info b<br>Num     Type           Disp Enb Address            What<br>4       breakpoint     keep y   0x0000000000400450 <span class="hljs-keyword">in</span> main at watch.c:10<br>	breakpoint already hit 1 time<br></code></pre></td></tr></table></figure>
 
-<h3 id="set-variable"><a href="#set-variable" class="headerlink" title="set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;"></a>set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb)p options<br><span class="hljs-variable">$7</span> =1<br>(gdb)<span class="hljs-built_in">set</span> varaable options = 0<br>(gdb)p options <br><span class="hljs-variable">$8</span> = 0<br></code></pre></td></tr></table></figure>
+<h3 id="set-variable"><a href="#set-variable" class="headerlink" title="set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;"></a>set variable &lt;变量&gt; &#x3D; &lt;表达式&gt;</h3><p>设置变量的值</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb)p options<br><span class="hljs-variable">$7</span> =1<br>(gdb)<span class="hljs-built_in">set</span> varaable options = 0<br>(gdb)p options <br><span class="hljs-variable">$8</span> = 0<br></code></pre></td></tr></table></figure>
 
 <h3 id="disassemble"><a href="#disassemble" class="headerlink" title="disassemble"></a>disassemble</h3><p>用于反汇编函数或指定地址范围的代码，以显示对应的汇编指令</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;address&gt; &lt;+offset&gt;:  &lt;assembly_instruction&gt;  &lt;operands&gt;<br><br>&lt;address&gt;：指令的地址<br>&lt;+offset&gt;：相对于函数或代码块开始处的偏移量<br>&lt;assembly_instruction&gt;：汇编指令的助记符<br>&lt;operands&gt;：汇编指令的操作数<br>在输出中，箭头 =&gt; 表示当前执行的指令<br></code></pre></td></tr></table></figure>
@@ -405,7 +454,7 @@
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) info b<br>Num     Type           Disp Enb Address            What<br>1       breakpoint     keep y   0x00007f218fcb1bd9 ../sysdeps/unix/sysv/linux/poll.c:29<br>(gdb) <span class="hljs-built_in">command</span> 1 <br>Type commands <span class="hljs-keyword">for</span> breakpoint(s) 1, one per line.<br>End with a line saying just <span class="hljs-string">&quot;end&quot;</span>.<br>&gt;p <span class="hljs-variable">$rip</span><br>&gt;end<br></code></pre></td></tr></table></figure>
 
-<h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><p>命令用于显示源代码，当没有参数时，它会显示当前执行代码的周围区域</p>
+<h3 id="l"><a href="#l" class="headerlink" title="l"></a>l</h3><p>list，命令用于显示源代码，当没有参数时，它会显示当前执行代码的周围区域</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">list：显示当前执行点周围的源代码。<br>list function_name：显示特定函数的源代码。<br>list filename:linenum：显示特定文件中特定行号的源代码。<br>list start, end：显示指定范围内的源代码行<br></code></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">(gdb) list<br>24      <span class="hljs-keyword">in</span> ../sysdeps/unix/sysv/linux/poll.c<br></code></pre></td></tr></table></figure>
