@@ -19,18 +19,19 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="USB子系统USB子系统框架    USB设备驱动：用于和枚举到的USB设备进行绑定，完成特定的功能 USB Core：用于内核USB总线的初始化及USB相关API，为设备驱动和HCD的交互提供桥梁 USB主机控制器HCD：完成主机控制器的初始化以及数据的传输，并监测外部设备插入，完成设备枚举  USB传输类型 控制传输：控制传输是双向传输，数据量通常比较小，主要指由USB总线驱动程序用来进行查询">
+    <meta name="description" content="文章介绍了USB子系统的框架，例如如何传输，以及相关描述符的使用方法，USB hub以及USB设备插入检测等等">
 <meta property="og:type" content="article">
 <meta property="og:title" content="USB子系统">
 <meta property="og:url" content="https://tomwithkernel.github.io/kernel/usb/usb%E5%AD%90%E7%B3%BB%E7%BB%9F/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="USB子系统USB子系统框架    USB设备驱动：用于和枚举到的USB设备进行绑定，完成特定的功能 USB Core：用于内核USB总线的初始化及USB相关API，为设备驱动和HCD的交互提供桥梁 USB主机控制器HCD：完成主机控制器的初始化以及数据的传输，并监测外部设备插入，完成设备枚举  USB传输类型 控制传输：控制传输是双向传输，数据量通常比较小，主要指由USB总线驱动程序用来进行查询">
+<meta property="og:description" content="文章介绍了USB子系统的框架，例如如何传输，以及相关描述符的使用方法，USB hub以及USB设备插入检测等等">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tomwithkernel.github.io/kernel/usb/usb%E5%AD%90%E7%B3%BB%E7%BB%9F/usb.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/kernel/usb/usb%E5%AD%90%E7%B3%BB%E7%BB%9F/usb_intf_image.png">
 <meta property="article:published_time" content="2024-05-18T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-08-19T07:16:49.635Z">
+<meta property="article:modified_time" content="2024-10-17T02:31:25.171Z">
 <meta property="article:author" content="Tom">
+<meta property="article:tag" content="USB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/usb/usb%E5%AD%90%E7%B3%BB%E7%BB%9F/usb.png">
   
@@ -504,6 +505,13 @@
 
     </div>
   
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/USB/" class="print-no-link">#USB</a>
+      
+    </div>
   
 </div>
 

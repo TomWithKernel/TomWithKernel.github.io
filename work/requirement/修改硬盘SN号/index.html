@@ -1,0 +1,751 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="读取硬盘SN号处理方式用户态发送smartctl -i &#x2F;dev&#x2F;sdX命令查询硬盘SN号 123456789101112131415161718192021uos@uos-PC [~] ➜  sudo smartctl -i &#x2F;dev&#x2F;sda     smartctl 7.1 2019-12-30 r5022 [x86_64-linux-5.10.0-amd64-deskto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="修改硬盘SN号">
+<meta property="og:url" content="https://tomwithkernel.github.io/work/requirement/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="读取硬盘SN号处理方式用户态发送smartctl -i &#x2F;dev&#x2F;sdX命令查询硬盘SN号 123456789101112131415161718192021uos@uos-PC [~] ➜  sudo smartctl -i &#x2F;dev&#x2F;sda     smartctl 7.1 2019-12-30 r5022 [x86_64-linux-5.10.0-amd64-deskto">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/work/requirement/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png">
+<meta property="article:published_time" content="2024-10-15T06:41:24.000Z">
+<meta property="article:modified_time" content="2024-10-17T02:34:30.416Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="requirement">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/work/requirement/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png">
+  
+  
+  
+  <title>修改硬盘SN号 - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="修改硬盘SN号"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-15 14:41" pubdate>
+          2024年10月15日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          743 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">修改硬盘SN号</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="读取硬盘SN号处理方式"><a href="#读取硬盘SN号处理方式" class="headerlink" title="读取硬盘SN号处理方式"></a>读取硬盘SN号处理方式</h3><p>用户态发送smartctl -i &#x2F;dev&#x2F;sdX命令查询硬盘SN号</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~] ➜  sudo smartctl -i /dev/sda     <br><br>smartctl 7.1 2019-12-30 r5022 [x86_64-linux-5.10.0-amd64-desktop] (local build)<br>Copyright (C) 2002-19, Bruce Allen, Christian Franke, www.smartmontools.org<br><br>=== START OF INFORMATION SECTION ===<br>Model Family:     Western Digital Blue<br>Device Model:     WDC WD10EZEX-22MFCA0<br>Serial Number:    WD-WCC6Y4DF6V9V<br>LU WWN Device Id: 5 0014ee 268c3dc22<br>Firmware Version: 01.01A01<br>User Capacity:    1,000,204,886,016 bytes [1.00 TB]<br>Sector Sizes:     512 bytes logical, 4096 bytes physical<br>Rotation Rate:    7200 rpm<br>Form Factor:      3.5 inches<br>Device is:        In smartctl database [for details use: -P show]<br>ATA Version is:   ACS-3 T13/2161-D revision 3b<br>SATA Version is:  SATA 3.1, 6.0 Gb/s (current: 6.0 Gb/s)<br>Local Time is:    Tue Oct 15 14:59:18 2024 CST<br>SMART support is: Available - device has SMART capability.<br>SMART support is: Enabled<br></code></pre></td></tr></table></figure>
+
+<h4 id="sd命令下发流程"><a href="#sd命令下发流程" class="headerlink" title="sd命令下发流程"></a>sd命令下发流程</h4><p>可以通过strace先追踪到下发的命令为SG_IO</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~] ➜  sudo strace smartctl -i /dev/sda<br><br>ioctl(3, SG_IO, &#123;interface_id=&#x27;S&#x27;, dxfer_direction=SG_DXFER_FROM_DEV, cmd_len=16, <br>cmdp=&quot;\x85\x08\x0e\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\xec\x00&quot;, mx_sb_len=32, iovec_count=0, <br>dxfer_len=512, timeout=60000, flags=0, <br>dxferp=&quot;\x7a\x42\xff\x3f\x37\xc8\x10\x00\x00\x00\x00\x00\x3f\x00\x00\x00\x00\x00\x00\x00\x20\x20\x20\x20\<br>x57\x20\x2d\x44\x43\x57\x36\x43&quot;..., status=0, masked_status=0, msg_status=0, sb_len_wr=0, sbp=&quot;&quot;, <br>host_status=0, driver_status=0, resid=0, duration=0, info=0&#125;) = 0<br><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">scsi_cmd_ioctl<br>	case SG_IO:<br>		get_sg_io_hdr(&amp;hdr, arg);<br>		sg_io(q, bd_disk, &amp;hdr, mode);#在此时硬盘的SN数据已经读取出来，存在了hdr中<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sg_io_hdr</span></span><br><span class="hljs-class">&#123;</span><br>    <span class="hljs-type">int</span> interface_id;           <span class="hljs-comment">/* [i] &#x27;S&#x27; for SCSI generic (required) */</span><br>    <span class="hljs-type">int</span> dxfer_direction;        <span class="hljs-comment">/* [i] data transfer direction  */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> cmd_len;      <span class="hljs-comment">/* [i] SCSI command length */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> mx_sb_len;    <span class="hljs-comment">/* [i] max length to write to sbp */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> iovec_count; <span class="hljs-comment">/* [i] 0 implies no scatter gather */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> dxfer_len;     <span class="hljs-comment">/* [i] byte count of data transfer */</span><br>    <span class="hljs-type">void</span> __user *dxferp;	<span class="hljs-comment">/* [i], [*io] points to data transfer memory</span><br><span class="hljs-comment">					      or scatter gather list */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> __user *cmdp; <span class="hljs-comment">/* [i], [*i] points to command to perform */</span><br>    <span class="hljs-type">void</span> __user *sbp;		<span class="hljs-comment">/* [i], [*o] points to sense_buffer memory */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> timeout;       <span class="hljs-comment">/* [i] MAX_UINT-&gt;no timeout (unit: millisec) */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags;         <span class="hljs-comment">/* [i] 0 -&gt; default, see SG_FLAG... */</span><br>    <span class="hljs-type">int</span> pack_id;                <span class="hljs-comment">/* [i-&gt;o] unused internally (normally) */</span><br>    <span class="hljs-type">void</span> __user * usr_ptr;      <span class="hljs-comment">/* [i-&gt;o] unused internally */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> status;       <span class="hljs-comment">/* [o] scsi status */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> masked_status;<span class="hljs-comment">/* [o] shifted, masked scsi status */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> msg_status;   <span class="hljs-comment">/* [o] messaging level data (optional) */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> sb_len_wr;    <span class="hljs-comment">/* [o] byte count actually written to sbp */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> host_status; <span class="hljs-comment">/* [o] errors from host adapter */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> driver_status;<span class="hljs-comment">/* [o] errors from software driver */</span><br>    <span class="hljs-type">int</span> resid;                  <span class="hljs-comment">/* [o] dxfer_len - actual_transferred */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> duration;      <span class="hljs-comment">/* [o] time taken by cmd (unit: millisec) */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> info;          <span class="hljs-comment">/* [o] auxiliary information */</span><br>&#125; <span class="hljs-type">sg_io_hdr_t</span>;  <span class="hljs-comment">/* 64 bytes long (on i386) */</span><br></code></pre></td></tr></table></figure>
+
+<p>通过strace可以看到最后数据的返回是通过hdr-&gt;dxferp返回给用户空间的</p>
+<p>感兴趣的小伙伴可以使用ftrace跟踪一下底层调用流程，我看到的是scsi会通过dma_map映射一片空间然后发送inquiry命令给硬盘查询硬盘数据最后返回上来，但是我们魔改没必要修改太底层的代码</p>
+<p>此时我们可以解析一下dxferp返回数据的内容，从第5个字节开始是真正的SN号</p>
+<img src="/work/requirement/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png" srcset="/img/loading.gif" lazyload class="" title="sn_buffer">
+
+<p>前面为控制字段，第四个字节为长度控制</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">modify_dev_sn</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> sg_io_hdr *hdr)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *buffer = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>,len_id = <span class="hljs-number">0</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *match = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> len_value = <span class="hljs-number">0xff</span>;<br>	<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> pattern[] = &#123;<span class="hljs-number">0x80</span>, <span class="hljs-number">0x00</span>&#125;;<br><br>	<span class="hljs-keyword">if</span> (hdr-&gt;dxfer_len &gt; <span class="hljs-number">0x1024</span>) &#123;<br>		pr_err(<span class="hljs-string">&quot;hdr info len too long!\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -EFAULT;<br>	&#125;<br><br>	buffer = kzalloc(hdr-&gt;dxfer_len, GFP_KERNEL);<br>	<span class="hljs-keyword">if</span> (!buffer) &#123;<br>		pr_err(<span class="hljs-string">&quot;Memory allocation failed for buffer\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (copy_from_user(buffer, hdr-&gt;dxferp, hdr-&gt;dxfer_len)) &#123;<br>		pr_err(<span class="hljs-string">&quot;Failed to copy data from user space\n&quot;</span>);<br>		kfree(buffer);<br>		<span class="hljs-keyword">return</span> -EFAULT;<br>	&#125;<br><br>	<span class="hljs-keyword">while</span> (i &lt;= (hdr-&gt;dxfer_len - <span class="hljs-number">3</span>)) &#123;<br>		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">memcmp</span>(&amp;buffer[i], pattern, <span class="hljs-number">2</span>) == <span class="hljs-number">0</span>) &#123;<br>			match = &amp;buffer[i + <span class="hljs-number">3</span>];<br>			len_id = i + <span class="hljs-number">2</span>;<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>		i++;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (match) &#123;<br>		<span class="hljs-type">int</span> sn_len = <span class="hljs-number">33</span>;<br>		<span class="hljs-keyword">if</span> ((hdr-&gt;dxfer_len - <span class="hljs-number">3</span>) &gt;= (sn_len + <span class="hljs-number">1</span>)) &#123;<br>			<span class="hljs-built_in">memcpy</span>(&amp;buffer[len_id], &amp;len_value, <span class="hljs-number">1</span>);<br>			<span class="hljs-built_in">memcpy</span>(match, get_huawei_ufs_cid(), sn_len);<br>			match[sn_len] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">if</span>(copy_to_user(hdr-&gt;dxferp, buffer, hdr-&gt;dxfer_len))<br>		pr_err(<span class="hljs-string">&quot;%s: copy from user failed.\n&quot;</span>, __func__);<br>	kfree(buffer);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>此时我们就可以通过直接修改返回数据达到修改sn号的效果</p>
+<h4 id="sg命令下发流程"><a href="#sg命令下发流程" class="headerlink" title="sg命令下发流程"></a>sg命令下发流程</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">sg_ioctl<br>	sg_ioctl_common<br>		case SG_IO:<br>			sg_new_write(sfp, filp, p, SZ_SG_IO_HDR, 1, read_only, 1, &amp;srp);<br>			sg_new_read(sfp, p, SZ_SG_IO_HDR, srp);#此时硬盘数据存在p中，需要拷贝回来<br>			<br>			copy_from_user(&amp;hdr, p, sizeof(hdr);<br><span class="hljs-meta prompt_">			#</span><span class="language-bash">进行数据修改后再传递回去</span><br>			copy_to_user(p, &amp;hdr, SZ_SG_IO_HDR);<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/work/" class="category-chain-item">work</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/work/requirement/" class="category-chain-item">requirement</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/requirement/" class="print-no-link">#requirement</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>修改硬盘SN号</div>
+      <div>https://tomwithkernel.github.io/work/requirement/修改硬盘SN号/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/dbg_meth/kgdb/" title="kgdb">
+                        <span class="hidden-mobile">kgdb</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
