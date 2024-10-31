@@ -19,15 +19,15 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux  btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 123456789101112131415161718192021222324252627">
+    <meta name="description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux    btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 1234567891011121314151617181920212223242526">
 <meta property="og:type" content="article">
 <meta property="og:title" content="crash">
 <meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/crash/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux  btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 123456789101112131415161718192021222324252627">
+<meta property="og:description" content="Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash &#x2F;lib&#x2F;debug&#x2F;vmlinux    btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 1234567891011121314151617181920212223242526">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-08-23T02:08:00.147Z">
+<meta property="article:modified_time" content="2024-10-30T07:09:19.688Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="dbg_meth">
 <meta name="twitter:card" content="summary_large_image">
@@ -242,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.6k 字
+          2.6k 字
         
       </span>
     
@@ -253,7 +253,7 @@
         
         
         
-          14 分钟
+          22 分钟
         
       </span>
     
@@ -307,6 +307,8 @@
                 <h1 id="Crash"><a href="#Crash" class="headerlink" title="Crash"></a>Crash</h1><p>一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等</p>
 <h3 id="进入crash环境"><a href="#进入crash环境" class="headerlink" title="进入crash环境"></a>进入crash环境</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> -s<br>crash /lib/debug/vmlinux<br></code></pre></td></tr></table></figure>
 
+
+
 <h3 id="bt"><a href="#bt" class="headerlink" title="bt"></a>bt</h3><p>backtrace打印内核栈回溯信息，bt pid 打印指定进程栈信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; bt 1942<br>PID: 1942   TASK: ffff88068c957300  CPU: 2   COMMAND: <span class="hljs-string">&quot;bash&quot;</span><br> <span class="hljs-comment">#0 [ffff88062b8f7b48] machine_kexec at ffffffff81051e9b</span><br> <span class="hljs-comment">#1 [ffff88062b8f7ba8] crash_kexec at ffffffff810f27e2</span><br> <span class="hljs-comment">#2 [ffff88062b8f7c78] oops_end at ffffffff81689948</span><br> <span class="hljs-comment">#3 [ffff88062b8f7ca0] no_context at ffffffff816793f1</span><br> <span class="hljs-comment">#4 [ffff88062b8f7cf0] __bad_area_nosemaphore at ffffffff81679487</span><br> <span class="hljs-comment">#5 [ffff88062b8f7d38] bad_area_nosemaphore at ffffffff816795f1</span><br> <span class="hljs-comment">#6 [ffff88062b8f7d48] __do_page_fault at ffffffff8168c6ce</span><br> <span class="hljs-comment">#7 [ffff88062b8f7da8] do_page_fault at ffffffff8168c863</span><br> <span class="hljs-comment">#8 [ffff88062b8f7dd0] page_fault at ffffffff81688b48</span><br>    [exception RIP: sysrq_handle_crash+22]<br>    RIP: ffffffff813baf16  RSP: ffff88062b8f7e80  RFLAGS: 00010046<br>    RAX: 000000000000000f  RBX: ffffffff81a7b180  RCX: 0000000000000000<br>    RDX: 0000000000000000  RSI: ffff88086ec8f6c8  RDI: 0000000000000063<br>    RBP: ffff88062b8f7e80   R8: 0000000000000092   R9: 0000000000000e37<br>    R10: 0000000000000e36  R11: 0000000000000003  R12: 0000000000000063<br>    R13: 0000000000000246  R14: 0000000000000004  R15: 0000000000000000<br>    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018<br> <span class="hljs-comment">#9 [ffff88062b8f7e88] __handle_sysrq at ffffffff813bb6d2</span><br><span class="hljs-comment">#10 [ffff88062b8f7ec0] write_sysrq_trigger at ffffffff813bbbaf</span><br><span class="hljs-comment">#11 [ffff88062b8f7ed8] proc_reg_write at ffffffff812494bd</span><br><span class="hljs-comment">#12 [ffff88062b8f7ef8] vfs_write at ffffffff811dee9d</span><br><span class="hljs-comment">#13 [ffff88062b8f7f38] sys_write at ffffffff811df93f</span><br><span class="hljs-comment">#14 [ffff88062b8f7f80] system_call_fastpath at ffffffff81691049</span><br>    RIP: 00007fb320bcb500  RSP: 00007ffde533c198  RFLAGS: 00000246<br>    RAX: 0000000000000001  RBX: ffffffff81691049  RCX: ffffffffffffffff<br>    RDX: 0000000000000002  RSI: 00007fb3214eb000  RDI: 0000000000000001<br>    RBP: 00007fb3214eb000   R8: 000000000000000a   R9: 00007fb3214d5740<br>    R10: 0000000000000001  R11: 0000000000000246  R12: 0000000000000001<br>    R13: 0000000000000002  R14: 00007fb320e9f400  R15: 0000000000000002<br>    ORIG_RAX: 0000000000000001  CS: 0033  SS: 002b<br></code></pre></td></tr></table></figure>
 
@@ -314,35 +316,243 @@
 <p>可以看到最后几步触发了缺页异常，进入crash_kexec的流程，最后调用 machine_kexec()。这通常是一个硬件相关的函数。它会引导启动捕获内核，从而完成 kdump 的过程。<br>代码就是走到了sysrq_handle_crash函数首地址+0x22这段命令的时候，触发的缺页异常。</p>
 <p>注意：</p>
 <p>这里，对应x86-64汇编，应用层下来的系统调用对应的6个参数存放的寄存器依次对应：rdi、rsi、rdx、rcx、r8、r9。对于多于6个参数的，仍存储在栈上。</p>
+<ul>
+<li>查看调用栈（默认查看的导致crash的进程的调用栈）<br><code>bt</code></li>
+<li>查看调用栈，显示返回地址在函数内的偏移<br><code>bt -sx</code></li>
+<li>查看调用栈中函数的返回地址对应的代码行<br><code>bt -l</code></li>
+<li>查看详细的调用栈内容<br><code>bt -fsx</code></li>
+<li>查看详细的调用栈，并且翻译栈里可以识别的符号<br><code>bt -FFsx</code></li>
+<li>想查看指定进程的栈<br><code>bt &lt;进程pid&gt;</code><br>或者<br><code>bt &lt;进程的task_struct地址&gt;</code><ul>
+<li>如果想查看多个进程的调用栈的话，可以直接在后面追加<code>进程pid</code>或者<code>进程的task_struct地址</code>，也可以使用<code>foreach bt</code></li>
+<li><code>进程pid</code>和<code>进程的task_struct</code>可以同时出现在bt后面</li>
+</ul>
+</li>
+<li>查看所有cpu上当前的调用栈<br><code>bt -a</code></li>
+<li>查看指定cpu上的当前调用栈<br><code>bt -c 0,1,3-6</code></li>
+<li>只显示导致crash的进程的调用栈<br><code>bt -p</code></li>
+<li>显示线程组中所有线程的调用栈<br><code>bt -g</code></li>
+<li>列出在调用栈里发现的所有的符号<br><code>bt -t</code></li>
+</ul>
 <h3 id="log"><a href="#log" class="headerlink" title="log"></a>log</h3><p>打印vmcore所在的系统内核dmesg日志信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; <span class="hljs-built_in">log</span><br>[    0.000000] Linux version 4.19.0-amd64-desktop (uos@x86-compile-PC) (gcc version 8.3.0 (Uos 8.3.0.5-1+dde)) (c42ec32bb9fc) <span class="hljs-comment">#6300 SMP Fri Dec 15 13:53:22 CST 2023</span><br>[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-4.19.0-amd64-desktop root=UUID=826567d9-9352-4ab2-a268-e23345c606df ro video=efifb:nobgrt splash quiet DEEPIN_GFXMODE= ima_appraise=off libahci.ignore_sss=1<br>[    0.000000] KERNEL supported cpus:<br>[    0.000000]   Intel GenuineIntel<br>[    0.000000]   AMD AuthenticAMD<br>[    0.000000]   Hygon HygonGenuine<br>[    0.000000]   Centaur CentaurHauls<br>[    0.000000]   zhaoxin   Shanghai  <br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: <span class="hljs-string">&#x27;x87 floating point registers&#x27;</span><br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: <span class="hljs-string">&#x27;SSE registers&#x27;</span><br>[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: <span class="hljs-string">&#x27;AVX registers&#x27;</span><br>[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256<br>[    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using <span class="hljs-string">&#x27;compacted&#x27;</span> format.<br>[    0.000000] BIOS-provided physical RAM map:<br>[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x0000000000086fff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000000087000-0x0000000000087fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000000088000-0x000000000009ffff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000000a0000-0x00000000000bffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x0000000009afffff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000009b00000-0x0000000009dfffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000009e00000-0x0000000009efffff] usable<br>[    0.000000] BIOS-e820: [mem 0x0000000009f00000-0x0000000009f0afff] ACPI NVS<br>[    0.000000] BIOS-e820: [mem 0x0000000009f0b000-0x00000000970f8fff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000970f9000-0x0000000097af8fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000097af9000-0x00000000add0efff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000add0f000-0x00000000aee8efff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000aee8f000-0x00000000af77efff] ACPI NVS<br>[    0.000000] BIOS-e820: [mem 0x00000000af77f000-0x00000000af7fefff] ACPI data<br>[    0.000000] BIOS-e820: [mem 0x00000000af7ff000-0x00000000af7fffff] usable<br>[    0.000000] BIOS-e820: [mem 0x00000000af800000-0x00000000afffffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000f8000000-0x00000000fbffffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fdc00000-0x00000000fec00fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fec10000-0x00000000fec10fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fed80000-0x00000000fed80fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000fee00000-0x00000000fee00fff] reserved<br>[    0.000000] BIOS-e820: [mem 0x00000000ff800000-0x00000000fff3ffff] reserved<br>[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000040effffff] usable<br>[    0.000000] BIOS-e820: [mem 0x000000040f000000-0x000000044effffff] reserved<br>[    0.000000] NX (Execute Disable) protection: active<br>[    0.000000] e820: update [mem 0x94db8018-0x94dc5457] usable ==&gt; usable<br>[    0.000000] e820: update [mem 0x94db8018-0x94dc5457] usable ==&gt; usable<br>[    0.000000] extended physical RAM map:<br></code></pre></td></tr></table></figure>
 
 <h3 id="dis"><a href="#dis" class="headerlink" title="dis"></a>dis</h3><p><code>dis -l (function+offset) 10</code> 反汇编出指令所在代码，10代表打印该指定位置开始的10行信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; dis -l do_sys_poll 10<br>/home/uos/code/workspace/kernel/gerrit-V20-kernel-pipeline/x86-kernel/fs/select.c: 928<br>0xffffffff8f681540 &lt;do_sys_poll&gt;:       nopl   0x0(%rax,%rax,1) [FTRACE NOP]<br>0xffffffff8f681545 &lt;do_sys_poll+5&gt;:     push   %rbp<br>0xffffffff8f681546 &lt;do_sys_poll+6&gt;:     mov    %rsp,%rbp<br>0xffffffff8f681549 &lt;do_sys_poll+9&gt;:     push   %r15<br>0xffffffff8f68154b &lt;do_sys_poll+11&gt;:    push   %r14<br>0xffffffff8f68154d &lt;do_sys_poll+13&gt;:    push   %r13<br>0xffffffff8f68154f &lt;do_sys_poll+15&gt;:    mov    %esi,%r13d<br>0xffffffff8f681552 &lt;do_sys_poll+18&gt;:    push   %r12<br>0xffffffff8f681554 &lt;do_sys_poll+20&gt;:    push   %rbx<br>0xffffffff8f681555 &lt;do_sys_poll+21&gt;:    and    <span class="hljs-variable">$0xfffffffffffffff0</span>,%rsp<br></code></pre></td></tr></table></figure>
 
+<ul>
+<li>反汇编指定函数<br><code>dis -x &lt;function name&gt;/&lt;addr&gt;</code></li>
+<li>反汇编指定偏移<br><code>dis -x &lt;function+0xXX&gt;</code></li>
+<li>反汇编从函数开始到指定偏移量之间的代码<br><code>dis -rx &lt;function+0xXX&gt;</code></li>
+</ul>
 <h3 id="mod"><a href="#mod" class="headerlink" title="mod"></a>mod</h3><p>mod 查看当时内核加载的所有内核模块信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; mod<br>     MODULE       NAME                 SIZE    OBJECT        FILE<br>ffffffffc01ee200  button               20480   (not loaded)  [CONFIG_KALLSYMS]<br>ffffffffc0211f00  hid                  139264  (not loaded)  [CONFIG_KALLSYMS]<br>ffffffffc021a0c0  ecb                  16384   (not loaded)  [CONFIG_KALLSYMS]<br></code></pre></td></tr></table></figure>
 
+
+
 <h3 id="sym"><a href="#sym" class="headerlink" title="sym"></a>sym</h3><p><code>sym 00007fb320bcb500 (内存地址)</code>   转换指定符号为其虚拟地址，显示系统中对应的符号表信息，并且具体到源代码的那一行</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; sym ffffffffc07c5024<br>ffffffffc07c5024 (t) my_openat+36 [my_test_lkm] /mnt/hgfs/test_ko/lkm-test05/my_lkm.c: 25<br></code></pre></td></tr></table></figure>
+
+
 
 <h3 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h3><p>ps 打印内核崩溃时，正常的进程信息</p>
 <p>带 &gt; 标识代表是活跃的进程，ps pid打印某指定进程的状态信息：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; ps 27005<br>   PID    PPID  CPU       TASK        ST  %MEM     VSZ    RSS  COMM<br>&gt; 27005   7783   1  ffff997b388ae180  RU   0.2   91732   4124  pickup<br>&gt; <br>查看指定进程的进程树，显示进程父子关系（ps -p pid） <br>crash&gt; ps -p 85151<br>PID: 0      TASK: ffffffff818b6420  CPU: 0   COMMAND: <span class="hljs-string">&quot;swapper/0&quot;</span><br> PID: 1      TASK: ffff881f91dae040  CPU: 28  COMMAND: <span class="hljs-string">&quot;init&quot;</span><br>  PID: 14544  TASK: ffff881f8d7b05c0  CPU: 11  COMMAND: <span class="hljs-string">&quot;init.tfa&quot;</span><br>   PID: 85138  TASK: ffff880bab01a400  CPU: 8   COMMAND: <span class="hljs-string">&quot;tfactl&quot;</span><br>    PID: 85151  TASK: ffff880b7a728380  CPU: 17  COMMAND: <span class="hljs-string">&quot;perl&quot;</span><br>ps -t [pid]: 显示进程运行时间<br></code></pre></td></tr></table></figure>
 
+<ul>
+<li><p>显示所有进程的pid、task_struct、cpu以及运行状态等信息<br><code>ps</code></p>
+<ul>
+<li><p>MEM列：使用物理内存的百分比</p>
+</li>
+<li><p>VSZ列：虚拟地址空间大小，单位KB</p>
+</li>
+<li><p>RSS列：实际使用的物理内存大小，单位KB</p>
+</li>
+<li><p>在进程状态一列显示的标识跟进程状态的对应关系(task_state_string)：</p>
+<table>
+<thead>
+<tr>
+<th>标识</th>
+<th>状态</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RU</td>
+<td>TASK_RUNNING</td>
+<td>0</td>
+</tr>
+<tr>
+<td>IN</td>
+<td>TASK_INTERRUPTIBLE</td>
+<td>1</td>
+</tr>
+<tr>
+<td>UN</td>
+<td>TASK_UNINTERRUPTIBLE</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ZO</td>
+<td>EXIT_ZOMBIE</td>
+<td></td>
+</tr>
+<tr>
+<td>ST</td>
+<td>__TASK_STOPPED</td>
+<td></td>
+</tr>
+<tr>
+<td>TR</td>
+<td>__TASK_TRACED</td>
+<td></td>
+</tr>
+<tr>
+<td>DE</td>
+<td>EXIT_DEAD</td>
+<td></td>
+</tr>
+<tr>
+<td>SW</td>
+<td>SWAPPING</td>
+<td></td>
+</tr>
+<tr>
+<td>WA</td>
+<td>TASK_WAKING</td>
+<td></td>
+</tr>
+<tr>
+<td>PA</td>
+<td>TASK_PARKED</td>
+<td></td>
+</tr>
+<tr>
+<td>ID</td>
+<td>TASK_IDLE</td>
+<td>TASK_UNINTERRUPTIBLE | TASK_NOLOAD</td>
+</tr>
+<tr>
+<td>NE</td>
+<td>TASK_NEW</td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+<li><p>显示指定进程的信息<br><code>ps &lt;进程pid&gt;</code><br>or<br><code>ps &lt;进程名字&gt;</code><br>or<br><code>ps &lt;进程task_struct地址&gt;</code></p>
+</li>
+<li><p>只显示内核线程<br><code>ps -k</code></p>
+</li>
+<li><p>只显示用户进程<br><code>ps -u</code></p>
+</li>
+<li><p>只显示线程组组长<br><code>ps -G</code></p>
+</li>
+<li><p>显示指定调度策略的任务<br><code>ps -y &lt;policy&gt;</code><br>这里的<code>policy</code>可以是左边的数组，或者对应的右边的字符串：</p>
+<table>
+<thead>
+<tr>
+<th>数字</th>
+<th>策略</th>
+<th>调度类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>NORMAL</td>
+<td>cfs</td>
+</tr>
+<tr>
+<td>1</td>
+<td>FIFO</td>
+<td>rt</td>
+</tr>
+<tr>
+<td>2</td>
+<td>RR</td>
+<td>rt</td>
+</tr>
+<tr>
+<td>3</td>
+<td>BATCH</td>
+<td>cfs</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ISO</td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td>IDLE</td>
+<td>cfs</td>
+</tr>
+<tr>
+<td>6</td>
+<td>DEADLINE</td>
+<td>deadline</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>显示每个进程的内核栈的地址<br><code>ps -s</code></p>
+</li>
+<li><p>显示进程之间的父子关系<br><code>ps -p</code></p>
+</li>
+<li><p>显示全部或者指定进程的子进程<br><code>ps -c</code></p>
+</li>
+<li><p>显示进程的运行时间、起始时间以及在用户态和内核态的时间<br><code>ps -t</code></p>
+</li>
+<li><p>显示进程上次运行的时间戳，有多个进程的话会从距离现在最近的时间戳开始进行排序<br><code>ps -l</code></p>
+<ul>
+<li>如果想将时间戳按<code>天-时-分-秒-毫秒</code>的形式显示，可以使用<code>ps -m</code></li>
+<li>如果想显示在指定cpu上的时间戳，可以配合<code>-C</code>：<code>ps -C 0,2,5-8 -l</code></li>
+</ul>
+</li>
+<li><p>按线程组的方式显示，<strong>如果知道了一个进程或者线程的pid，想知道所属的线程组还有哪些线程，可以使用这个命令</strong><br><code>ps -g</code></p>
+</li>
+<li><p>显示进程的资源限制<br><code>ps -r</code></p>
+</li>
+<li><p>统计每种状态的进程的数量<br><code>ps -S</code></p>
+</li>
+<li><p>只显示当前正在cpu上运行的进程<br><code>ps -A</code></p>
+</li>
+</ul>
 <h3 id="files"><a href="#files" class="headerlink" title="files"></a>files</h3><p>files pid 打印指定进程所打开的文件信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; files 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>ROOT: /    CWD: /<br> FD       FILE            DENTRY           INODE       TYPE PATH<br>  0 ffff8bac747f8900 ffff8bac7f00a000 ffff8bac7d02bad0 CHR  /dev/null<br>  1 ffff8bac747f9e00 ffff8bac7a23cd80 ffff8bac7abb5570 SOCK UNIX<br>  2 ffff8bac747f9e00 ffff8bac7a23cd80 ffff8bac7abb5570 SOCK UNIX<br>  3 ffff8bac794fdc00 ffff8bac7a0fd980 ffff8bac7ca64000 UNKN [eventfd]<br>  4 ffff8bac794fd700 ffff8bac7a0fc780 ffff8bac7a1771e0 FIFO <br>  5 ffff8bac794fde00 ffff8bac7a0fc780 ffff8bac7a1771e0 FIFO <br>  6 ffff8bac794fd400 ffff8bac66e9ecc0 ffff8bac7a1ec928 REG  /var/var/log/lightdm/lightdm.log<br>  7 ffff8bac794fc700 ffff8bac66e9e000 ffff8bac7ca64000 UNKN [eventfd]<br>  8 ffff8bac74d4d300 ffff8bac7a3ad680 ffff8bac7988d1a8 DIR  /var/var/lib/lightdm/data<br>  9 ffff8bac78f1d700 ffff8bac7a08cb40 ffff8bac7a090b30 SOCK UNIX<br> 10 ffff8bac73e40500 ffff8bac7985aa80 ffff8bac7ca64000 UNKN [eventfd]<br> 11 ffff8bac731c6b00 ffff8bac775a8000 ffff8bac7abfee30 SOCK UNIX<br> 15 ffff8bac74670900 ffff8bac7772e000 ffff8bac7aa704c0 FIFO <br> 16 ffff8bac74670e00 ffff8bac7772ef00 ffff8bac7aa72860 FIFO <br> 22 ffff8bac69130900 ffff8bac7772f500 ffff8bac7aa710a0 FIFO<br></code></pre></td></tr></table></figure>
 
-<h3 id="vm"><a href="#vm" class="headerlink" title="vm"></a>vm</h3><p>vm pid 打印某指定进程当时虚拟内存基本信息</p>
+
+
+<h3 id="vm"><a href="#vm" class="headerlink" title="vm"></a>vm</h3><p>vm pid 打印某指定进程当时虚拟内存基本信息，查看进程的用户虚拟内存信息（mm_struct地址，vma等）</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; vm 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>       MM               PGD          RSS    TOTAL_VM<br>ffff8bac695bf700  ffff8bac6ce42000  9504k   309268k <br>      VMA           START       END     FLAGS FILE<br>ffff8bac71486a90 563c12926000 563c1292d000 8000871 /usr/sbin/lightdm<br>ffff8bac714872b0 563c1292d000 563c12957000 8000875 /usr/sbin/lightdm<br>ffff8bac71486750 563c12957000 563c1296a000 8000871 /usr/sbin/lightdm<br>ffff8bac71487110 563c1296b000 563c1296c000 8100871 /usr/sbin/lightdm<br>ffff8bac713be340 563c1296c000 563c1296d000 8100873 /usr/sbin/lightdm<br>ffff8bac713be5b0 563c13820000 563c138ae000 8100073 <br>ffff8bac6ce94270 7fa728000000 7fa72802d000 8200073<br></code></pre></td></tr></table></figure>
 
+<p>看进程的用户虚拟内存的映射信息<br><code>vma -p</code></p>
+<ul>
+<li><p>如果虚拟地址已经映射到物理地址，那么会将对应的物理地址显示出来</p>
+</li>
+<li><p>否则，如果映射的是文件的话，显示文件名以及偏移</p>
+</li>
+<li><p>如果是匿名内存，并且被交换出去了，那么会显示对应的交换设备以及偏移</p>
+</li>
+<li><p>如果只想查看指定vma的映射信息，可以使用<code>vm -P &lt;vma的虚拟地址&gt;</code></p>
+</li>
+<li><p>查看指定mm_struct的信息，用于无法通过task_struct获取mm_struct，但是可以通过其他途径获取mm_struct地址的情况<br><code>vm -M &lt;mm_struct的地址&gt;</code></p>
+</li>
+<li><p>查看指定进程的mm_struct的内容，跟用<code>struct mm_struct &lt;mm_struct地址&gt;</code>一个效果<br><code>vm -m</code> 或者 <code>vm -m &lt;pid&gt;</code></p>
+</li>
+<li><p>查看指定进程的vm_area_struct的内容，跟<code>struct vm_area_struct &lt;vma地址&gt;</code>效果类似<br><code>vm -v</code> 或者 <code>vm -v &lt;pid&gt;</code> 或者 <code>vm -v &lt;进程task_struct&gt;</code></p>
+</li>
+</ul>
 <h3 id="task"><a href="#task" class="headerlink" title="task"></a>task</h3><p>task 查看当前进程或指定进程task_struct和thread_info的信息</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; task 1106<br>PID: 1106   TASK: ffff8bac7d2c0f40  CPU: 0   COMMAND: <span class="hljs-string">&quot;lightdm&quot;</span><br>struct task_struct &#123;<br>  thread_info = &#123;<br>    flags = 0, <br>    status = 0<br>  &#125;, <br>  state = 1, <br>  stack = 0xffffa530038c4000, <br>  usage = &#123;<br>    counter = 2<br>  &#125;, <br>  flags = 4194560, <br>  ptrace = 0, <br>  wake_entry = &#123;<br>    next = 0x0<br>  &#125;, <br>  on_cpu = 0, <br>  cpu = 0, <br>  wakee_flips = 16, <br>  wakee_flip_decay_ts = 4295264801, <br>  last_wakee = 0xffff8bac7d2c1e80, <br>	.................<br></code></pre></td></tr></table></figure>
+
+
 
 <h3 id="kmem"><a href="#kmem" class="headerlink" title="kmem"></a>kmem</h3><p><code>kmem -i</code> 查看内存整体使用情况</p>
 <p><code>kmem -s</code>  查看slab使用情况</p>
 <p><code>kmem [addr]</code> 搜索地址所属的内存结构</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; kmem -i<br>                 PAGES        TOTAL      PERCENTAGE<br>    TOTAL MEM  3847813      14.7 GB         ----<br>         FREE  2437856       9.3 GB   63% of TOTAL MEM<br>         USED  1409957       5.4 GB   36% of TOTAL MEM<br>       SHARED   197787     772.6 MB    5% of TOTAL MEM<br>      BUFFERS    43217     168.8 MB    1% of TOTAL MEM<br>       CACHED   984251       3.8 GB   25% of TOTAL MEM<br>         SLAB    73599     287.5 MB    1% of TOTAL MEM<br><br>   TOTAL HUGE        0            0         ----<br>    HUGE FREE        0            0    0% of TOTAL HUGE<br><br>   TOTAL SWAP  3971839      15.2 GB         ----<br>    SWAP USED        0            0    0% of TOTAL SWAP<br>    SWAP FREE  3971839      15.2 GB  100% of TOTAL SWAP<br><br> COMMIT LIMIT  5895745      22.5 GB         ----<br>    COMMITTED  1660064       6.3 GB   28% of TOTAL LIMIT<br></code></pre></td></tr></table></figure>
+
+
 
 <h3 id="struct"><a href="#struct" class="headerlink" title="struct"></a>struct</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">struct [struct]              //查看结构体成员变量<br>struct -o [struct]           //显示结构体中成员的偏移<br>struct [struct] [address]    //显示对应地址结构体的值<br>[struct] [address]           //简化形式显示对应地址结构体的值<br>[struct] [address] -xo       //打印结构体定义和大小<br>[struct].member[address]     //显示某个成员的值<br></code></pre></td></tr></table></figure>
 
@@ -359,8 +569,20 @@
 <p><code>rd [addr] [len]</code>                    &#x2F;&#x2F;查看指定地址，长度为len的内存<br><code>rd -S [addr][len]</code>                &#x2F;&#x2F;尝试将地址转换为对应的符号<br><code>rd [addr] -e [addr]</code>            &#x2F;&#x2F;查看指定内存区域内容</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; rd ffffffff8fbed352 32<br>ffffffff8fbed352:  ff8c17c6e8c78948 09d8bf8349c78949   H.......I..I....<br>ffffffff8fbed362:  000450850f000000 334865d0458b4800   .....P...H.E.eH3<br>ffffffff8fbed372:  850f000000282504 30c4834800000562   .%(.....b...H..0<br>ffffffff8fbed382:  415e415d415c415b 2140c0c748c35d5f   [A\A]A^A_].H..@!<br>ffffffff8fbed392:  1e3c050348650002 00000b8c80837042   ..eH..&lt;.Bp......<br>ffffffff8fbed3a2:  f641fffffd88e901 0f01000007412484   ......A..<span class="hljs-variable">$A</span>.....<br>ffffffff8fbed3b2:  0009bafffffdf785 df8948e6894c0000   ..........L..H..<br>ffffffff8fbed3c2:  44c741ff8c49f9e8 f641000000006c24   ..I..A.D<span class="hljs-variable">$l</span>....A.<br>ffffffff8fbed3d2:  0f02000004c82484 44f6410000032785   .$.......<span class="hljs-string">&#x27;...A.D</span><br><span class="hljs-string">ffffffff8fbed3e2:  fffdcc840f202424 8b495de8e7894cff   $$ ......L...]I.</span><br><span class="hljs-string">ffffffff8fbed3f2:  0fc08548c68949ff 3c408bfffffdb884   .I..H.........@&lt;</span><br><span class="hljs-string">ffffffff8fbed402:  4c00022140c5c749 4890509720c52c03   I..@!..L.,. .P.H</span><br><span class="hljs-string">ffffffff8fbed412:  486500022140c0c7 394970421db80503   ..@!..eH....BpI9</span><br><span class="hljs-string">ffffffff8fbed422:  6500000456850fc5 00015cc025048b48   ...V...eH..%.\..</span><br><span class="hljs-string">ffffffff8fbed432:  00044b840fc63949 0000079c868d4900   I9...K...I......</span><br><span class="hljs-string">ffffffff8fbed442:  e8b8458948c78948 3475c08500005b12   H..H.E...[....u4</span><br></code></pre></td></tr></table></figure>
 
+
+
 <h3 id="p"><a href="#p" class="headerlink" title="p"></a>p</h3><p>p命令可以用来打印出表达式或者变量的值</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">crash&gt; p __schedule<br>__schedule = <span class="hljs-variable">$1</span> = <br> &#123;void (bool)&#125; 0xffffffff8fbed0b0<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="ptov"><a href="#ptov" class="headerlink" title="ptov"></a>ptov</h3><p>根据一个物理地址，转存成对应的内核态虚拟地址</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">crash&gt; </span><span class="language-bash">ptov 65065400</span><br>VIRTUAL           PHYSICAL<br>ffff800025065400  65065400<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/pengdonglin137/collections/7424?page=1">https://www.cnblogs.com/pengdonglin137/collections/7424?page=1</a></p>
+
                 
               </div>
             

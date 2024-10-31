@@ -19,25 +19,25 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+    <meta name="description" content="scsi子系统硬件模型   上图为scsi子系统的硬件拓扑图：  soc芯片内部有host(0),host(1)…host(k)这些有scsi功能的控制器  这些host分别连接着片外的scsi设备device(0)…device(k)外设  每个device内部有若干个channel，每个channel下面有若干个id，每个id下面有若干个lun  这些lun就是可以接受scsi命令的实体，例如">
 <meta property="og:type" content="article">
-<meta property="og:title" content="内存管理">
-<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:title" content="scsi子系统">
+<meta property="og:url" content="https://tomwithkernel.github.io/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+<meta property="og:description" content="scsi子系统硬件模型   上图为scsi子系统的硬件拓扑图：  soc芯片内部有host(0),host(1)…host(k)这些有scsi功能的控制器  这些host分别连接着片外的scsi设备device(0)…device(k)外设  每个device内部有若干个channel，每个channel下面有若干个id，每个id下面有若干个lun  这些lun就是可以接受scsi命令的实体，例如">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png">
-<meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T05:48:59.268Z">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_dev.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_2.png">
+<meta property="article:published_time" content="2024-10-21T07:30:09.000Z">
+<meta property="article:modified_time" content="2024-10-24T01:39:39.310Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="scsi">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_dev.png">
   
   
   
-  <title>内存管理 - TomWithKernel&#39;s Blog</title>
+  <title>scsi子系统 - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -222,7 +222,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="内存管理"></span>
+            <span id="subtitle" data-typed-text="scsi子系统"></span>
           
         </div>
 
@@ -233,8 +233,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 10:09" pubdate>
-          2024年7月10日 上午
+        <time datetime="2024-10-21 15:30" pubdate>
+          2024年10月21日 下午
         </time>
       </span>
     
@@ -245,7 +245,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          2.3k 字
         
       </span>
     
@@ -256,7 +256,7 @@
         
         
         
-          13 分钟
+          20 分钟
         
       </span>
     
@@ -302,112 +302,131 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">内存管理</h1>
+            <h1 id="seo-header">scsi子系统</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="内存寻址"><a href="#内存寻址" class="headerlink" title="内存寻址"></a>内存寻址</h2><h3 id="内存地址"><a href="#内存地址" class="headerlink" title="内存地址"></a>内存地址</h3><p>​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离</p>
-<p>​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff</p>
-<p>​	物理地址：内存芯片级内存单元寻址</p>
-<p>​	在内存寻址中，我们通常以字节为单位</p>
-<h3 id="段选择符和段寄存器"><a href="#段选择符和段寄存器" class="headerlink" title="段选择符和段寄存器"></a>段选择符和段寄存器</h3><p>​	逻辑地址：段标识符+段内相对地址偏移量</p>
-<p>​	<strong>段标识符</strong>是一个16位长的字段，成为<strong>段选择符</strong></p>
-<p>​	段寄存器：快速查找段选择符，cs，ss，ds，es，fs，gs，程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</p>
-<p>​		cs：代码段寄存器，指向包含程序指令的段，它含有一个两位的字段，指明CPU当前的特权级（CPL），0内核态，3用户态</p>
-<p>​		ss：栈段寄存器，指向包含当前程序栈的段</p>
-<p>​		ds：数据段寄存器，指向包含静态数据或全局数据段</p>
-<h3 id="段描述符"><a href="#段描述符" class="headerlink" title="段描述符"></a>段描述符</h3><p>​	每个段由一个8字节的段描述符表示，它描述段的特征。放在全局描述符表（GDT）或局部描述符表（LDT）中。</p>
-<p>​	通常只定义一个GDT，而每个进程除了存放在GDT的段以外如果还需创建附加段就可以有自己的LDT。GDT在主存中的地址和大小放在gdtr控制寄存器中，当前正被使用的LDT地址和大小放在ldtr控制寄存器中</p>
-<p>​	段描述符字段</p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Base</td>
-<td>段首地址的线性地址</td>
-</tr>
-<tr>
-<td>G</td>
-<td>粒度标志：如果该位清0，则段大小以字节为单位，否则以4096字节的倍数计</td>
-</tr>
-<tr>
-<td>Limit</td>
-<td>存放段中最后一个内存单元的偏移量，从而决定段的长度。如果G被置为0，则一个段的大小在1个字节到1MB之间变化；否则，将在4KB到4GB之间变化</td>
-</tr>
-<tr>
-<td>S</td>
-<td>系统标志：如果它被清0，则这是一个系统段，存储诸如LDT这种关键的数据结构，否则它是一个普通的代码段或数据段</td>
-</tr>
-<tr>
-<td>Type</td>
-<td>描述了段的类型特征和它的存取权限（请看表下面的描述）</td>
-</tr>
-<tr>
-<td>DPL</td>
-<td>描述符特权级（Descriptor Privilege Level）字段：用于限制对这个段的存取。它表示为访问这个段而要求的CPU最小的优先级。因此，DPL设为0的段只能当CPL为0时（即在内核态）才是可访问的，而DPL设为3的段对任何CPL值都是可访问的</td>
-</tr>
-<tr>
-<td>P</td>
-<td>Segment-Present标志：等于0表示段当前不在主存中。Linux总是把这个标志（第47位）设为1，因为它从来不把整个段交换到磁盘上去</td>
-</tr>
-<tr>
-<td>D或B</td>
-<td>称为D或B的标志，取决于是代码段还是数据段。D或B的含义在两种情况下稍微有所区别，但是如果段偏移量的地址是32位长，就基本上把它置为1，如果这个偏移量是16位长，它被清0（更详细的描述参见Intel使用手册）</td>
-</tr>
-<tr>
-<td>AVL标志</td>
-<td>可以由操作系统使用，但是被Linux忽略</td>
-</tr>
-</tbody></table>
-<h3 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h3><table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>index</td>
-<td>指定了放在GDT或LDT中的相应段描述符的入口</td>
-</tr>
-<tr>
-<td>TI</td>
-<td>（Table Indicator）标志，指明段描述符是在GDT中（TI&#x3D;0）或在LDT中（TI&#x3D;1）</td>
-</tr>
-<tr>
-<td>RPL</td>
-<td>请求者特权级：当相应的段选择符装入到cs寄存器中时指示出CPU当前的特权级，它还可以用于在访问数据段时有选择地削弱处理器的特权级</td>
-</tr>
-</tbody></table>
-<h3 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h3><p>​	逻辑地址	—-&gt;	线性地址</p>
-<p>​	从段选择符的index字段计算段描述符的地址，index字段乘以8（一个段描述符大小），结果与gdtr或ldtr相加</p>
-<p>​	逻辑地址偏移量+段描述符地址	—&gt;	线性地址</p>
-<h3 id="Linux中的分段"><a href="#Linux中的分段" class="headerlink" title="Linux中的分段"></a>Linux中的分段</h3><p>​	分段可以给每一个进程分配不同的线性地址空间</p>
-<p>​	分页可以把同一线性地址空间映射到不同的物理空间（Linux多用这个）</p>
-<h3 id="硬件中的分页"><a href="#硬件中的分页" class="headerlink" title="硬件中的分页"></a>硬件中的分页</h3><p>​	分页单元把线性地址转换为物理地址</p>
-<p>​	其中一个关键任务，把请求访问的类型和线性地址的访问权限相比较，如果这次内存访问无效，就产生一个缺页异常</p>
-<p>​	线性地址被分为以固定长度位单位的组，称为<strong>页</strong>。页内部连续的线性地址被映射到连续的物理地址中</p>
-<p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
-<p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
-<p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
+                <h2 id="scsi子系统"><a href="#scsi子系统" class="headerlink" title="scsi子系统"></a>scsi子系统</h2><h3 id="硬件模型"><a href="#硬件模型" class="headerlink" title="硬件模型"></a>硬件模型</h3><img src="/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_dev.png" srcset="/img/loading.gif" lazyload class="" title="scsi_hardware"> 
 
-<h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
+<p>上图为scsi子系统的硬件拓扑图：</p>
 <ul>
-<li>页全局目录</li>
-<li>页上级目录</li>
-<li>页中级目录</li>
-<li>页表</li>
+<li><p>soc芯片内部有host(0),host(1)…host(k)这些有scsi功能的控制器</p>
+</li>
+<li><p>这些host分别连接着片外的scsi设备device(0)…device(k)外设</p>
+</li>
+<li><p>每个device内部有若干个channel，每个channel下面有若干个id，每个id下面有若干个lun</p>
+</li>
+<li><p>这些lun就是可以接受scsi命令的实体，例如可以是硬盘，cdrom，磁带等等，也可以是一些可以接收特殊scsi命令的wlun</p>
+</li>
 </ul>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
+<h4 id="Host-0-k"><a href="#Host-0-k" class="headerlink" title="Host(0-k)"></a>Host(0-k)</h4><ul>
+<li>表示可以发送和接收scsi命令的控制器。图示中的host(0)，host(1)是一个示意图，框图以描述host(k)为主</li>
+<li>一个控制器对应一个外设；也可以不接任何外设</li>
+</ul>
+<div class="note note-warning">
+            <p>注意：需要说明的是，现实硬件里看不到任何纯scsi控制器；例如ufs的scsi命令是ufs控制器通过upiu传送和接收的，upiu是在mipi总线上传送的物理信息，而scsi则是cmd upiu中的字段。再例如usb U盘，也是类似情况。</p>
+          </div>
 
+<ul>
+<li><p>在UFS设备中，虽然上层协议采用了SCSI命令集，但传输介质和方法并不直接依赖SCSI硬件控制器。UFS控制器通过<strong>UPIU（UFS Protocol Information Unit）</strong>来传输和接收SCSI命令。UPIU可以看作是一种封装结构，承载了SCSI命令。最终，UPIU在物理上通过<strong>MIPI（Mobile Industry Processor Interface）</strong>总线传输，而不是传统的SCSI总线。</p>
+</li>
+<li><p>UFS协议栈利用SCSI命令集来处理存储请求，但这些SCSI命令实际上通过UPIU载体在MIPI总线上进行传输。因此，SCSI命令只是协议的一部分，而实际的物理层由其他技术来完成。</p>
+</li>
+</ul>
+<p>因此这里的host(0),host(1)…host(k)是一个控制器抽象描述，真实的控制器可以是ufs、usb上接着的硬盘控制器(这个应该画在soc外面)或者pcie上挂着的硬盘控制器(这个也应该画在soc外面)。</p>
+<h4 id="device-0-k"><a href="#device-0-k" class="headerlink" title="device(0-k)"></a>device(0-k)</h4><p>图示中，例子device(0)是连接到host(0)控制器上的外设；device(k)是连接到host(k)控制器上的外设。外设可以是硬盘，光驱，ufs等。</p>
+<p>Host和device之间的连接方式用了一个双箭头表示，它是一个抽象描述，代表scsi命令通道。</p>
+<img src="/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_2.png" srcset="/img/loading.gif" lazyload class="" title="scsi"> 
 
-
+<p>Scsi只是一个协议，因此各种五花八门的控制器都可以使用scsi进行交互。因此这个“通道”是借助各种控制器的驱动来完成的。有点像协议分层，scsi类似于协议层，而物理层，链路层则交给了各种控制器去完成。</p>
+<h4 id="channel-id"><a href="#channel-id" class="headerlink" title="channel + id"></a>channel + id</h4><h5 id="SCSI-channel"><a href="#SCSI-channel" class="headerlink" title="SCSI channel"></a>SCSI channel</h5><ul>
+<li><p>scsi channel（通道）指的是设备之间数据传输的物理或逻辑路径。一个SCSI控制器可以有多个通道，每个通道能够连接多个设备，类似于一条“数据总线”。具体而言：</p>
+<ul>
+<li>一个SCSI通道可以看作是多个设备共用的连接“线路”，所有的设备通过这个通道与控制器进行通信。</li>
+<li>在多通道的SCSI控制器中，通道可以分开管理，通常用于连接多个设备或分离设备组（例如硬盘、磁带机等）。</li>
+</ul>
+<p><strong>举例</strong>：某些高端服务器可能会配备双通道SCSI控制器，一个通道连接硬盘，另一个通道连接磁带机。</p>
+</li>
+</ul>
+<h5 id="SCSI-id"><a href="#SCSI-id" class="headerlink" title="SCSI id"></a>SCSI id</h5><ul>
+<li><p>scsi id是分配给每个SCSI设备的唯一标识符，用于区分同一通道上连接的不同设备。每个设备都需要有一个唯一的ID，以便主机能够识别它们。SCSI ID的作用类似于网络中的IP地址，是设备之间通信的基本标识。</p>
+<ul>
+<li>SCSI设备的ID范围通常为0到7（针对7设备的窄SCSI），或者0到15（针对15设备的宽SCSI），主机和每个设备都占用一个ID。</li>
+<li><strong>主机</strong>（也就是SCSI控制器）通常默认使用ID 7（在窄SCSI中），因为它需要优先管理与其他设备的通信。</li>
+<li>每个设备（例如硬盘、光驱）都有唯一的SCSI ID，控制器通过这个ID与设备进行通信。</li>
+</ul>
+<p><strong>举例</strong>： 在窄SCSI中，假设主机的SCSI ID为7，三个硬盘的SCSI ID分别为0、1、2。主机在通过通道发送数据时，会根据SCSI ID将数据发送到相应的设备</p>
+</li>
+</ul>
+<h5 id="SCSI-Channel和ID的用途"><a href="#SCSI-Channel和ID的用途" class="headerlink" title="SCSI Channel和ID的用途"></a>SCSI Channel和ID的用途</h5><ul>
+<li><strong>设备识别</strong>：SCSI通道加上SCSI ID的组合确保了在一个SCSI总线上的设备能够被唯一识别。例如，假设一个服务器有一个双通道SCSI控制器，并且每个通道上连接多个硬盘。每个硬盘将通过特定的通道和ID被主机识别和访问。</li>
+<li><strong>多设备管理</strong>：SCSI通道和ID的设计允许多个设备共享一个通道进行通信。例如，在旧式SCSI系统中，多个设备可以共享一条SCSI总线。ID区分了不同设备，使得主机能够管理并同时访问多个设备。</li>
+<li><strong>优先级</strong>：在传统SCSI系统中，ID的数值还影响设备的优先级。ID越高，优先级越高。例如，SCSI ID 7（通常分配给控制器）具有最高优先级，这意味着它的操作通常会优先于其他设备。</li>
+</ul>
+<h4 id="SCSI-Target"><a href="#SCSI-Target" class="headerlink" title="SCSI Target"></a>SCSI Target</h4><p>在SCSI（Small Computer System Interface）系统中，<strong>Target</strong>是指一个<strong>SCSI设备</strong>，它负责响应来自<strong>Initiator</strong>（主机）发出的SCSI命令。Target设备可以是多种类型的硬件设备，通常包括存储设备如硬盘、光驱、磁带机、或者RAID控制器。</p>
+<p><strong>Target</strong>是Initiator与SCSI系统中的设备通信的对象。在SCSI架构中：</p>
+<ul>
+<li><strong>Initiator</strong>：是发出SCSI命令的设备，通常是计算机的主机控制器（Host Bus Adapter, HBA）。</li>
+<li><strong>Target</strong>：是接收并处理这些命令的设备，比如硬盘、光驱等。</li>
+</ul>
+<p><strong>Target设备的例子</strong>：</p>
+<ul>
+<li>SCSI硬盘</li>
+<li>SCSI磁带机</li>
+<li>SCSI光驱</li>
+<li>RAID控制器</li>
+</ul>
+<p><strong>Target与ID</strong>：</p>
+<ul>
+<li><strong>Target</strong>设备通过一个SCSI总线的<strong>ID</strong>来标识。每个Target在SCSI总线上都有一个唯一的<strong>Target ID</strong>。多个设备（Target）可以连接在同一个SCSI总线上，每个设备都通过不同的ID来区分。</li>
+<li>SCSI ID是Target设备在SCSI总线上的唯一标识符，决定了系统如何识别和寻址该设备。</li>
+</ul>
+<p><strong>Target与LUN（Logical Unit Number，逻辑单元号）</strong>：</p>
+<ul>
+<li>一个Target设备可以包含多个<strong>LUN</strong>，每个LUN代表设备内部的一个逻辑单元。例如，一个硬盘可能有多个逻辑卷（partition），每个卷会有一个不同的LUN。</li>
+<li>LUN的存在让Target设备能够表示多个逻辑资源（例如，一个RAID控制器有多个磁盘阵列，每个阵列可能分配一个LUN）。</li>
+</ul>
+<h4 id="LUN"><a href="#LUN" class="headerlink" title="LUN"></a>LUN</h4><p><strong>LUN作为SCSI命令接收主体</strong>：</p>
+<ul>
+<li><strong>LUN（逻辑单元号）</strong>可以代表不同的设备或逻辑实体，能够接收并处理来自SCSI Initiator的命令。例如，它可以是一个物理硬盘、光驱等存储设备，或是UFS固件虚拟出来的设备，比如RPMB（Replay Protected Memory Block）、Boot0、Boot1等。</li>
+</ul>
+<p><strong>非物理实体的LUN</strong>：</p>
+<ul>
+<li>有些LUN并不对应实际的物理设备，而是虚拟逻辑单元，例如<code>REPORT LUNS</code>命令会返回设备上存在的LUN信息，这些LUN也是SCSI协议中的有效目标。</li>
+</ul>
+<p><strong>每个LUN在Linux通用块设备层（generic block layer）拥有独立的request queue</strong>：</p>
+<ul>
+<li>在Linux内核中，每个LUN都有自己的<strong>request queue</strong>，即请求队列，用于管理该LUN的I&#x2F;O请求。</li>
+</ul>
+<p><strong>逻辑分区</strong>：</p>
+<ul>
+<li>如果一个硬盘被分为多个逻辑分区（通过GPT或MBR），这些分区是在一个LUN内，因此它们共享同一个request queue。这种分区属于文件系统的层级，而不是在SCSI子系统内处理的。</li>
+</ul>
+<h3 id="scsi-三个重要组成"><a href="#scsi-三个重要组成" class="headerlink" title="scsi 三个重要组成"></a>scsi 三个重要组成</h3><h3 id="1-SCSI-Bus"><a href="#1-SCSI-Bus" class="headerlink" title="1. SCSI Bus"></a>1. <strong>SCSI Bus</strong></h3><ul>
+<li><p><strong>SCSI Bus</strong> 是所有SCSI主机（Host）、目标设备（Target）和逻辑单元号（LUN）连接的总线。每个设备都对应一个 <code>struct device</code>，这些设备通过SCSI Bus进行组织和管理。</p>
+</li>
+<li><p>常见的SCSI设备驱动如 <strong>sd</strong>（磁盘驱动）、<strong>sr</strong>（光盘驱动）、<strong>osst</strong>（磁带驱动）等都挂载在SCSI Bus上，并通过 <code>struct device</code> 激活它们。</p>
+<p><strong>作用</strong>：SCSI Bus 承载了所有设备的通信，使主机能够与各种目标设备（包括磁盘、光驱等）进行数据交换。</p>
+</li>
+</ul>
+<h3 id="2-SCSI-Host"><a href="#2-SCSI-Host" class="headerlink" title="2. SCSI Host"></a>2. <strong>SCSI Host</strong></h3><ul>
+<li><p><strong>SCSI Host</strong> 是主机控制器，它负责管理主机系统与SCSI设备之间的交互。它通过 <code>struct device</code> 注册到系统中，并挂载在 <code>scsi_host</code> class 下。</p>
+</li>
+<li><p>每个 SCSI Host 控制器都具有特定的属性，例如通过它的 <code>struct device</code> 的属性组（attr group, type）可以查看和控制其特性，如触发扫描操作。</p>
+</li>
+<li><p>可以通过在 <code>scsi_host</code> 上使用扫描（scan）机制来强制系统扫描主机下的所有SCSI设备。</p>
+<p><strong>作用</strong>：SCSI Host 控制器通过处理SCSI命令，使主机能够与连接的SCSI设备进行交互，并协调设备的发现和管理。</p>
+</li>
+</ul>
+<h3 id="3-SCSI-Device"><a href="#3-SCSI-Device" class="headerlink" title="3. SCSI Device"></a>3. <strong>SCSI Device</strong></h3><ul>
+<li><p><strong>SCSI Device</strong> 表示SCSI子系统中的每一个 <strong>LUN（逻辑单元）</strong>。每个LUN在SCSI系统中都有一个对应的 <code>struct device</code>，并且这些设备都会挂载在 <code>scsi_device</code> class 上。</p>
+</li>
+<li><p>操作LUN的通用驱动程序是 <strong>sg.c</strong>，即SCSI通用（SCSI Generic）驱动，它提供了对LUN的直接操作接口。</p>
+<p><strong>作用</strong>：SCSI Device 是SCSI子系统中的具体目标设备（如硬盘、光驱等）。每个LUN都可以独立接收并处理来自主机的SCSI命令。</p>
+</li>
+</ul>
+<h4 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h4><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/feelabclihu/article/details/108675669">https://blog.csdn.net/feelabclihu/article/details/108675669</a></p>
 
                 
               </div>
@@ -426,7 +445,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="category-chain-item">内存管理</a>
+  <a href="/categories/scsi/" class="category-chain-item">scsi</a>
   
   
 
@@ -441,7 +460,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="print-no-link">#内存管理</a>
+        <a href="/tags/scsi/" class="print-no-link">#scsi</a>
       
     </div>
   
@@ -453,8 +472,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>内存管理</div>
-      <div>https://tomwithkernel.github.io/kernel/内存管理/内存管理/</div>
+      <div>scsi子系统</div>
+      <div>https://tomwithkernel.github.io/kernel/scsi/scsi子系统/</div>
     </div>
     <div class="license-meta">
       
@@ -466,7 +485,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月10日</div>
+          <div>2024年10月21日</div>
         </div>
       
       
@@ -498,9 +517,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/" title="S3 问题根因分析技术文档">
+                      <a href="/kernel/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/" title="进程">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">S3 问题根因分析技术文档</span>
+                        <span class="hidden-mobile">进程</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -508,8 +527,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/kernel/pm/Suspend/" title="Suspend (kernel 5.10)">
-                        <span class="hidden-mobile">Suspend (kernel 5.10)</span>
+                      <a href="/dbg_meth/kgdb/" title="kgdb">
+                        <span class="hidden-mobile">kgdb</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

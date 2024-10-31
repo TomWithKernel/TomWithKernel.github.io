@@ -19,25 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+    <meta name="description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产生">
 <meta property="og:type" content="article">
-<meta property="og:title" content="内存管理">
-<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:title" content="中断">
+<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+<meta property="og:description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产生">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png">
-<meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T05:48:59.268Z">
+<meta property="article:published_time" content="2024-10-31T05:45:42.000Z">
+<meta property="article:modified_time" content="2024-10-31T05:48:56.640Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="中断">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
   
   
   
-  <title>内存管理 - TomWithKernel&#39;s Blog</title>
+  <title>中断 - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -222,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="内存管理"></span>
+            <span id="subtitle" data-typed-text="中断"></span>
           
         </div>
 
@@ -233,8 +230,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 10:09" pubdate>
-          2024年7月10日 上午
+        <time datetime="2024-10-31 13:45" pubdate>
+          2024年10月31日 下午
         </time>
       </span>
     
@@ -245,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          2k 字
         
       </span>
     
@@ -256,7 +253,7 @@
         
         
         
-          13 分钟
+          17 分钟
         
       </span>
     
@@ -302,112 +299,69 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">内存管理</h1>
+            <h1 id="seo-header">中断</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="内存寻址"><a href="#内存寻址" class="headerlink" title="内存寻址"></a>内存寻址</h2><h3 id="内存地址"><a href="#内存地址" class="headerlink" title="内存地址"></a>内存地址</h3><p>​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离</p>
-<p>​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff</p>
-<p>​	物理地址：内存芯片级内存单元寻址</p>
-<p>​	在内存寻址中，我们通常以字节为单位</p>
-<h3 id="段选择符和段寄存器"><a href="#段选择符和段寄存器" class="headerlink" title="段选择符和段寄存器"></a>段选择符和段寄存器</h3><p>​	逻辑地址：段标识符+段内相对地址偏移量</p>
-<p>​	<strong>段标识符</strong>是一个16位长的字段，成为<strong>段选择符</strong></p>
-<p>​	段寄存器：快速查找段选择符，cs，ss，ds，es，fs，gs，程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</p>
-<p>​		cs：代码段寄存器，指向包含程序指令的段，它含有一个两位的字段，指明CPU当前的特权级（CPL），0内核态，3用户态</p>
-<p>​		ss：栈段寄存器，指向包含当前程序栈的段</p>
-<p>​		ds：数据段寄存器，指向包含静态数据或全局数据段</p>
-<h3 id="段描述符"><a href="#段描述符" class="headerlink" title="段描述符"></a>段描述符</h3><p>​	每个段由一个8字节的段描述符表示，它描述段的特征。放在全局描述符表（GDT）或局部描述符表（LDT）中。</p>
-<p>​	通常只定义一个GDT，而每个进程除了存放在GDT的段以外如果还需创建附加段就可以有自己的LDT。GDT在主存中的地址和大小放在gdtr控制寄存器中，当前正被使用的LDT地址和大小放在ldtr控制寄存器中</p>
-<p>​	段描述符字段</p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Base</td>
-<td>段首地址的线性地址</td>
-</tr>
-<tr>
-<td>G</td>
-<td>粒度标志：如果该位清0，则段大小以字节为单位，否则以4096字节的倍数计</td>
-</tr>
-<tr>
-<td>Limit</td>
-<td>存放段中最后一个内存单元的偏移量，从而决定段的长度。如果G被置为0，则一个段的大小在1个字节到1MB之间变化；否则，将在4KB到4GB之间变化</td>
-</tr>
-<tr>
-<td>S</td>
-<td>系统标志：如果它被清0，则这是一个系统段，存储诸如LDT这种关键的数据结构，否则它是一个普通的代码段或数据段</td>
-</tr>
-<tr>
-<td>Type</td>
-<td>描述了段的类型特征和它的存取权限（请看表下面的描述）</td>
-</tr>
-<tr>
-<td>DPL</td>
-<td>描述符特权级（Descriptor Privilege Level）字段：用于限制对这个段的存取。它表示为访问这个段而要求的CPU最小的优先级。因此，DPL设为0的段只能当CPL为0时（即在内核态）才是可访问的，而DPL设为3的段对任何CPL值都是可访问的</td>
-</tr>
-<tr>
-<td>P</td>
-<td>Segment-Present标志：等于0表示段当前不在主存中。Linux总是把这个标志（第47位）设为1，因为它从来不把整个段交换到磁盘上去</td>
-</tr>
-<tr>
-<td>D或B</td>
-<td>称为D或B的标志，取决于是代码段还是数据段。D或B的含义在两种情况下稍微有所区别，但是如果段偏移量的地址是32位长，就基本上把它置为1，如果这个偏移量是16位长，它被清0（更详细的描述参见Intel使用手册）</td>
-</tr>
-<tr>
-<td>AVL标志</td>
-<td>可以由操作系统使用，但是被Linux忽略</td>
-</tr>
-</tbody></table>
-<h3 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h3><table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>index</td>
-<td>指定了放在GDT或LDT中的相应段描述符的入口</td>
-</tr>
-<tr>
-<td>TI</td>
-<td>（Table Indicator）标志，指明段描述符是在GDT中（TI&#x3D;0）或在LDT中（TI&#x3D;1）</td>
-</tr>
-<tr>
-<td>RPL</td>
-<td>请求者特权级：当相应的段选择符装入到cs寄存器中时指示出CPU当前的特权级，它还可以用于在访问数据段时有选择地削弱处理器的特权级</td>
-</tr>
-</tbody></table>
-<h3 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h3><p>​	逻辑地址	—-&gt;	线性地址</p>
-<p>​	从段选择符的index字段计算段描述符的地址，index字段乘以8（一个段描述符大小），结果与gdtr或ldtr相加</p>
-<p>​	逻辑地址偏移量+段描述符地址	—&gt;	线性地址</p>
-<h3 id="Linux中的分段"><a href="#Linux中的分段" class="headerlink" title="Linux中的分段"></a>Linux中的分段</h3><p>​	分段可以给每一个进程分配不同的线性地址空间</p>
-<p>​	分页可以把同一线性地址空间映射到不同的物理空间（Linux多用这个）</p>
-<h3 id="硬件中的分页"><a href="#硬件中的分页" class="headerlink" title="硬件中的分页"></a>硬件中的分页</h3><p>​	分页单元把线性地址转换为物理地址</p>
-<p>​	其中一个关键任务，把请求访问的类型和线性地址的访问权限相比较，如果这次内存访问无效，就产生一个缺页异常</p>
-<p>​	线性地址被分为以固定长度位单位的组，称为<strong>页</strong>。页内部连续的线性地址被映射到连续的物理地址中</p>
-<p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
-<p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
-<p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
-
-<h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
+                <h2 id="中断和异常"><a href="#中断和异常" class="headerlink" title="中断和异常"></a>中断和异常</h2><p>中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。<br>中断通常分为同步（synchronous）中断和异步（asynchronous）中断：</p>
 <ul>
-<li>页全局目录</li>
-<li>页上级目录</li>
-<li>页中级目录</li>
-<li>页表</li>
+<li>同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。</li>
+<li>异步中断是由其他硬件设备依照CPU时钟信号随机产生的。</li>
 </ul>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
-
-
-
+<p>在Intel微处理器手册中，把同步和异步中断分别称为<strong>异常</strong>（exception）和<strong>中断</strong>（interrupt）。我们也采用这种分类，当然有时我们也用术语“中断信号”指这两种类型（同步及异步）。</p>
+<p>中断是由间隔定时器和I&#x2F;O设备产生的，例如，用户的一次按键会引起一个中断。另一方面，异常是由程序的错误产生的，或者是由内核必须处理的异常条件产生的。第一种情况下，内核通过发送一个每个Unix程序员都熟悉的信号来处理异常。第二种情况下，内核执行恢复异常需要的所有步骤，例如缺页，或对内核服务的一个请求（通过一条int或sysenter指令）。</p>
+<h3 id="中断和异常-1"><a href="#中断和异常-1" class="headerlink" title="中断和异常"></a>中断和异常</h3><ul>
+<li><p>中断：</p>
+<ul>
+<li><p>可屏蔽中断</p>
+<p>I&#x2F;O设备发出的所有中断请求（IRQ)都产生可屏蔽中断。可屏蔽中断可以处于两种状态：屏蔽的（masked）或非屏蔽的（unmasked）：一个屏蔽的中断只要还是屏蔽的，控制单元就忽略它。</p>
+</li>
+<li><p>非屏蔽中断</p>
+<p>只有几个危急事件（如硬件故障）才引起非屏蔽中断，非屏蔽中断总是由CPU辨认</p>
+</li>
+</ul>
+</li>
+<li><p>异常</p>
+<ul>
+<li><p>处理器探测异常</p>
+<p>当CPU执行指令时探测到的一个反常条件所产生的异常。可以进一步分为三组，这取决于CPU控制单元产生异常时保存在内核态堆栈eip寄存器（在 x86 指令集中，EIP 寄存器存储着 CPU 将要执行的下一条指令的内存地址）中的值。</p>
+<ul>
+<li><p>故障</p>
+<p>通常可以纠正；一且纠正，程序就可以在不失连贯性的情况下重新开始。保存在eip中的值是引起故障的指令地址，因此，当异常处理程序终止时，那条指令会被重新执行。我们将在“缺页异常处理程序”一节中看到，只要处理程序能纠正引起异常的反常条件，重新执行同一指令就是必要的。</p>
+</li>
+<li><p>陷阱</p>
+<p>在陷指令执行后立即报告：内核把控制权返回给程序后就可以继续它的执行而不失连贯性。保存在eip中的值是一个随后要执行的指令地址。只有当没有必要重新执行已终止的指令时，才触发陷阱。陷阱的主要用途是为了调试程序。在这种情况下，中断信号的作用是通知调试程序一条特殊指令已被执行（例如到了一个程序内的断点）。一旦用户检查到调试程序所提供的数据，她就可能要求被调试程序从下一条指令重新开始执行。</p>
+</li>
+<li><p>异常终止</p>
+<p>发生一个严重的错误：控制单元出了问题，不能在eip寄存器中保存引起异常的指令所在的确切位置。异常中止用于报告严重的错误，如硬件故障或系统表中无效的值或不一致的值。由控制单元发送的这个中断信号是紧急信号，用来把控制权切换到相应的异常中止处理程序，这个异常中止处理程序除了强制受影响的进程终止外，没有别的选择。</p>
+</li>
+<li><p>编程异常</p>
+<p>在编程者发出请求时发生。是由int或int3指令触发的：当into（检查溢出）和bound（检查地址出界）指令检查的条件不为真时，也引起编程异常。控制单元把编程异常作为陷来处理。编程异常通常也叫做软中断（software interrupt）。这样的异常有两种常用的用途：执行系统调用及给调试程序通报一个特定的事件。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>每个中断和异常是由0~255之间的一个数来标识。因为一些未知的原因，Intel把这个8位的无符号整数叫做一个向量（vector）。非屏蔽中断的向量和异常的向量是固定的，而可屏蔽中断的向量可以通过对中断控制器的编程来改变。</p>
+<h3 id="IRQ和中断"><a href="#IRQ和中断" class="headerlink" title="IRQ和中断"></a>IRQ和中断</h3><p>​	每个能够发出中断请求的硬件设备控制器都有一条名为IRQ（Interrupt ReQuest）的输出线（复杂一些的设备有几条IRQ线，例知，PCI卡可能使用多达4条IRQ线）。所有现有的IRQ线（IRQ line）都与一个名为可编程中断控制器（Programmable Interrupt Controller，PIC)的硬件电路的输入引脚相连，可编程中断控制器执行下列动作：</p>
+<pre><code class="hljs"> 1. 监视IRQ线，检查产生的信号（raised signal）。如果有条或两条以上的IRQ线上产生信号，就选择引脚编号较小的IRQ线
+ 2. 如果一个引发信号出现在IRQ线上：
+  - 把接收到的引发信号转换成对应的向量
+  - 把这个向量存放在中断控制器的一个I/O端口，从而允许CPU通过数据总线读取此向量
+  - 把引发信号发送到处理器的INTR引脚，即产生一个中断
+  - 等待，直到CPU通过把这个中断信号写进可编程中断控制器的一个I/O端口来确认他；当这种情况发生时，清INTR线
+ 3. 返回到第一步
+</code></pre>
+<p>​	IRQ线是从0开始顺序编号的，因此，第一条IRQ线通常表示成IRQ0。与IRQn关联的Intel的缺省向量是n+32。如前所述，通过向中断控制器端口发布合适的指令，就可以修改IRQ和向量之间的映射。</p>
+<p>​	可以有选择地禁止每条IRQ线。因此，可以对PIC编程从而禁止IRQ，也就是说，可以告诉PIC停止对给定的IRQ线发布中断，或者激活它们。禁止的中断是丢失不了的，它们一旦被激活，PIC就又把它们发送到CPU。这个特点被大多数中断处理程序使用，因为这允许中断处理程序逐次地处理同一类型的IRQ</p>
+<h3 id="中断描述符表"><a href="#中断描述符表" class="headerlink" title="中断描述符表"></a>中断描述符表</h3><p>​	中断描述符表（Interrupt Descriptor Table.IDT）是一个系统表，它与每一个中断或异常向量（异常向量是一组预定义的内存地址，用于存储处理器在发生异常时应该跳转到的位置）相联系，每一个向量在表中有相应的中断或异常处理程序的入口地址。内核在允许中断发生前，必须适当地初始化IDT.</p>
+<p>​	IDT包含三种类型的描述符：</p>
+<p>​		任务门：当中断信号发生时，必须取代当前进程的那个进程的TSS选择符存放在任务门中。</p>
+<p>​		中断门：包含段选择符和中断或异常处理程序的段内偏移量。当控制权转移到一个适当的段时，处理器清IF标志，从而关闭将来会发生的可屏蔽中断。</p>
+<p>​		陷阱门：与中断门相似，只是控制权传递到一个适当的段时处理器不修改IF标志。</p>
+<p>​	Linux利用中断门处理中断，利用陷阱门处理异常</p>
 
                 
               </div>
@@ -426,7 +380,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="category-chain-item">内存管理</a>
+  <a href="/categories/%E4%B8%AD%E6%96%AD/" class="category-chain-item">中断</a>
   
   
 
@@ -441,7 +395,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="print-no-link">#内存管理</a>
+        <a href="/tags/%E4%B8%AD%E6%96%AD/" class="print-no-link">#中断</a>
       
     </div>
   
@@ -453,8 +407,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>内存管理</div>
-      <div>https://tomwithkernel.github.io/kernel/内存管理/内存管理/</div>
+      <div>中断</div>
+      <div>https://tomwithkernel.github.io/kernel/中断/中断/</div>
     </div>
     <div class="license-meta">
       
@@ -466,7 +420,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月10日</div>
+          <div>2024年10月31日</div>
         </div>
       
       
@@ -498,18 +452,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/" title="S3 问题根因分析技术文档">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">S3 问题根因分析技术文档</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/kernel/pm/Suspend/" title="Suspend (kernel 5.10)">
-                        <span class="hidden-mobile">Suspend (kernel 5.10)</span>
+                      <a href="/kernel/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/" title="进程">
+                        <span class="hidden-mobile">进程</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

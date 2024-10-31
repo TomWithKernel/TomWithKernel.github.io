@@ -19,25 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+    <meta name="description" content="进程​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体 ​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="内存管理">
-<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:title" content="进程">
+<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+<meta property="og:description" content="进程​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体 ​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png">
-<meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T05:48:59.268Z">
+<meta property="article:published_time" content="2024-10-31T05:45:28.000Z">
+<meta property="article:modified_time" content="2024-10-31T05:48:47.487Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="进程">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
   
   
   
-  <title>内存管理 - TomWithKernel&#39;s Blog</title>
+  <title>进程 - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -222,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="内存管理"></span>
+            <span id="subtitle" data-typed-text="进程"></span>
           
         </div>
 
@@ -233,8 +230,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 10:09" pubdate>
-          2024年7月10日 上午
+        <time datetime="2024-10-31 13:45" pubdate>
+          2024年10月31日 下午
         </time>
       </span>
     
@@ -245,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          1k 字
         
       </span>
     
@@ -256,7 +253,7 @@
         
         
         
-          13 分钟
+          9 分钟
         
       </span>
     
@@ -302,112 +299,27 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">内存管理</h1>
+            <h1 id="seo-header">进程</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="内存寻址"><a href="#内存寻址" class="headerlink" title="内存寻址"></a>内存寻址</h2><h3 id="内存地址"><a href="#内存地址" class="headerlink" title="内存地址"></a>内存地址</h3><p>​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离</p>
-<p>​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff</p>
-<p>​	物理地址：内存芯片级内存单元寻址</p>
-<p>​	在内存寻址中，我们通常以字节为单位</p>
-<h3 id="段选择符和段寄存器"><a href="#段选择符和段寄存器" class="headerlink" title="段选择符和段寄存器"></a>段选择符和段寄存器</h3><p>​	逻辑地址：段标识符+段内相对地址偏移量</p>
-<p>​	<strong>段标识符</strong>是一个16位长的字段，成为<strong>段选择符</strong></p>
-<p>​	段寄存器：快速查找段选择符，cs，ss，ds，es，fs，gs，程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</p>
-<p>​		cs：代码段寄存器，指向包含程序指令的段，它含有一个两位的字段，指明CPU当前的特权级（CPL），0内核态，3用户态</p>
-<p>​		ss：栈段寄存器，指向包含当前程序栈的段</p>
-<p>​		ds：数据段寄存器，指向包含静态数据或全局数据段</p>
-<h3 id="段描述符"><a href="#段描述符" class="headerlink" title="段描述符"></a>段描述符</h3><p>​	每个段由一个8字节的段描述符表示，它描述段的特征。放在全局描述符表（GDT）或局部描述符表（LDT）中。</p>
-<p>​	通常只定义一个GDT，而每个进程除了存放在GDT的段以外如果还需创建附加段就可以有自己的LDT。GDT在主存中的地址和大小放在gdtr控制寄存器中，当前正被使用的LDT地址和大小放在ldtr控制寄存器中</p>
-<p>​	段描述符字段</p>
-<table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Base</td>
-<td>段首地址的线性地址</td>
-</tr>
-<tr>
-<td>G</td>
-<td>粒度标志：如果该位清0，则段大小以字节为单位，否则以4096字节的倍数计</td>
-</tr>
-<tr>
-<td>Limit</td>
-<td>存放段中最后一个内存单元的偏移量，从而决定段的长度。如果G被置为0，则一个段的大小在1个字节到1MB之间变化；否则，将在4KB到4GB之间变化</td>
-</tr>
-<tr>
-<td>S</td>
-<td>系统标志：如果它被清0，则这是一个系统段，存储诸如LDT这种关键的数据结构，否则它是一个普通的代码段或数据段</td>
-</tr>
-<tr>
-<td>Type</td>
-<td>描述了段的类型特征和它的存取权限（请看表下面的描述）</td>
-</tr>
-<tr>
-<td>DPL</td>
-<td>描述符特权级（Descriptor Privilege Level）字段：用于限制对这个段的存取。它表示为访问这个段而要求的CPU最小的优先级。因此，DPL设为0的段只能当CPL为0时（即在内核态）才是可访问的，而DPL设为3的段对任何CPL值都是可访问的</td>
-</tr>
-<tr>
-<td>P</td>
-<td>Segment-Present标志：等于0表示段当前不在主存中。Linux总是把这个标志（第47位）设为1，因为它从来不把整个段交换到磁盘上去</td>
-</tr>
-<tr>
-<td>D或B</td>
-<td>称为D或B的标志，取决于是代码段还是数据段。D或B的含义在两种情况下稍微有所区别，但是如果段偏移量的地址是32位长，就基本上把它置为1，如果这个偏移量是16位长，它被清0（更详细的描述参见Intel使用手册）</td>
-</tr>
-<tr>
-<td>AVL标志</td>
-<td>可以由操作系统使用，但是被Linux忽略</td>
-</tr>
-</tbody></table>
-<h3 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h3><table>
-<thead>
-<tr>
-<th>字段名</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>index</td>
-<td>指定了放在GDT或LDT中的相应段描述符的入口</td>
-</tr>
-<tr>
-<td>TI</td>
-<td>（Table Indicator）标志，指明段描述符是在GDT中（TI&#x3D;0）或在LDT中（TI&#x3D;1）</td>
-</tr>
-<tr>
-<td>RPL</td>
-<td>请求者特权级：当相应的段选择符装入到cs寄存器中时指示出CPU当前的特权级，它还可以用于在访问数据段时有选择地削弱处理器的特权级</td>
-</tr>
-</tbody></table>
-<h3 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h3><p>​	逻辑地址	—-&gt;	线性地址</p>
-<p>​	从段选择符的index字段计算段描述符的地址，index字段乘以8（一个段描述符大小），结果与gdtr或ldtr相加</p>
-<p>​	逻辑地址偏移量+段描述符地址	—&gt;	线性地址</p>
-<h3 id="Linux中的分段"><a href="#Linux中的分段" class="headerlink" title="Linux中的分段"></a>Linux中的分段</h3><p>​	分段可以给每一个进程分配不同的线性地址空间</p>
-<p>​	分页可以把同一线性地址空间映射到不同的物理空间（Linux多用这个）</p>
-<h3 id="硬件中的分页"><a href="#硬件中的分页" class="headerlink" title="硬件中的分页"></a>硬件中的分页</h3><p>​	分页单元把线性地址转换为物理地址</p>
-<p>​	其中一个关键任务，把请求访问的类型和线性地址的访问权限相比较，如果这次内存访问无效，就产生一个缺页异常</p>
-<p>​	线性地址被分为以固定长度位单位的组，称为<strong>页</strong>。页内部连续的线性地址被映射到连续的物理地址中</p>
-<p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
-<p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
-<p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
+                <h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体</p>
+<p>​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）</p>
+<p>​	Linux使用轻量级进程（lightweight process）对多线程应用程序提供更好的支持。两个轻量级进程基本上可以共享一些资源，诸如地址空间、打开的文件等等。只要其中一个修改共享资源，另一个就立即查看这种修改。当然，当两个线程访问共享资源时就必须同步它们自己。</p>
+<h3 id="进程描述符"><a href="#进程描述符" class="headerlink" title="进程描述符"></a>进程描述符</h3>
 
-<h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
-<ul>
-<li>页全局目录</li>
-<li>页上级目录</li>
-<li>页中级目录</li>
-<li>页表</li>
-</ul>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
-
-
-
+<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><p>state字段描述了进程当前所处的状态</p>
+<p>可运行状态（TASK_RUNNING)<br>        进程要么在CPU上执行，要么准备执行。</p>
+<p>可中断的等待状态（TASK_INTERRUPTIBLE)<br>        进程被挂起（睡眠），直到某个条件变为真。产生一个硬件中断，释放进程正等待的系统资源，或传递一个信号都是可以唤醒进程的条件（把进程的状态放回到TASK_RUNNING).</p>
+<p>不可中断的等待状态（TASK_UNINTERRUPTIBLE)<br>        与可中断的等待状态类似，但有一个例外，把信号传递到睡眠进程不能改变它的状态。这种状态很少用到，但在一些特定的情况下（进程必须等待，直到一个不能被中断的事件发生），这种状态是很有用的。例如，当进程打开一个设备文件，其相应的设备驱动程序开始探测相应的硬件设备时会用到这种状态。探测完成以前，设备驱动程序不能被中断，否则，硬件设备会处于不可预知的状态。</p>
+<p>暂停状态（TASK_STOPPED)<br>        进程的执行被暂停。当进程接收到SIGSTOP、SIGTSTP、SIGTTIN或SIGTTOU信号后，进入暂停状态。</p>
+<p>跟踪状态（TASK_TRACED)<br>        进程的执行已由debugger程序暂停。当一个进程被另一个进程监控时（例如debugger执行ptrace（）系统调用监控一个测试程序），任何信号都可以把这个进程置于TASK_TRACED状态。</p>
+<p>还有两个进程状态是既可以存放在进程描述符的state字段中，也可以存放在exit_state字段中。从这两个字段的名称可以看出，只有当进程的执行被终止时，进程的状态才会变为这两种状态中的一种：</p>
+<p>僵死状态（EXIT_ZOMBIE）<br>        进程的执行被终止，但是，父进程还没有发布wait4（）或waitpid（）系统调用来返回有关死亡进程的信息。发布wait（）类系统调用前，内核不能丢弃包含在死进程描述符中的数据，因为父进程可能还需要它</p>
+<p>僵死撤消状态（EXIT_DEAD)<br>        最终状态：由于父进程刚发出 wait4（）或waitpid（）系统调用，因而进程由系统删除。为了防止其他执行线程在同一个进程上也执行wait（）类系统调用（这是一种竞争条件），而把进程的状态由優死（EXIT_ZOMBIE）状态改为死撤消状态(EXIT-DEAD）参见第五）。</p>
+<h3 id="硬件上下文"><a href="#硬件上下文" class="headerlink" title="硬件上下文"></a>硬件上下文</h3><p>​	进程恢复执行前必须装入寄存器的一组数据称为硬件上下文。硬件上下文是进程可执行上下文的一个子集，因为可执行上下文包含进程执行时需要的所有信息。在Linux中，进程硬件上下文的一部分存放在TSS段，而剩余部分存放在内核态堆栈中。</p>
+<h3 id="任务状态段（TSS）"><a href="#任务状态段（TSS）" class="headerlink" title="任务状态段（TSS）"></a>任务状态段（TSS）</h3><p>​	存放硬件上下文</p>
 
                 
               </div>
@@ -426,7 +338,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="category-chain-item">内存管理</a>
+  <a href="/categories/%E8%BF%9B%E7%A8%8B/" class="category-chain-item">进程</a>
   
   
 
@@ -441,7 +353,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="print-no-link">#内存管理</a>
+        <a href="/tags/%E8%BF%9B%E7%A8%8B/" class="print-no-link">#进程</a>
       
     </div>
   
@@ -453,8 +365,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>内存管理</div>
-      <div>https://tomwithkernel.github.io/kernel/内存管理/内存管理/</div>
+      <div>进程</div>
+      <div>https://tomwithkernel.github.io/kernel/进程/进程/</div>
     </div>
     <div class="license-meta">
       
@@ -466,7 +378,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月10日</div>
+          <div>2024年10月31日</div>
         </div>
       
       
@@ -498,9 +410,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/kernel/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/" title="S3 问题根因分析技术文档">
+                      <a href="/kernel/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/" title="中断">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">S3 问题根因分析技术文档</span>
+                        <span class="hidden-mobile">中断</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -508,8 +420,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/kernel/pm/Suspend/" title="Suspend (kernel 5.10)">
-                        <span class="hidden-mobile">Suspend (kernel 5.10)</span>
+                      <a href="/kernel/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="scsi子系统">
+                        <span class="hidden-mobile">scsi子系统</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
