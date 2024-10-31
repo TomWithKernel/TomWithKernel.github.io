@@ -21,23 +21,23 @@
   
     <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
 <meta property="og:type" content="article">
-<meta property="og:title" content="内存管理">
-<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:title" content="内存寻址">
+<meta property="og:url" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
 <meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png">
 <meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T05:48:59.268Z">
+<meta property="article:modified_time" content="2024-10-31T05:59:54.690Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="内存寻址">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
   
   
   
-  <title>内存管理 - TomWithKernel&#39;s Blog</title>
+  <title>内存寻址 - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -222,7 +222,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="内存管理"></span>
+            <span id="subtitle" data-typed-text="内存寻址"></span>
           
         </div>
 
@@ -302,7 +302,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">内存管理</h1>
+            <h1 id="seo-header">内存寻址</h1>
             
             
               <div class="markdown-body">
@@ -395,7 +395,7 @@
 <p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
 <p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
 <p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
+<img src="/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
 
 <h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
 <ul>
@@ -404,7 +404,7 @@
 <li>页中级目录</li>
 <li>页表</li>
 </ul>
-<img src="/kernel/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
+<img src="/kernel/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
 
 
 
@@ -426,7 +426,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="category-chain-item">内存管理</a>
+  <a href="/categories/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/" class="category-chain-item">内存寻址</a>
   
   
 
@@ -441,7 +441,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="print-no-link">#内存管理</a>
+        <a href="/tags/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/" class="print-no-link">#内存寻址</a>
       
     </div>
   
@@ -453,8 +453,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>内存管理</div>
-      <div>https://tomwithkernel.github.io/kernel/内存管理/内存管理/</div>
+      <div>内存寻址</div>
+      <div>https://tomwithkernel.github.io/kernel/内存寻址/内存寻址/</div>
     </div>
     <div class="license-meta">
       
