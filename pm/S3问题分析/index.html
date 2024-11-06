@@ -1,0 +1,791 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志   我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="S3 问题根因分析技术文档">
+<meta property="og:url" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="S3 问题根因分析技术文档问题背景 x86	1070	5.10 联想昭阳k4e-iml 待机自动唤醒  首先我们看一下日志   我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze 一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png">
+<meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
+<meta property="article:modified_time" content="2024-11-05T01:58:47.519Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="bug">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png">
+  
+  
+  
+  <title>S3 问题根因分析技术文档 - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="S3 问题根因分析技术文档"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-07-10 10:09" pubdate>
+          2024年7月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          887 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">S3 问题根因分析技术文档</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="S3-问题根因分析技术文档"><a href="#S3-问题根因分析技术文档" class="headerlink" title="S3 问题根因分析技术文档"></a>S3 问题根因分析技术文档</h2><h3 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h3><ul>
+<li>x86	1070	5.10</li>
+<li>联想昭阳k4e-iml 待机自动唤醒</li>
+</ul>
+<p>首先我们看一下日志</p>
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" srcset="/img/loading.gif" lazyload class="" title="log">
+
+<p>我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze</p>
+<p>一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导致S3停止</p>
+<h3 id="S3-待机流程"><a href="#S3-待机流程" class="headerlink" title="S3 待机流程"></a>S3 待机流程</h3><p>我们先来了解一下S3的流程是怎么样的</p>
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" srcset="/img/loading.gif" lazyload class="" title="S3待机流程">
+
+<p>如上图所示，这是S3待机过程的流程图，简单介绍一下：</p>
+<ul>
+<li>state_store：处理系统进入不同的电源状态</li>
+<li>pm_suspend：suspend入口</li>
+<li>suspend_prepare：suspend前的一些准备工作</li>
+<li>suspend_freeze_processes：冻结用户进程以及内核线程</li>
+<li>suspend_devices_and_enter：开始进行挂起设备</li>
+<li>suspend_enter：关闭设备中断，关闭辅助cpu，检查irq事件，CPU进入suspend</li>
+</ul>
+<h3 id="处理问题"><a href="#处理问题" class="headerlink" title="处理问题"></a>处理问题</h3><p>问题是它唤醒了，在知道了S3的流程以后，他在哪里检测唤醒事件呢？pm_wakeup_pending，没错就是这里，我们查看此部分代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">bool</span> <span class="hljs-title function_">pm_wakeup_pending</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br>	<span class="hljs-type">bool</span> ret = <span class="hljs-literal">false</span>;<br><br>	raw_spin_lock_irqsave(&amp;events_lock, flags);<br>	<span class="hljs-keyword">if</span> (events_check_enabled) &#123;<br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> cnt, inpr;<br><br>		split_counters(&amp;cnt, &amp;inpr);<br>		ret = (cnt != saved_count || inpr &gt; <span class="hljs-number">0</span>);<br>		events_check_enabled = !ret;<br>	&#125;<br>	raw_spin_unlock_irqrestore(&amp;events_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (ret) &#123;<br>		pm_pr_dbg(<span class="hljs-string">&quot;Wakeup pending, aborting suspend\n&quot;</span>);<br>		pm_print_active_wakeup_sources();<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> ret || <span class="hljs-type">atomic_read</span>(&amp;pm_abort_suspend) &gt; <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>发现他在检测到中断事件的时候就会return  false，暂停S3的操作</p>
+<p>具体检测irq函数为pm_system_irq_wakeup</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_system_irq_wakeup</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq_number)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><br>	raw_spin_lock_irqsave(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">0</span>] = irq_number;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">1</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">1</span>] = irq_number;<br>	<span class="hljs-keyword">else</span><br>		irq_number = <span class="hljs-number">0</span>;<br><br>	raw_spin_unlock_irqrestore(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (irq_number)<br>		pm_system_wakeup();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在这个函数里面我们可以添加printk打印出中断号，或者可以使用bpftrace工具进行打印，kprobe:pm_system_irq_wakeup</p>
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" srcset="/img/loading.gif" lazyload class="" title="int">
+
+<p>此时发现中断号为122，接下来通过cat &#x2F;proc&#x2F;interrupts 查看这个中断相应的中断处理程序</p>
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" srcset="/img/loading.gif" lazyload class="" title="irq">
+
+<p>此中断所挂载的相关中断处理程序是aerdrv和pcie-dpc，这2个中断处理程序主要负责处理pcie上面的错误信号的</p>
+<p>通过lspci -tv查看到这个pcie总线上挂载了一张amd的显卡，此时基本可以判断问题出在显卡驱动上面</p>
+<h3 id="AER和DPC"><a href="#AER和DPC" class="headerlink" title="AER和DPC"></a>AER和DPC</h3><ul>
+<li>AER：是一种用于检测和报告PCIe设备中发生的错误的机制。它允许PCIe设备检测到并报告各种类型的错误，如非致命的、可恢复的以及严重的错误。AER在PCIe设备上实现了一组寄存器和相应的错误通知机制，可以通过读取这些寄存器来获取关于错误的信息。使用AER，系统能够更好地监控和处理PCIe设备的错误情况，以提高数据完整性和可靠性。</li>
+<li>DPC：是一种用于处理PCIe链路中错误情况的机制。当PCIe链路上的一个设备发送错误信号时，DPC机制允许系统针对该错误进行处理，以避免错误的传播和影响其他设备。具体而言，DPC机制会隔离出故障设备，从而限制错误的影响范围，确保其他设备继续正常工作。</li>
+</ul>
+<div class="note note-warning">
+            <p>DPC机制依赖于AER提供的错误信息来进行错误处理</p>
+          </div>
+
+<p>由于后期任务较多，该问题当时并未深究amdgpu驱动为何报错，不过知道了中断处理程序上报的错误，最后采用pcie_ports&#x3D;compat进行规避。</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">pcie_ports</span>=	[<span class="hljs-type">PCIE</span>] <span class="hljs-type">PCIe</span> <span class="hljs-keyword">port</span> services handling:<br>	native	Use native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span> hotplug)<br>		even if the platform doesn&#x27;t give the OS permission to<br>		use them.  This may cause conflicts if the platform<br>		also tries to use these services.<br>	dpc-native	Use native PCIe service for DPC only.  May<br>			cause conflicts if firmware uses AER or DPC.<br>	compat	Disable native PCIe services (<span class="hljs-type">PME</span>, <span class="hljs-type">AER</span>, <span class="hljs-type">DPC</span>, <span class="hljs-type">PCIe</span><br>		hotplug).<br></code></pre></td></tr></table></figure>
+
+<p>compat参数用于禁用原生的 PCIe 服务，包括 PME、AER、DPC 和 PCIe 热插拔功能，忽略该错误进行规避。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PM/" class="category-chain-item">PM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/bug/" class="print-no-link">#bug</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>S3 问题根因分析技术文档</div>
+      <div>https://tomwithkernel.github.io/pm/S3问题分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年7月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/ioctl/ioctl/" title="ioctl">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ioctl</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/" title="内存寻址">
+                        <span class="hidden-mobile">内存寻址</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>

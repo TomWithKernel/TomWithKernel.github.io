@@ -1,0 +1,969 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Linux内核Kernel启动过程内核启动的基本流程  启动加载程序 (Bootloader)启动加载程序（如GRUB、LILO、syslinux等）负责将内核映像从存储设备加载到内存中，并准备好内核启动所需的环境。  加载内核映像：启动加载程序将压缩的内核映像（如vmlinuz）从硬盘加载到内存中。内核映像通常是一个gzip或其他格式压缩的二进制文件。 加载initrd&#x2F;initram">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kernel boot">
+<meta property="og:url" content="https://tomwithkernel.github.io/boot/boot/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="Linux内核Kernel启动过程内核启动的基本流程  启动加载程序 (Bootloader)启动加载程序（如GRUB、LILO、syslinux等）负责将内核映像从存储设备加载到内存中，并准备好内核启动所需的环境。  加载内核映像：启动加载程序将压缩的内核映像（如vmlinuz）从硬盘加载到内存中。内核映像通常是一个gzip或其他格式压缩的二进制文件。 加载initrd&#x2F;initram">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/boot/boot/boot1.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/boot/boot/boot2.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/boot/boot/boot3.png">
+<meta property="article:published_time" content="2024-11-05T02:06:22.000Z">
+<meta property="article:modified_time" content="2024-11-06T02:29:51.857Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="boot">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/boot/boot/boot1.png">
+  
+  
+  
+  <title>kernel boot - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="kernel boot"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-05 10:06" pubdate>
+          2024年11月5日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">kernel boot</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Linux内核Kernel启动过程"><a href="#Linux内核Kernel启动过程" class="headerlink" title="Linux内核Kernel启动过程"></a>Linux内核Kernel启动过程</h1><h2 id="内核启动的基本流程"><a href="#内核启动的基本流程" class="headerlink" title="内核启动的基本流程"></a>内核启动的基本流程</h2><img src="/boot/boot/boot1.png" srcset="/img/loading.gif" lazyload class="" title="boot1">
+
+<h3 id="启动加载程序-Bootloader"><a href="#启动加载程序-Bootloader" class="headerlink" title="启动加载程序 (Bootloader)"></a>启动加载程序 (Bootloader)</h3><p>启动加载程序（如GRUB、LILO、syslinux等）负责将内核映像从存储设备加载到内存中，并准备好内核启动所需的环境。</p>
+<ul>
+<li><strong>加载内核映像</strong>：启动加载程序将压缩的内核映像（如vmlinuz）从硬盘加载到内存中。内核映像通常是一个gzip或其他格式压缩的二进制文件。</li>
+<li><strong>加载initrd&#x2F;initramfs</strong>：如果使用initrd（初始RAM盘）或initramfs（初始RAM文件系统），启动加载程序也会将这些文件加载到内存中，以便内核在启动时使用。</li>
+</ul>
+<h3 id="内核解压阶段"><a href="#内核解压阶段" class="headerlink" title="内核解压阶段"></a>内核解压阶段</h3><p>在内核映像的开头，有一个小的解压缩程序，它负责解压内核的主体部分。</p>
+<ul>
+<li><strong>解压内核</strong>：内核映像被加载到内存后，解压缩程序会运行并将压缩的内核映像解压到适当的内存位置。</li>
+<li><strong>跳转到解压后的内核</strong>：一旦解压完成，控制权会被移交给解压后的内核代码的入口点。</li>
+</ul>
+<h3 id="内核启动（kernel-startup）"><a href="#内核启动（kernel-startup）" class="headerlink" title="内核启动（kernel startup）"></a>内核启动（kernel startup）</h3><p>解压后的内核代码会从一个固定的入口点开始执行，这个入口点是平台和架构相关的。对于x86架构，通常是startup_32或startup_64函数。</p>
+<ul>
+<li><strong>架构特定的初始化</strong>：根据具体的硬件架构，内核会执行一些必要的初始化步骤，比如设置CPU的运行模式，初始化分页机制，建立基本的内存映射等。</li>
+<li><strong>初始化内核堆栈</strong>：内核设置好自己的堆栈，以便后续的函数调用和操作。</li>
+<li><strong>调用<code>start_kernel</code>函数</strong>：完成基础的硬件初始化后，内核会调用start_kernel函数，这是内核初始化的核心部分。</li>
+</ul>
+<h3 id="start-kernel函数"><a href="#start-kernel函数" class="headerlink" title="start_kernel函数"></a>start_kernel函数</h3><p>start_kernel函数位于init&#x2F;main.c文件中，负责完成大部分内核的初始化工作。</p>
+<ul>
+<li>初始化控制台：设置内核的打印机制，以便后续的输出可以显示出来。</li>
+<li>初始化内存管理子系统：建立初始的内存管理结构，准备好内存分配机制。</li>
+<li>检测和初始化硬件设备：内核会检测并初始化系统中的各种硬件设备和驱动程序。</li>
+<li>启动中断处理机制：设置和启动中断处理机制，使得内核可以响应硬件中断。</li>
+<li>初始化内核调度器：初始化内核调度器，以便管理进程调度。</li>
+<li>加载初始进程：内核创建并启动第一个用户空间进程，通常是&#x2F;sbin&#x2F;init。</li>
+</ul>
+<h3 id="启动初始进程"><a href="#启动初始进程" class="headerlink" title="启动初始进程"></a>启动初始进程</h3><p>init进程是用户空间的第一个进程，负责进一步的系统初始化工作，包括启动系统服务和守护进程。</p>
+<ul>
+<li>init进程的初始化：init进程执行系统初始化脚本，设置各种系统参数和启动服务。</li>
+<li>启动用户空间服务：最终，init进程启动配置的所有用户空间服务和守护进程，从而完成系统的启动过程。</li>
+</ul>
+<h2 id="内核文件加载及解压缩"><a href="#内核文件加载及解压缩" class="headerlink" title="内核文件加载及解压缩"></a>内核文件加载及解压缩</h2><h3 id="为什么是压缩文件"><a href="#为什么是压缩文件" class="headerlink" title="为什么是压缩文件"></a>为什么是压缩文件</h3><p>Linux内核映像通常是一个压缩文件，主要有以下原因：</p>
+<ul>
+<li><strong>减少存储空间</strong>: 压缩内核映像可以显著减少其在存储设备上的占用空间。这对嵌入式系统、存储资源有限的设备以及需要快速分发和更新内核的环境尤其重要</li>
+<li><strong>加快加载速度</strong>: 压缩文件占用的空间更小，这意味着启动加载程序从磁盘读取文件到内存中的时间会更短。虽然解压缩内核映像需要一些时间，但现代处理器的解压缩速度非常快，通常解压缩的时间比从存储设备读取更多数据的时间要少。这会整体上加快启动过程。</li>
+<li><strong>提高传输效率</strong>: 在网络上传输内核映像时，压缩文件可以显著减少带宽使用量。这对于需要远程更新内核的系统（OTA）非常有利。</li>
+<li><strong>便于管理和分发</strong>: 压缩内核映像更便于在各种介质上分发，比如光盘、U盘等。一个较小的文件更容易管理、备份和分发。</li>
+<li><strong>标准化处理</strong>: 使用压缩内核映像是一种标准做法，启动加载程序（如GRUB）已经能够很好地支持这种格式，能自动识别并处理压缩的内核映像。这使得系统启动过程更简单可靠。</li>
+</ul>
+<h3 id="文件类型vmlinuz和bzimage"><a href="#文件类型vmlinuz和bzimage" class="headerlink" title="文件类型vmlinuz和bzimage"></a>文件类型vmlinuz和bzimage</h3><p>在连接压缩映像文件之前，我们先来了解一下未经压缩的编译文件<code>vmlinux</code>。</p>
+<h4 id="什么是vmlinux"><a href="#什么是vmlinux" class="headerlink" title="什么是vmlinux"></a>什么是vmlinux</h4><p><code>vmlinux</code>是<code>内核编译过程</code>中生成的一个包含所有内核代码和数据的<code>二进制文件</code>。它是未经压缩和未经过处理的内核映像，通常位于内核源码目录的根目录下,特性如下：</p>
+<ul>
+<li><strong>未压缩</strong>：vmlinux 是内核的未压缩映像。它包含所有内核代码、内核模块以及相关的数据结构。</li>
+<li><strong>ELF 格式</strong>：vmlinux 通常是一个 ELF（Executable and Linkable Format）文件，这是一个标准的可执行文件格式，用于存储可执行文件、目标代码和共享库等。</li>
+<li><strong>符号信息</strong>：vmlinux 文件中包含调试符号和符号表信息，这些信息对内核调试和分析非常重要。</li>
+<li><strong>没有文件后缀</strong>：虽然 vmlinux 通常没有文件后缀，但它是一个标准的 ELF 文件，可以通过文件头信息识别其格式。</li>
+</ul>
+<h4 id="vmlinux的生成过程"><a href="#vmlinux的生成过程" class="headerlink" title="vmlinux的生成过程"></a>vmlinux的生成过程</h4><p>编译Linux内核时，vmlinux是在链接阶段生成的。以下是一个简化的生成过程：</p>
+<ul>
+<li><strong>编译各个源文件</strong>：内核的各个源文件（<code>.c</code> 和 <code>.S</code> 文件）首先被编译为目标文件（.o 文件）。</li>
+<li><strong>链接目标文件</strong>：所有目标文件通过链接器（如<code>ld</code>）链接在一起，生成一个完整的内核映像，这个映像就是 vmlinux。</li>
+</ul>
+<blockquote>
+<p>链接命令举例:<code>ld -o vmlinux [object files] [linker scripts]</code></p>
+</blockquote>
+<h4 id="vmlinuz和bzimage的生成过程"><a href="#vmlinuz和bzimage的生成过程" class="headerlink" title="vmlinuz和bzimage的生成过程"></a>vmlinuz和bzimage的生成过程</h4><p>在获得编译文件vmlinux后，通常使用压缩工具做进一步处理。</p>
+<ul>
+<li><strong>压缩内核映像</strong>：将 vmlinux 压缩生成 vmlinuz。通常使用 gzip 或其他压缩工具。</li>
+</ul>
+<blockquote>
+<p>压缩命令: <code>gzip -c vmlinux &gt; vmlinuz</code></p>
+</blockquote>
+<ul>
+<li><strong>生成引导加载程序格式的内核映像</strong>：一些系统需要特定格式的内核映像，例如 bzImage（适用于 x86 架构）。</li>
+</ul>
+<blockquote>
+<p>生成命令：<code>make bzImage</code></p>
+</blockquote>
+<h4 id="其他压缩格式"><a href="#其他压缩格式" class="headerlink" title="其他压缩格式"></a>其他压缩格式</h4><p><code>vmlinuz</code>、<code>bzImage</code>、<code>zImage</code> 和 <code>uImage</code> 都是不同的 Linux 内核映像文件格式，它们各自有不同的用途和特性。</p>
+<ul>
+<li><strong>vmlinuz</strong>：通用的压缩内核映像名称，主要用于各种 Linux 发行版。通常使用 gzip 压缩。</li>
+<li><strong>bzImage</strong>：大内核映像，解决了早期 zImage 的内存限制问题。用于 x86 架构，支持较大的内核映像。</li>
+<li><strong>zImage</strong>：较老的内核映像格式，适用于小内核映像，受限于低内存地址空间。</li>
+<li><strong>uImage</strong>：U-Boot 使用的内核映像格式，广泛用于嵌入式系统。包含 U-Boot 头部信息，支持多种压缩算法。</li>
+</ul>
+<h4 id="Android系统文件"><a href="#Android系统文件" class="headerlink" title="Android系统文件"></a>Android系统文件</h4><p>在 Android 系统中，内核的压缩文件格式通常是<code>zImage</code>或<code>Image.gz</code>，具体取决于所使用的启动加载程序和设备的要求。</p>
+<ul>
+<li><strong>zImage</strong>：在一些早期的 Android 设备上，内核映像可能采用 zImage 格式。这种格式的内核映像通常会被启动加载程序直接加载并解压，然后启动内核。</li>
+<li><strong>Image.gz</strong>：Image.gz 是指经过 gzip 压缩的内核映像。这种格式的内核映像通常是 Linux 内核编译过程中生成的 vmlinuz 文件，只是在 Android 系统中可能被重新命名为 Image.gz。启动加载程序会加载这个压缩的内核映像，并在加载到内存后解压缩，然后启动内核。</li>
+</ul>
+<h3 id="内核加载过程"><a href="#内核加载过程" class="headerlink" title="内核加载过程"></a>内核加载过程</h3><img src="/boot/boot/boot2.png" srcset="/img/loading.gif" lazyload class="" title="boot2">
+
+<h4 id="内核映像加载到内存中"><a href="#内核映像加载到内存中" class="headerlink" title="内核映像加载到内存中"></a>内核映像加载到内存中</h4><p>启动加载程序（Bootloader）负责将压缩的内核映像加载到内存中，并准备好启动内核的环境。</p>
+<ul>
+<li><strong>加载内核和initrd</strong>：GRUB 会根据配置文件（通常是 grub.cfg）加载压缩的内核映像和可选的 initrd&#x2F;initramfs 文件。</li>
+<li><strong>设置内核参数</strong>：GRUB 会设置内核启动参数，这些参数可以通过命令行传递给内核。</li>
+<li><strong>跳转到内核入口点</strong>：GRUB 将控制权转移到内核映像的入口点。对于 x86 架构，这个入口点通常在内核映像的开头。</li>
+</ul>
+<h5 id="启动BootLoader"><a href="#启动BootLoader" class="headerlink" title="启动BootLoader"></a>启动BootLoader</h5><p>以BIOS为例</p>
+<ul>
+<li>CPU在重置后执行的第一条指令的内存地址<code>0xfffffff0</code>，它包含一个 jump 指令，这个指令通常指向BIOS入口点。</li>
+<li>BIOS会进行一系列硬件初始化和自检，然后根据设置（例如启动顺序）选择一个启动设备（如硬盘、光盘、USB 等）</li>
+<li>将控制权转移到启动设备的启动扇区代码。</li>
+</ul>
+<h5 id="加载内核文件"><a href="#加载内核文件" class="headerlink" title="加载内核文件"></a>加载内核文件</h5><ul>
+<li>启动设备的启动扇区代码被执行，通常这段代码非常小，只占用一个扇区（512字节）。</li>
+<li>启动扇区代码负责完成一些基本的初始化操作，然后跳转到更复杂的引导加载程序，如 GRUB 的核心映像（<code>core image</code>）。</li>
+<li>核心映像开始执行，它负责进一步的初始化操作，如加载GRUB的模块和配置文件（grub.cfg）。</li>
+<li>根据<code>grub.cfg</code>文件中的配置，GRUB加载压缩的内核映像（<code>vmlinuz</code>）和可选的<code>initrd/initramfs</code>文件。</li>
+<li>内核映像加载完成后，GRUB 将控制权转移给内核的入口点代码，完成控制权从 BIOS 到内核的转移。</li>
+</ul>
+<h4 id="内核解压"><a href="#内核解压" class="headerlink" title="内核解压"></a>内核解压</h4><p>以下以x86系统为例</p>
+<h5 id="关键文件和代码路径"><a href="#关键文件和代码路径" class="headerlink" title="关键文件和代码路径"></a>关键文件和代码路径</h5><ul>
+<li>arch&#x2F;x86&#x2F;boot&#x2F;header.S：启动代码的汇编部分，定义了内核入口点。</li>
+<li>arch&#x2F;x86&#x2F;boot&#x2F;compressed&#x2F;head_64.S 和 arch&#x2F;x86&#x2F;boot&#x2F;compressed&#x2F;misc.c：解压缩代码。</li>
+<li>arch&#x2F;x86&#x2F;kernel&#x2F;head_64.S 和 arch&#x2F;x86&#x2F;kernel&#x2F;head.c：解压后的内核启动代码。</li>
+</ul>
+<h5 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h5><h6 id="启动加载程序跳转到内核入口点"><a href="#启动加载程序跳转到内核入口点" class="headerlink" title="启动加载程序跳转到内核入口点"></a>启动加载程序跳转到内核入口点</h6><ul>
+<li>BootLoader根据<code>grub.cfg</code>文件中的配置加载内核映像（<code>vmlinuz</code>）到内存，并跳转到内核映像的入口点，即内核代码的起始地址。</li>
+</ul>
+<h6 id="解压缩程序的初始化"><a href="#解压缩程序的初始化" class="headerlink" title="解压缩程序的初始化"></a>解压缩程序的初始化</h6><ul>
+<li>内核入口点代码（在 header.S 中）会设置初始的 CPU 状态和内存环境，然后跳转到解压缩代码的入口。</li>
+<li>32位方法<code>startup_32</code>，64位方法<code>startup_64</code>。（长模式的32到64转换这里不做讨论，有兴趣的可以自行查阅资料）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs assembly">ENTRY(startup_32)<br>// 设置 CPU 状态和内存环境<br>jmp decompress_kernel // 跳转到解压缩代码<br></code></pre></td></tr></table></figure>
+
+<h6 id="解压缩代码执行"><a href="#解压缩代码执行" class="headerlink" title="解压缩代码执行"></a>解压缩代码执行</h6><ul>
+<li>解压缩代码的入口点在 arch&#x2F;x86&#x2F;boot&#x2F;compressed&#x2F;head_64.S 中。</li>
+<li>arch&#x2F;x86&#x2F;boot&#x2F;compressed&#x2F;head_64.S 会设置解压环境，如设置段寄存器、建立临时堆栈等。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">ENTRY(decompress_kernel)<br>// 设置硬件环境<br>// 调用解压缩函数入口方法<br>jmp decompress_kernel_method<br></code></pre></td></tr></table></figure>
+
+<h6 id="解压缩完成后跳转到内核入口"><a href="#解压缩完成后跳转到内核入口" class="headerlink" title="解压缩完成后跳转到内核入口"></a>解压缩完成后跳转到内核入口</h6><ul>
+<li>解压完成后，解压缩代码会跳转到解压后的内核入口点。</li>
+<li>arch&#x2F;x86&#x2F;boot&#x2F;compressed&#x2F;head_64.S中定义了一个跳转指令，内核入口点的地址加载到寄存器中（例如 %eax），通常是内核主函数（<code>start_kernel</code>），跳转后即将控制权转移到解压后的内核代码。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs assembly">jmp *%eax<br></code></pre></td></tr></table></figure>
+
+<h5 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h5><h6 id="跳转入口点和控制权转移"><a href="#跳转入口点和控制权转移" class="headerlink" title="跳转入口点和控制权转移"></a>跳转入口点和控制权转移</h6><ul>
+<li>在技术实现上跳抓入口点和控制权转移是一致的，都是通过改变程序计数器（Program Counter，PC）或指令指针（Instruction Pointer，IP）的值来实现的。</li>
+</ul>
+<blockquote>
+<p>程序计数器或指令指针是一个特殊的寄存器，用于存储正在执行的指令的内存地址。当处理器执行一条指令时，程序计数器会自动递增到下一条指令的地址，从而控制执行流程。这样就实现了执行流程的转移，从而使得程序执行从一个代码段转移到另一个代码段。</p>
+</blockquote>
+<ul>
+<li>“跳转到入口点”强调了执行流程从某个特定的位置（入口点）开始执行，而”控制权转移”则更加广泛地描述了执行流程从一个执行上下文到另一个执行上下文的转移过程。</li>
+<li>在内核加载和启动的上下文中，这两个术语通常可以互换使用，因为在设置了内核入口点后，执行流程的转移也意味着控制权的转移。</li>
+</ul>
+<h6 id="initrd-initramfs文件"><a href="#initrd-initramfs文件" class="headerlink" title="initrd&#x2F;initramfs文件"></a>initrd&#x2F;initramfs文件</h6><p>加载 vmlinuz（Linux 内核映像）时，通常还会加载 initrd（initial ramdisk）或 initramfs（initial ram filesystem）文件。initrd 和 initramfs 文件的主要作用是在内核启动的早期阶段提供一个临时的根文件系统，帮助内核完成启动过程。</p>
+<p><strong>特性如下</strong>：</p>
+<ul>
+<li>硬件驱动支持： 在系统启动时，内核可能需要加载某些硬件驱动程序（如文件系统驱动、磁盘驱动、网络驱动等）来访问根文件系统。这些驱动程序可能并未内置在内核映像中，而是作为模块存在。initrd&#x2F;initramfs 提供了一个早期的文件系统，内核可以从中加载必要的模块。</li>
+<li>根文件系统挂载：在一些复杂的存储配置中，如 LVM（Logical Volume Manager）、RAID、加密文件系统等，内核需要在挂载实际根文件系统之前进行一些初始化操作。这些操作通常通过 initrd&#x2F;initramfs 中的脚本完成。</li>
+<li>通用内核：发行版通常提供通用内核以支持多种硬件配置。使用 initrd&#x2F;initramfs 可以在启动时动态加载适配不同硬件配置的模块，而无需为每种硬件配置编译一个特定的内核。</li>
+</ul>
+<p><strong>加载过程</strong>：</p>
+<ul>
+<li>启动加载程序(BootLoader)将内核映像和initrd&#x2F;initramfs文件加载到内存中，并将控制权交给内核。</li>
+<li>内核启动时会识别并加载initrd&#x2F;initramfs文件，将其作为初始根文件系统挂载。</li>
+<li>内核从临时根文件系统中加载必要的模块并运行初始化脚本。</li>
+<li>初始化脚本完成必要的硬件初始化和配置后，会挂载实际的根文件系统（如 &#x2F;dev&#x2F;sda1）。</li>
+<li>初始化脚本切换到实际根文件系统，然后移除initrd&#x2F;initramfs文件。</li>
+</ul>
+<h2 id="内核启动（start-kernel）"><a href="#内核启动（start-kernel）" class="headerlink" title="内核启动（start_kernel）"></a>内核启动（start_kernel）</h2><p><code>start_kernel</code>是Linux内核中非常重要的一个函数，它是整个内核初始化的核心函数，负责初始化内核的各个子系统、驱动程序以及其他关键组件，并最终将控制权转移到用户空间。</p>
+<h3 id="start-kernel方法介绍"><a href="#start-kernel方法介绍" class="headerlink" title="start_kernel方法介绍"></a>start_kernel方法介绍</h3><h4 id="第一个C函数的位置"><a href="#第一个C函数的位置" class="headerlink" title="第一个C函数的位置"></a>第一个C函数的位置</h4><p><code>start_kernel</code>方法的定义通常位于<code>init/main.c</code>文件中，也是Linux启动过程中执行的第一个C函数</p>
+<h4 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h4><ul>
+<li><strong>初始化内核的基本设置</strong>：如内存管理、进程管理等。</li>
+<li><strong>初始化各个子系统</strong>：如文件系统、网络子系统、设备驱动程序等。</li>
+<li><strong>启动第一个用户进程</strong>：将控制权从内核转移到用户空间。</li>
+</ul>
+<h3 id="start-kernel源码"><a href="#start-kernel源码" class="headerlink" title="start_kernel源码"></a>start_kernel源码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c">asmlinkage __visible <span class="hljs-type">void</span> __init <span class="hljs-title function_">start_kernel</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>  <br>&#123;  <br>    <span class="hljs-type">char</span> *command_line;  <br>    <span class="hljs-keyword">extern</span> <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kernel_param</span> __<span class="hljs-title">start___param</span>[], __<span class="hljs-title">stop___param</span>[];</span>  <br>  <br>    <span class="hljs-comment">/* ... 其他初始化代码 ... */</span>  <br>  <br>    <span class="hljs-comment">/* 设置页表和内存管理 */</span>  <br>    paging_init();  <br>    mem_init();  <br>    kmem_cache_init();  <br>  <br>    <span class="hljs-comment">/* 设备和驱动程序初始化 */</span>  <br>    driver_init();  <br>    init_irq_proc();  <br>    softirq_init();  <br>    time_init();  <br>    console_init();  <br>  <br>    <span class="hljs-comment">/* 文件系统初始化 */</span>  <br>    vfs_caches_init_early();  <br>    mnt_init();  <br>    init_rootfs();  <br>    init_mount_tree();  <br>  <br>    <span class="hljs-comment">/* 初始化进程 */</span>  <br>    pid_cache_init();  <br>    proc_caches_init();  <br>    <span class="hljs-comment">/* 启动 init 进程 */</span><br>    rest_init();  <br>  <br>    <span class="hljs-comment">/* ... 其他初始化代码 ... */</span>  <br>  <br>    <span class="hljs-comment">/* 调用内核参数解析函数 */</span>  <br>    kernel_param_init(karg_strings, num_args);  <br>  <br>    <span class="hljs-comment">/* ... 其他初始化代码 ... */</span>  <br>  <br>    <span class="hljs-comment">/* 永远不会返回 */</span>  <br>    cpu_idle();  <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="启动初始进程（init-process）"><a href="#启动初始进程（init-process）" class="headerlink" title="启动初始进程（init process）"></a>启动初始进程（init process）</h2><h3 id="进程概念介绍"><a href="#进程概念介绍" class="headerlink" title="进程概念介绍"></a>进程概念介绍</h3><h4 id="内核进程（Kernel-Thread）和用户进程（User-Process）"><a href="#内核进程（Kernel-Thread）和用户进程（User-Process）" class="headerlink" title="内核进程（Kernel Thread）和用户进程（User Process）"></a>内核进程（Kernel Thread）和用户进程（User Process）</h4><h5 id="内核进程（Kernel-Thread）"><a href="#内核进程（Kernel-Thread）" class="headerlink" title="内核进程（Kernel Thread）"></a>内核进程（Kernel Thread）</h5><p>内核进程是由内核创建和调度的线程，运行在内核态，用于处理内核的各类任务。与用户进程不同，内核进程不直接与用户空间交互，主要用于执行内核内部的工作，如处理中断、管理设备、调度任务等。</p>
+<ul>
+<li><strong>运行空间</strong>：内核进程运行在内核地址空间，而普通用户进程运行在用户地址空间。</li>
+<li><strong>权限</strong>：内核进程可以直接访问内核数据结构，而用户进程通过系统调用与内核交互。</li>
+<li><strong>交互</strong>：内核进程通常不与用户交互，其生命周期完全由内核管理。</li>
+<li><strong>创建方式</strong>：内核进程的创建通常通过kernel_thread函数实现。</li>
+</ul>
+<div class="note note-primary">
+            <p>注意内核进程是独立的，与0、1、2号进程无关</p>
+          </div>
+
+<h5 id="用户进程（User-Process）"><a href="#用户进程（User-Process）" class="headerlink" title="用户进程（User Process）"></a>用户进程（User Process）</h5><p>用户进程是在用户空间中执行的进程，用户通过编写和执行应用程序来创建用户进程。用户进程通过系统调用与内核交互，进行资源分配、文件操作、网络通信等。</p>
+<ul>
+<li><strong>运行空间</strong>：用户进程运行在用户态，受限于用户空间的权限，不能直接访问硬件和内核数据结构。</li>
+<li><strong>权限</strong>：内核线程运行在内核态，具有更高的权限，能够直接操作内核资源。</li>
+</ul>
+<h4 id="0号进程、1号进程、2号进程"><a href="#0号进程、1号进程、2号进程" class="headerlink" title="0号进程、1号进程、2号进程"></a>0号进程、1号进程、2号进程</h4><ul>
+<li><code>0号进程</code>：是内核线程，运行在内核态，负责在系统空闲时执行。</li>
+<li><code>1号进程</code>：是内核线程，后期会切换到用户进程（init进程），执行内核部分初始化工作及进行系统配置，并创建若干个用于高速缓存和虚拟主存管理的内核线程。</li>
+<li><code>2号进程</code>：是内核进程，运行在内核态，负责创建和管理其他内核线程。这些内核线程通常用于执行内核中的异步任务，如磁盘I&#x2F;O、网络操作等。</li>
+</ul>
+<h5 id="0号进程（swapper-idle-空闲进程）"><a href="#0号进程（swapper-idle-空闲进程）" class="headerlink" title="0号进程（swapper&#x2F;idle&#x2F;空闲进程）"></a>0号进程（swapper&#x2F;idle&#x2F;空闲进程）</h5><ul>
+<li>0号进程是Linux启动的第一个进程，它的task_struct的comm字段为”swapper”，也称为swapper进程、idel进程、空闲进程。</li>
+<li>0号进程是在系统引导过程中由内核创建的第一个进程。它的任务是进入空闲循环，当系统中没有其他可运行的进程时，它会被调度执行，以避免CPU闲置。</li>
+</ul>
+<blockquote>
+<p>0号进程（idle进程）是在系统引导过程中，由内核初始化代码创建的。在x86架构中，这个过程发生在汇编启动代码（通常在arch&#x2F;x86&#x2F;kernel&#x2F;head.S中），该代码会设置基本的CPU和内存环境，然后跳转到C语言的start_kernel函数。</p>
+</blockquote>
+<h5 id="1号进程（init进程）和2号进程（kthreadd进程）"><a href="#1号进程（init进程）和2号进程（kthreadd进程）" class="headerlink" title="1号进程（init进程）和2号进程（kthreadd进程）"></a>1号进程（init进程）和2号进程（kthreadd进程）</h5><ul>
+<li>1号内核进程调用执行init函数演变成1号用户态进程（init进程），这里前者是init是函数，后者是进程</li>
+<li>init（）函数在内核态运行，是内核代码</li>
+<li>1号内核进程调用execve（）从文件&#x2F;etc&#x2F;inittab中加载执行init函数，这个过程并没有使用调用do_fork()，因此两个进程都是1号进程</li>
+<li>1号进程和2号进程都是在<code>rest_init</code>函数中创建的</li>
+<li>1号进程通过kernel_init创建</li>
+<li>2号进程通过kthreadd创建</li>
+</ul>
+<p>0号进程-&gt;1号内核进程-&gt;1号用户进程（init进程）-&gt;getty进程-&gt;shell进程</p>
+<img src="/boot/boot/boot3.png" srcset="/img/loading.gif" lazyload class="" title="boot3">
+
+<h3 id="rest-init函数-初始化入口"><a href="#rest-init函数-初始化入口" class="headerlink" title="rest_init函数-初始化入口"></a><code>rest_init</code>函数-初始化入口</h3><p>rest_init函数负责创建初始进程并进行一些进一步的初始化工作。其代码实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> noinline <span class="hljs-type">void</span> __ref <span class="hljs-title function_">rest_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    <span class="hljs-comment">// 通知RCU（Read-Copy Update）子系统，调度器即将开始。这是确保RCU在调度器开始运行前正确初始化的关键步骤。</span><br>    rcu_scheduler_starting();<br>    <span class="hljs-comment">// 创建pid=1的1号进程</span><br>    pid = kernel_thread(kernel_init, <span class="hljs-literal">NULL</span>, CLONE_FS);<br>    <span class="hljs-comment">/** 处理1号进程相关代码 **/</span><br>    <br>    <span class="hljs-comment">// 创建pid=2的2号进程</span><br>    pid = kernel_thread(kthreadd, <span class="hljs-literal">NULL</span>, CLONE_FS | CLONE_FILES);<br>    <span class="hljs-comment">/** 处理2号进程相关代码 **/</span><br>    <span class="hljs-comment">/** 其他初始化代码 **/</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="kernel-thread函数"><a href="#kernel-thread函数" class="headerlink" title="kernel_thread函数"></a><code>kernel_thread</code>函数</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">kernel_thread</span><span class="hljs-params">(<span class="hljs-type">int</span> (*fn)(<span class="hljs-type">void</span> *), <span class="hljs-type">void</span> *arg, <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags)</span><br>&#123;<br>    <span class="hljs-keyword">return</span> do_fork(flags | CLONE_VM | CLONE_UNTRACED, (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)fn,<br>                   (<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>)arg, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>do_fork</code>：这是内核中实现创建新进程（或线程）的核心函数。通过该函数，内核可以复制当前进程的上下文，生成一个新的进程（或线程）。</li>
+</ul>
+<h4 id="kernel-init函数-初始化1号进程（init）"><a href="#kernel-init函数-初始化1号进程（init）" class="headerlink" title="kernel_init函数 - 初始化1号进程（init）"></a><code>kernel_init</code>函数 - 初始化1号进程（init）</h4><p>kernel_init负责启动初始用户空间进程（&#x2F;sbin&#x2F;init或指定的init进程）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> __ref <span class="hljs-title function_">kernel_init</span><span class="hljs-params">(<span class="hljs-type">void</span> *unused)</span><br>&#123;<br>    <span class="hljs-comment">/** 其他初始化代码 **/</span><br>    <span class="hljs-comment">// 启动用户空间进程</span><br>    <span class="hljs-keyword">if</span> (ramdisk_execute_command) &#123;<br>        run_init_process(ramdisk_execute_command);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (execute_command) &#123;<br>        run_init_process(execute_command);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        run_init_process(<span class="hljs-string">&quot;/sbin/init&quot;</span>);<br>    &#125;<br> <br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="系统启动"><a href="#系统启动" class="headerlink" title="系统启动"></a>系统启动</h3><p>init进程启动后，通过后续工作完成了操作系统的加载和启动</p>
+<h4 id="系统初始化脚本"><a href="#系统初始化脚本" class="headerlink" title="系统初始化脚本"></a>系统初始化脚本</h4><p>init进程读取系统的初始化脚本（如&#x2F;etc&#x2F;inittab、&#x2F;etc&#x2F;init.d&#x2F;脚本）或systemd的单元文件（unit files），执行系统初始化任务。这包括设置系统环境、挂载文件系统、启动网络服务、启动守护进程等。</p>
+<h4 id="启动用户界面"><a href="#启动用户界面" class="headerlink" title="启动用户界面"></a>启动用户界面</h4><ul>
+<li><code>图形登录管理器</code>：如果系统配置为使用图形界面，init进程会启动图形登录管理器（如GDM、LightDM、SDDM）。这些登录管理器负责提供图形化的登录界面，供用户输入用户名和密码。</li>
+<li><code>启动桌面环境</code>：用户登录成功后，登录管理器会启动用户的桌面环境（如GNOME、KDE、Xfce）。桌面环境提供完整的图形用户界面，允许用户运行应用程序、管理文件、设置系统等。</li>
+</ul>
+<h4 id="图形界面启动流程（systemd示例）"><a href="#图形界面启动流程（systemd示例）" class="headerlink" title="图形界面启动流程（systemd示例）"></a>图形界面启动流程（systemd示例）</h4><ul>
+<li><strong>systemd初始化</strong>：systemd作为init进程启动，读取其配置文件（通常在&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;和&#x2F;etc&#x2F;systemd&#x2F;system&#x2F;）。</li>
+<li><strong>启动目标（target）</strong>：systemd根据配置文件启动系统目标（如graphical.target）。graphical.target包含了启动图形界面所需的所有服务。</li>
+<li><strong>启动显示管理器</strong>：systemd启动图形显示管理器服务（如gdm.service、lightdm.service）。</li>
+<li><strong>显示管理器运行</strong>：显示管理器提供图形登录界面，用户登录后启动用户会话。</li>
+<li><strong>启动桌面环境</strong>：用户会话启动后，显示管理器启动桌面环境，用户进入图形用户界面。</li>
+</ul>
+<p>参考链接：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/anywherego/p/18217546">https://www.cnblogs.com/anywherego/p/18217546</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Hyc_cheng/article/details/120771756">https://blog.csdn.net/Hyc_cheng/article/details/120771756</a></p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/boot/" class="category-chain-item">boot</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/boot/" class="print-no-link">#boot</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>kernel boot</div>
+      <div>https://tomwithkernel.github.io/boot/boot/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/" title="中断">
+                        <span class="hidden-mobile">中断</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
