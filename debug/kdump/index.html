@@ -19,24 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="bpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针  单行命令   1234bpftrac">
+    <meta name="description" content="Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC&#x3D;yCONFIG_KEXEC_FILE&#x3D;y   &#x2F;&#x2F;两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP&#x3D;y   &#x2F;&#x2F;内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊">
 <meta property="og:type" content="article">
-<meta property="og:title" content="bpftrace">
-<meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/bpftrace/bpftrace/index.html">
+<meta property="og:title" content="kdump">
+<meta property="og:url" content="https://tomwithkernel.github.io/debug/kdump/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="bpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针  单行命令   1234bpftrac">
+<meta property="og:description" content="Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC&#x3D;yCONFIG_KEXEC_FILE&#x3D;y   &#x2F;&#x2F;两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP&#x3D;y   &#x2F;&#x2F;内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/dbg_meth/bpftrace/bpftrace/probe.jpg">
 <meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-11-05T01:59:35.257Z">
+<meta property="article:modified_time" content="2024-11-07T06:00:23.183Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="dbg_meth">
+<meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/dbg_meth/bpftrace/bpftrace/probe.jpg">
   
   
   
-  <title>bpftrace - TomWithKernel&#39;s Blog</title>
+  <title>kdump - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -221,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="bpftrace"></span>
+            <span id="subtitle" data-typed-text="kdump"></span>
           
         </div>
 
@@ -244,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          361 字
+          510 字
         
       </span>
     
@@ -255,7 +253,7 @@
         
         
         
-          4 分钟
+          18 分钟
         
       </span>
     
@@ -301,65 +299,47 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">bpftrace</h1>
+            <h1 id="seo-header">kdump</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="bpftrace"><a href="#bpftrace" class="headerlink" title="bpftrace"></a>bpftrace</h2><ul>
-<li><p>探针</p>
-</li>
-<li><img src="/dbg_meth/bpftrace/bpftrace/probe.jpg" srcset="/img/loading.gif" lazyload class="" title="probe">
+                <h1 id="Kdump"><a href="#Kdump" class="headerlink" title="Kdump"></a>Kdump</h1><p>kdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务</p>
+<h3 id="相关配置"><a href="#相关配置" class="headerlink" title="相关配置"></a>相关配置</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c">CONFIG_KEXEC=y<br>CONFIG_KEXEC_FILE=y   <br><span class="hljs-comment">//两者选其一，或者都选也可以，对应两个版本的kexec接口</span><br><br>CONFIG_CRASH_DUMP=y   <br><span class="hljs-comment">//内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊断和调试</span><br>CONFIG_PROC_VMCORE=y<br><span class="hljs-comment">//内核支持在 /proc 文件系统中生成 vmcore 文件以供调试和分析系统崩溃时的信息</span><br>CONFIG_RELOCATABLE=y<br><span class="hljs-comment">//内核能够在运行时进行地址重定位，从而使内核能够在不同的物理内存地址上加载和运行</span><br>CONFIG_SYSFS=y<br>CONFIG_DEBUG_INFO=y<br><span class="hljs-comment">//编译过程中会生成额外的调试信息，包括函数符号，代码注释，宏定义等</span><br></code></pre></td></tr></table></figure>
 
-<p>kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回）</p>
-<p>uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针</p>
-</li>
-<li><p>单行命令</p>
-</li>
+<h3 id="安装用户态工具包"><a href="#安装用户态工具包" class="headerlink" title="安装用户态工具包"></a>安装用户态工具包</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt install kdump-tools<br><span class="hljs-built_in">sudo</span> apt install makedumpfile<br></code></pre></td></tr></table></figure>
+
+<h3 id="配置预留内存"><a href="#配置预留内存" class="headerlink" title="配置预留内存"></a>配置预留内存</h3><p>配置第一内核启动参数（&#x2F;etc&#x2F;default&#x2F;grub.d&#x2F;kdump-tools.cfg）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">GRUB_CMDLINE_LINUX_DEFAULT=<span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_CMDLINE_LINUX_DEFAULT</span> crashkernel=512M&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>完整的格式可以是：crashkernel&#x3D;1G-:512M@3G，其含义是：</p>
+<ul>
+<li>当内存大于1Ｇ时，预留512Ｍ</li>
+<li>预留位置在3Ｇ</li>
+<li>如果“@offset”部分留空的话，内核会自动寻找合适的位置。（一般都不需要指定）</li>
+<li>在x86虚拟机环境里，直接用crashkernel&#x3D;512M就能正常运行，但某些架构不行，所以推荐用这个格式：crashkernel&#x3D;1G-:512M。</li>
+<li>预留内存大小默认是128Ｍ，一般而言都太小了，建议使用512Ｍ</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">bpftrace -e &#x27;BEGIN &#123; printf(&quot;Hello world!\n&quot;); &#125;&#x27;<br>bpftrace -e &#x27;kprobe:vfs_read &#123; @[tid] = count();&#125;&#x27;<br>bpftrace -e &#x27;kprobe:vfs_read  /pid == 123/ &#123; @[tid, comm] = count();&#125;&#x27;<br>bpftrace -e &#x27;t:block:block_rq_insert &#123; @[kstack] = count(); &#125;&#x27;<br></code></pre></td></tr></table></figure>
-
+<p>注意：</p>
 <ul>
-<li><p>语法</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">probes /filter/ &#123; actions &#125;<br></code></pre></td></tr></table></figure>
-
-<ul>
-<li><p><code>probes</code>表示事件 tracepoint、kprobe、kretprobe、uprobe、BEGIN、END</p>
-</li>
-<li><p><code>filter</code>表示过滤条件 当一个事件触发时，会先判断该条件，满足条件才会执行后面的action行为</p>
-</li>
-<li><p><code>action</code>表示具体操作</p>
-</li>
-<li><p><code>bpftrace -e &#39;kprobe:vfs_read  /pid == 123/ &#123; @[tid, comm] = count();&#125;&#39;</code></p>
-</li>
+<li>sw内核的crashkernel代码不完整，没有实现自动寻找的功能，所以不指定offset时会默认为offset&#x3D;0，与第一内核发生冲突而导致系统起不来，此时应该用完整的格式，比如1G-:512M@3G。</li>
 </ul>
-</li>
-<li><p>变量</p>
-<ul>
-<li><p>内部变量（build-in）</p>
-</li>
-<li><pre><code class="c">uid:用户id
-tid：线程id
-pid：进程id
-cpu：cpu id
-cgroup：cgroup id
-probe：当前的trace点
-comm：进程名字
-nsecs：纳秒级别的时间戳
-kstack：内核栈回溯
-ustack - 用户栈回溯
-curtask：当前进程的task_struct地址
-args:获取该kprobe或者tracepoint的参数列表
-arg0:获取该kprobe的第一个变量，tracepoint不可用
-arg1:获取该kprobe的第二个变量，tracepoint不可用
-arg2:获取该kprobe的第三个变量，tracepoint不可用
-retval: kretprobe中获取函数返回值
-args-&gt;ret: kretprobe中获取函数返回值
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><br>- 使用`-v`选项可以列出tracepoint类型跟踪点的参数<br><br>  ```c<br>  <span class="hljs-meta"># bpftrace -lv tracepoint:syscalls:sys_enter_shmctl</span><br>  tracepoint:syscalls:sys_enter_shmctl<br>      <span class="hljs-type">int</span> __syscall_nr;<br>      <span class="hljs-type">int</span> shmid;<br>      <span class="hljs-type">int</span> cmd;<br>      <span class="hljs-keyword">struct</span> <span class="hljs-title class_">shmid_ds</span> * buf;<br></code></pre></td></tr></table></figure>
-</code></pre>
-</li>
+<p>配置完成后需要重启系统生效</p>
+<p>有两种方式可以确认内核是否正确完成了内存预留：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> dmesg | grep -i crashkernel<br><br>[0.008200] Reserving 512MB of memory at 1520MB <span class="hljs-keyword">for</span> crashkernel (System RAM: 4095MB)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cat</span> /proc/iomem<br><br>00100000-7ffdbfff : System RAM<br>01000000-02002287 : Kernel code<br>02200000-02cb1fff : Kernel rodata<br>02e00000-0311473f : Kernel data<br>03449000-039fffff : Kernel bss<br>5f000000-7effffff : Crash kernel<br></code></pre></td></tr></table></figure>
+
+<h3 id="触发Kdump"><a href="#触发Kdump" class="headerlink" title="触发Kdump"></a>触发Kdump</h3><ul>
+<li>手动触发<ul>
+<li>开启sysrq   <code>sysctl kernel.sysrq=1</code></li>
+<li>触发panic   <code>echo c &gt; /proc/sysrq-trigger</code></li>
 </ul>
 </li>
+<li>oops</li>
+<li>oom</li>
+<li>softlockup&#x2F;hardlockup</li>
+<li>rcu-stall</li>
 </ul>
 
                 
@@ -379,7 +359,7 @@ args-&gt;ret: kretprobe中获取函数返回值
     
       <span class="category-chain">
         
-  <a href="/categories/dbg-meth/" class="category-chain-item">dbg_meth</a>
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
   
   
 
@@ -394,7 +374,7 @@ args-&gt;ret: kretprobe中获取函数返回值
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/dbg-meth/" class="print-no-link">#dbg_meth</a>
+        <a href="/tags/debug/" class="print-no-link">#debug</a>
       
     </div>
   
@@ -406,8 +386,8 @@ args-&gt;ret: kretprobe中获取函数返回值
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>bpftrace</div>
-      <div>https://tomwithkernel.github.io/dbg_meth/bpftrace/bpftrace/</div>
+      <div>kdump</div>
+      <div>https://tomwithkernel.github.io/debug/kdump/</div>
     </div>
     <div class="license-meta">
       
@@ -451,9 +431,9 @@ args-&gt;ret: kretprobe中获取函数返回值
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/dbg_meth/strace/" title="strace">
+                      <a href="/debug/gdb/" title="gdb">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">strace</span>
+                        <span class="hidden-mobile">gdb</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -461,8 +441,8 @@ args-&gt;ret: kretprobe中获取函数返回值
                   <article class="post-next col-6">
                     
                     
-                      <a href="/linux%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/%E5%AD%97%E7%AC%A6%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/" title="字符设备驱动">
-                        <span class="hidden-mobile">字符设备驱动</span>
+                      <a href="/debug/perf/" title="perf">
+                        <span class="hidden-mobile">perf</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

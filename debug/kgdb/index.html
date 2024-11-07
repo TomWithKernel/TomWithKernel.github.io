@@ -22,18 +22,15 @@
     <meta name="description" content="KGDBkgdb是Linux内核提供的用于调试内核的源码级调试工具，支持断点设置，单步调试等源码调试常用功能，类似于在用户空间用gdb调试应用程序。kgdb从形式上来说类似于gdb server，你需要两台设备，一台主机，用于运行普通的gdb程序，一台被调试设备，需要安装所需调试的内核或者驱动，同时运行kgdb。kgdb与主机通过串口通讯，所以要在内核的启动参数里指定kgdb所需使用的串口设备号。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="kgdb">
-<meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/kgdb/index.html">
+<meta property="og:url" content="https://tomwithkernel.github.io/debug/kgdb/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
 <meta property="og:description" content="KGDBkgdb是Linux内核提供的用于调试内核的源码级调试工具，支持断点设置，单步调试等源码调试常用功能，类似于在用户空间用gdb调试应用程序。kgdb从形式上来说类似于gdb server，你需要两台设备，一台主机，用于运行普通的gdb程序，一台被调试设备，需要安装所需调试的内核或者驱动，同时运行kgdb。kgdb与主机通过串口通讯，所以要在内核的启动参数里指定kgdb所需使用的串口设备号。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/dbg_meth/kgdb/grub.png">
-<meta property="og:image" content="https://tomwithkernel.github.io/dbg_meth/kgdb/kgdb_bug.png">
 <meta property="article:published_time" content="2024-09-05T02:44:35.000Z">
-<meta property="article:modified_time" content="2024-09-06T02:10:46.779Z">
+<meta property="article:modified_time" content="2024-11-07T06:00:26.243Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="dbg_meth">
+<meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/dbg_meth/kgdb/grub.png">
   
   
   
@@ -256,7 +253,7 @@
         
         
         
-          18 分钟
+          69 分钟
         
       </span>
     
@@ -343,7 +340,7 @@
             <p>​	kgdbwait这个字符串的作用就是让内核停在刚启动的地方。</p>
           </div>
 
-<img src="/dbg_meth/kgdb/grub.png" srcset="/img/loading.gif" lazyload class="" title="grub">
+
 
 <h4 id="方法2："><a href="#方法2：" class="headerlink" title="方法2："></a>方法2：</h4><p>​	在系统启动后，设置进入kgdb模式</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">设置调试串口</span><br>echo &quot;kgdboc=ttyXXX,115200&quot; &gt; /sys/module/kgdboc/parameters/kgdboc<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">设置魔术键，g就是进行KGDB模式</span><br>echo g &gt; /proc/sysrq-trigger<br></code></pre></td></tr></table></figure>
@@ -368,7 +365,7 @@
 
 <h3 id="agent-proxy"><a href="#agent-proxy" class="headerlink" title="agent-proxy"></a>agent-proxy</h3><p>kgdb目前有一个问题，它和测试机的Linux终端共用一个串口，所以在进行信息输出的时候无法使用kgdb，因为kgdb还等着使用该串口，一般测试机只有一个串口，这就给调试带来了很大的麻烦，因为一般驱动是要应用程序调用的，也就是说我在调试时可能需要不停的在kgdb和终端之间来回切换，因为经常需要运行程序，停下程序，甚至输入一些参数。而且在实际的过程当中，切换也会有问题。</p>
 <p>官网解释：</p>
-<img src="/dbg_meth/kgdb/kgdb_bug.png" srcset="/img/loading.gif" lazyload class="" title="kgdb">
+
 
 <p>也就是说官网目前已知该问题</p>
 <p>这时我们需要一个工具agent-proxy</p>
@@ -454,7 +451,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/dbg-meth/" class="category-chain-item">dbg_meth</a>
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
   
   
 
@@ -469,7 +466,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/dbg-meth/" class="print-no-link">#dbg_meth</a>
+        <a href="/tags/debug/" class="print-no-link">#debug</a>
       
     </div>
   
@@ -482,7 +479,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>kgdb</div>
-      <div>https://tomwithkernel.github.io/dbg_meth/kgdb/</div>
+      <div>https://tomwithkernel.github.io/debug/kgdb/</div>
     </div>
     <div class="license-meta">
       
@@ -536,7 +533,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/dbg_meth/ftrace/" title="ftrace">
+                      <a href="/debug/ftrace/" title="ftrace">
                         <span class="hidden-mobile">ftrace</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>

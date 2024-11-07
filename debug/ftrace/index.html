@@ -19,22 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="vim安装Vim插件管理器 VimPlug12curl -fLo ~&#x2F;.vim&#x2F;autoload&#x2F;plug.vim --create-dirs \    https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;junegunn&#x2F;vim-plug&#x2F;master&#x2F;plug.vim  配置 ~&#x2F;.vimrc12345678910111213141516171819202122232">
+    <meta name="description" content="什么是ftrace​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。 ​	ftrace 的主要功能：  函数跟踪 (function tracing): 可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。 例如，可以跟踪某个特定">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vim">
-<meta property="og:url" content="https://tomwithkernel.github.io/config/vim/index.html">
+<meta property="og:title" content="ftrace">
+<meta property="og:url" content="https://tomwithkernel.github.io/debug/ftrace/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="vim安装Vim插件管理器 VimPlug12curl -fLo ~&#x2F;.vim&#x2F;autoload&#x2F;plug.vim --create-dirs \    https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;junegunn&#x2F;vim-plug&#x2F;master&#x2F;plug.vim  配置 ~&#x2F;.vimrc12345678910111213141516171819202122232">
+<meta property="og:description" content="什么是ftrace​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。 ​	ftrace 的主要功能：  函数跟踪 (function tracing): 可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。 例如，可以跟踪某个特定">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-02-24T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-11-07T06:04:19.389Z">
+<meta property="article:published_time" content="2024-08-22T02:33:06.000Z">
+<meta property="article:modified_time" content="2024-11-07T06:00:16.358Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="config">
+<meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>vim - TomWithKernel&#39;s Blog</title>
+  <title>ftrace - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -219,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="vim"></span>
+            <span id="subtitle" data-typed-text="ftrace"></span>
           
         </div>
 
@@ -230,8 +230,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-24 10:09" pubdate>
-          2024年2月24日 上午
+        <time datetime="2024-08-22 10:33" pubdate>
+          2024年8月22日 上午
         </time>
       </span>
     
@@ -242,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          223 字
+          944 字
         
       </span>
     
@@ -253,7 +253,7 @@
         
         
         
-          8 分钟
+          32 分钟
         
       </span>
     
@@ -299,17 +299,108 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">vim</h1>
+            <h1 id="seo-header">ftrace</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h1><h3 id="安装Vim插件管理器-VimPlug"><a href="#安装Vim插件管理器-VimPlug" class="headerlink" title="安装Vim插件管理器 VimPlug"></a><strong>安装Vim插件管理器 VimPlug</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -fLo ~/.vim/autoload/plug.vim --create-dirs \<br>    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim<br></code></pre></td></tr></table></figure>
+                <h3 id="什么是ftrace"><a href="#什么是ftrace" class="headerlink" title="什么是ftrace"></a>什么是ftrace</h3><p>​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。</p>
+<p>​	<code>ftrace</code> 的主要功能：</p>
+<ol>
+<li><strong>函数跟踪</strong> (<code>function tracing</code>):<ul>
+<li>可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。</li>
+<li>例如，可以跟踪某个特定函数的调用频率及其调用者。</li>
+</ul>
+</li>
+<li><strong>函数调用图</strong> (<code>function graph tracing</code>):<ul>
+<li>记录函数调用的完整调用栈。与简单的函数跟踪不同，函数调用图会显示函数的调用关系以及调用链中的每个函数的执行时间。</li>
+</ul>
+</li>
+<li><strong>系统调用跟踪</strong>:<ul>
+<li>可以跟踪所有的系统调用或特定的系统调用，从而了解用户空间程序如何与内核交互。</li>
+</ul>
+</li>
+<li><strong>调度器跟踪</strong>:<ul>
+<li><code>ftrace</code> 可以记录和分析调度器行为，比如任务切换、任务调度延迟等，帮助分析多任务系统中的调度性能。</li>
+</ul>
+</li>
+<li><strong>事件跟踪</strong>:<ul>
+<li><code>ftrace</code> 支持各种内核事件的跟踪（例如，IRQ 处理、中断、软中断等），并允许用户定义和过滤感兴趣的事件。</li>
+</ul>
+</li>
+</ol>
+<p>传统的ftrace操作较为繁琐，需要向多个文件写入信息，当前我们紧介绍ftrace前端工具：trace-cmd</p>
+<h3 id="trace-cmd"><a href="#trace-cmd" class="headerlink" title="trace-cmd"></a>trace-cmd</h3><ul>
+<li><p>trace-cmd record：记录实时跟踪数据并将其写入trace.dat 文件</p>
+</li>
+<li><p>trace-cmd report：读取 trace.dat 文件并将二进制数据转换为可读的 ASCII 文本格式。</p>
+</li>
+<li><p>trace-cmd start：开始跟踪但不记录到 trace.dat 文件。</p>
+</li>
+<li><p>trace-cmd stop：停止跟踪。</p>
+</li>
+<li><p>trace-cmd extract：从内核缓冲区提取数据并创建 trace.dat 文件。</p>
+</li>
+<li><p>trace-cmd reset：禁用所有跟踪并恢复系统性能。</p>
+</li>
+<li><p>查看可用追踪器</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd list -t<br>hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<br></code></pre></td></tr></table></figure>
 
-<h3 id="配置-vimrc"><a href="#配置-vimrc" class="headerlink" title="配置 ~&#x2F;.vimrc"></a><strong>配置 ~&#x2F;.vimrc</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs bash">call plug#begin()<br><br>Plug <span class="hljs-string">&#x27;scrooloose/nerdtree&#x27;</span><br>noremap &lt;leader&gt;t :NERDTreeToggle&lt;CR&gt;<br>autocmd VimEnter * wincmd p<br>autocmd BufEnter * <span class="hljs-keyword">if</span> 0 == len(filter(range(1, winnr(<span class="hljs-string">&#x27;$&#x27;</span>)), <span class="hljs-string">&#x27;empty(getbufvar(winbufnr(v:val), &quot;&amp;bt&quot;))&#x27;</span>)) | qa! | endif<br><span class="hljs-built_in">let</span> NERDTreeWinSize=25<br><br>Plug <span class="hljs-string">&#x27;junegunn/fzf&#x27;</span>, &#123; <span class="hljs-string">&#x27;do&#x27;</span>: &#123; -&gt; fzf#install() &#125; &#125;<br>Plug <span class="hljs-string">&#x27;junegunn/fzf.vim&#x27;</span><br>nnoremap &lt;c-p&gt; :Files&lt;CR&gt;<br>nnoremap &lt;c-g&gt; :Ag&lt;CR&gt;<br><br>Plug <span class="hljs-string">&#x27;junegunn/fzf&#x27;</span>, &#123; <span class="hljs-string">&#x27;dir&#x27;</span>: <span class="hljs-string">&#x27;~/.fzf&#x27;</span>, <span class="hljs-string">&#x27;do&#x27;</span>: <span class="hljs-string">&#x27;./install --all&#x27;</span> &#125;<br>Plug <span class="hljs-string">&#x27;tracyone/fzf-funky&#x27;</span>,&#123;<span class="hljs-string">&#x27;on&#x27;</span>: <span class="hljs-string">&#x27;FzfFunky&#x27;</span>&#125;<br>nnoremap &lt;Leader&gt;f :FzfFunky&lt;CR&gt;<br><br>Plug <span class="hljs-string">&#x27;majutsushi/tagbar&#x27;</span><br>nmap &lt;Leader&gt;b :TagbarToggle&lt;CR&gt;<br><span class="hljs-built_in">let</span> g:tagbar_width=30<br>autocmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()<br><br>call plug#end()<br><br><span class="hljs-built_in">set</span> mouse=a<br><span class="hljs-built_in">set</span> backspace=indent,eol,start<br><span class="hljs-built_in">set</span> cursorline<br><span class="hljs-built_in">set</span> autoindent    <span class="hljs-string">&quot; 在输入文本时自动缩进</span><br><span class="hljs-string">set smartindent   &quot;</span> 根据上一行的缩进进行智能缩进<br><span class="hljs-built_in">set</span> hlsearch                                                                                                                   <span class="hljs-built_in">set</span> number <br></code></pre></td></tr></table></figure>
+<ul>
+<li>查看可跟踪的函数</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -f | grep mmap<br><br>xen_hvm_exit_mmap<br>xen_dup_mmap<br>xen_exit_mmap<br>ldt_arch_exit_mmap<br>__ia32_compat_sys_ia32_mmap<br>...<br></code></pre></td></tr></table></figure>
 
-<h3 id="把插件放到-vim文件夹中"><a href="#把插件放到-vim文件夹中" class="headerlink" title="把插件放到~&#x2F;.vim文件夹中"></a>把插件放到~&#x2F;.vim文件夹中</h3><p>autoload 和 plugged</p>
-<p>执行<code>source ~/.vimrc</code></p>
+<ul>
+<li>查看可跟踪的事件</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -e | grep snd<br><br>asoc:snd_soc_bias_level_start<br>asoc:snd_soc_bias_level_done<br>asoc:snd_soc_dapm_start<br>asoc:snd_soc_dapm_done<br>...<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>查看函数调用栈</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function -l do_mmap --func-stack<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">使用 ctrl-c 退出trace-cmd时，会在当前目录生成 trace.dat文件,使用report读取trace.dat</span><br>uos@uos-PC [~] ➜  trace-cmd report | head -20<br><br>CPU 0 is empty<br>cpus=16<br>    explorer.exe-14504 [008] 1274475.231218: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231223: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231269: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231271: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231285: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231286: kernel_stack:         &lt;stack trace&gt;<br><br></code></pre></td></tr></table></figure>
+
+<p>命令解释：</p>
+<ul>
+<li><p><code>-p</code>：指定当前的 tracer，类似 <code>echo function &gt; current_tracer</code>，可以是支持的 tracer 中的任意一个</p>
+</li>
+<li><p><code>-l</code>：指定跟踪的函数，可以设置多个，类似 <code>echo function_name &gt; set_ftrace_filter</code></p>
+</li>
+<li><p><code>--func-stack</code>：记录被跟踪函数的调用栈</p>
+</li>
+<li><p>-n 指定不跟踪的函数</p>
+<ul>
+<li>比如：<code>trace-cmd record -p function -l &#39;dev*&#39; -n dev_attr_show</code></li>
+<li>设置跟踪所有 dev 开头的函数，但是不跟踪 <code>dev_attr_show</code></li>
+</ul>
+</li>
+<li><p><code>-g</code>：指定 function_graph tracer 跟踪的 函数，类似 <code>echo function_name &gt; set_graph_function</code></p>
+</li>
+<li><p><code>-O</code>：设置 options，比如设置 <code>options/func_stack_trace</code> 可以用 <code>-O func_stack_trace</code>，在 optoin 名称前加上 <code>no</code> 就是将 option 清 0</p>
+</li>
+<li><p><code>-P</code>：设置跟踪的进程</p>
+</li>
+</ul>
+<p>注意，function_graph tracer 同时支持 <code>-l/-g</code> 参数，但是两者是有区别的，他们区别的本质还是 <code>set_ftrace_filter</code> 与 <code>set_graph_function</code> 的区别。</p>
+<ul>
+<li><code>-l</code> 表示被跟踪的函数是叶子函数，不会跟踪其内部的调用子函数。</li>
+<li><code>-g</code> 会跟踪函数内部调用的子函数。</li>
+</ul>
+<p>​	默认情况下，<code>trace-cmd</code> 的 <code>function_graph</code> 会记录所有嵌套的函数调用。可以通过设置 <code>--max-graph-depth</code> 来限制跟踪深度。例如要将深度设置为 2，可以使用以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph --max-graph-depth 2 -P 1656<br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>直接跟踪执行命令</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph smartctl -i /dev/sg1<br>sudo trace-cmd report<br></code></pre></td></tr></table></figure>
+
+
+
 
                 
               </div>
@@ -328,7 +419,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/config/" class="category-chain-item">config</a>
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
   
   
 
@@ -343,7 +434,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/config/" class="print-no-link">#config</a>
+        <a href="/tags/debug/" class="print-no-link">#debug</a>
       
     </div>
   
@@ -355,8 +446,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>vim</div>
-      <div>https://tomwithkernel.github.io/config/vim/</div>
+      <div>ftrace</div>
+      <div>https://tomwithkernel.github.io/debug/ftrace/</div>
     </div>
     <div class="license-meta">
       
@@ -368,7 +459,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月24日</div>
+          <div>2024年8月22日</div>
         </div>
       
       
@@ -400,9 +491,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/config/tmux/" title="tmux">
+                      <a href="/debug/kgdb/" title="kgdb">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">tmux</span>
+                        <span class="hidden-mobile">kgdb</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -410,8 +501,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/commands/ctags/" title="ctags">
-                        <span class="hidden-mobile">ctags</span>
+                      <a href="/debug/I2C%E8%B0%83%E8%AF%95/I2C%E8%B0%83%E8%AF%95/" title="I2C调试">
+                        <span class="hidden-mobile">I2C调试</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

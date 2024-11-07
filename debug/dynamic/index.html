@@ -19,22 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="什么是ftrace​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。 ​	ftrace 的主要功能：  函数跟踪 (function tracing): 可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。 例如，可以跟踪某个特定">
+    <meta name="description" content="Dynamic debugDynamic debug(dyndbg) 功能，就是允许用户空间通过 debugfs 导出的文件节点 &#x2F;sys&#x2F;kernel&#x2F;debug&#x2F;dynamic_debug&#x2F;control，动态的、在运行时控制 Linux 内核 KERN_DEBUG 类型日志的开启和关闭。 开启配置12CONFIG_DYNAMIC_DEBUG&#x3D;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ftrace">
-<meta property="og:url" content="https://tomwithkernel.github.io/dbg_meth/ftrace/index.html">
+<meta property="og:title" content="dynamic debug">
+<meta property="og:url" content="https://tomwithkernel.github.io/debug/dynamic/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="什么是ftrace​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。 ​	ftrace 的主要功能：  函数跟踪 (function tracing): 可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。 例如，可以跟踪某个特定">
+<meta property="og:description" content="Dynamic debugDynamic debug(dyndbg) 功能，就是允许用户空间通过 debugfs 导出的文件节点 &#x2F;sys&#x2F;kernel&#x2F;debug&#x2F;dynamic_debug&#x2F;control，动态的、在运行时控制 Linux 内核 KERN_DEBUG 类型日志的开启和关闭。 开启配置12CONFIG_DYNAMIC_DEBUG&#x3D;">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-08-22T02:33:06.000Z">
-<meta property="article:modified_time" content="2024-10-09T08:19:43.144Z">
+<meta property="article:published_time" content="2024-11-07T06:07:49.000Z">
+<meta property="article:modified_time" content="2024-11-07T06:39:21.263Z">
 <meta property="article:author" content="Tom">
-<meta property="article:tag" content="dbg_meth">
+<meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>ftrace - TomWithKernel&#39;s Blog</title>
+  <title>dynamic debug - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -219,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="ftrace"></span>
+            <span id="subtitle" data-typed-text="dynamic debug"></span>
           
         </div>
 
@@ -230,8 +230,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-08-22 10:33" pubdate>
-          2024年8月22日 上午
+        <time datetime="2024-11-07 14:07" pubdate>
+          2024年11月7日 下午
         </time>
       </span>
     
@@ -242,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          944 字
+          507 字
         
       </span>
     
@@ -253,7 +253,7 @@
         
         
         
-          8 分钟
+          17 分钟
         
       </span>
     
@@ -299,108 +299,38 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">ftrace</h1>
+            <h1 id="seo-header">dynamic debug</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="什么是ftrace"><a href="#什么是ftrace" class="headerlink" title="什么是ftrace"></a>什么是ftrace</h3><p>​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。</p>
-<p>​	<code>ftrace</code> 的主要功能：</p>
-<ol>
-<li><strong>函数跟踪</strong> (<code>function tracing</code>):<ul>
-<li>可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。</li>
-<li>例如，可以跟踪某个特定函数的调用频率及其调用者。</li>
-</ul>
-</li>
-<li><strong>函数调用图</strong> (<code>function graph tracing</code>):<ul>
-<li>记录函数调用的完整调用栈。与简单的函数跟踪不同，函数调用图会显示函数的调用关系以及调用链中的每个函数的执行时间。</li>
-</ul>
-</li>
-<li><strong>系统调用跟踪</strong>:<ul>
-<li>可以跟踪所有的系统调用或特定的系统调用，从而了解用户空间程序如何与内核交互。</li>
-</ul>
-</li>
-<li><strong>调度器跟踪</strong>:<ul>
-<li><code>ftrace</code> 可以记录和分析调度器行为，比如任务切换、任务调度延迟等，帮助分析多任务系统中的调度性能。</li>
-</ul>
-</li>
-<li><strong>事件跟踪</strong>:<ul>
-<li><code>ftrace</code> 支持各种内核事件的跟踪（例如，IRQ 处理、中断、软中断等），并允许用户定义和过滤感兴趣的事件。</li>
-</ul>
-</li>
-</ol>
-<p>传统的ftrace操作较为繁琐，需要向多个文件写入信息，当前我们紧介绍ftrace前端工具：trace-cmd</p>
-<h3 id="trace-cmd"><a href="#trace-cmd" class="headerlink" title="trace-cmd"></a>trace-cmd</h3><ul>
-<li><p>trace-cmd record：记录实时跟踪数据并将其写入trace.dat 文件</p>
-</li>
-<li><p>trace-cmd report：读取 trace.dat 文件并将二进制数据转换为可读的 ASCII 文本格式。</p>
-</li>
-<li><p>trace-cmd start：开始跟踪但不记录到 trace.dat 文件。</p>
-</li>
-<li><p>trace-cmd stop：停止跟踪。</p>
-</li>
-<li><p>trace-cmd extract：从内核缓冲区提取数据并创建 trace.dat 文件。</p>
-</li>
-<li><p>trace-cmd reset：禁用所有跟踪并恢复系统性能。</p>
-</li>
-<li><p>查看可用追踪器</p>
-</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd list -t<br>hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<br></code></pre></td></tr></table></figure>
+                <h3 id="Dynamic-debug"><a href="#Dynamic-debug" class="headerlink" title="Dynamic debug"></a>Dynamic debug</h3><p>Dynamic debug(dyndbg) 功能，就是允许用户空间通过 debugfs 导出的文件节点 &#x2F;sys&#x2F;kernel&#x2F;debug&#x2F;dynamic_debug&#x2F;control，动态的、在运行时控制 Linux 内核 KERN_DEBUG 类型日志的开启和关闭。</p>
+<h3 id="开启配置"><a href="#开启配置" class="headerlink" title="开启配置"></a>开启配置</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile">CONFIG_DYNAMIC_DEBUG=y<br>CONFIG_DEBUG_FS=y<br></code></pre></td></tr></table></figure>
 
+<p>当打开了内核配置选项<code>CONFIG_DYNAMIC_DEBUG</code>， 内核中的<code>pr_debug()/dev_dbg()</code>和<code>print_hex_dump_debug()/print_hex_dump_bytes()</code>就使用了<code>Dynamic debug</code>特性。</p>
+<p>当未打开了内核配置选项<code>CONFIG_DYNAMIC_DEBUG</code>:</p>
 <ul>
-<li>查看可跟踪的函数</li>
+<li><code>printk</code>就退化成<code>printk(KERN_DEBUG)</code></li>
+<li><code>print_hex_dump_debug()</code> 就退化成<code>print_hex_dump(KERN_DEBUG)</code></li>
+<li><code>dev_dbg</code>就退化为空。</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -f | grep mmap<br><br>xen_hvm_exit_mmap<br>xen_dup_mmap<br>xen_exit_mmap<br>ldt_arch_exit_mmap<br>__ia32_compat_sys_ia32_mmap<br>...<br></code></pre></td></tr></table></figure>
+<p><code>Dynamic debug</code>在<code>debugfs</code>中有个控制文件节点：<code>/sys/kernel/debug/dynamic_debug/control</code>。它记录了所有使用<code>Dynamic debug</code>技术的文件路径、行号、模块名称、函数名称和要打印的语句。</p>
+<h3 id="查看dynamic-debug的行为"><a href="#查看dynamic-debug的行为" class="headerlink" title="查看dynamic debug的行为"></a>查看dynamic debug的行为</h3><p>我们可以通过向读文件<code>/sys/kernel/debug/dynamic_debug/control</code>来查看目前系统上<code>Dynamic debug</code>的配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~] ➜  sudo cat /sys/kernel/debug/dynamic_debug/control | head                                                                                              [14:27:15]<br><span class="hljs-meta prompt_"># </span><span class="language-bash">filename:lineno [module]<span class="hljs-keyword">function</span> flags format</span><br>drivers/usb/storage/usb.c:1131 [usb_storage]storage_probe =_ &quot;Use Bulk-Only transport with the Transparent SCSI protocol for dynamic id: 0x%04x 0x%04x\012&quot;<br>drivers/usb/storage/usb.c:1067 [usb_storage]usb_stor_probe2 =_ &quot;waiting for device to settle before scanning\012&quot;<br>drivers/usb/storage/usb.c:917 [usb_storage]usb_stor_scan_dwork =_ &quot;scan complete\012&quot;<br>drivers/usb/storage/usb.c:899 [usb_storage]usb_stor_scan_dwork =_ &quot;starting scan\012&quot;<br>drivers/usb/storage/sierra_ms.c:110 [usb_storage]truinst_show =_ &quot;SWIMS: failed SWoC query\012&quot;<br>drivers/usb/storage/sierra_ms.c:89 [usb_storage]debug_swoc =_ &quot;SWIMS: Linux Version: %04X\012&quot;<br>drivers/usb/storage/sierra_ms.c:88 [usb_storage]debug_swoc =_ &quot;SWIMS: Linux SKU: %04X\012&quot;<br>drivers/usb/storage/sierra_ms.c:87 [usb_storage]debug_swoc =_ &quot;SWIMS: SWoC Rev: %02d\012&quot;<br>drivers/usb/storage/sierra_ms.c:69 [usb_storage]sierra_get_swoc_info =_ &quot;SWIMS: Attempting to get TRU-Install info\012&quot;<br></code></pre></td></tr></table></figure>
 
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p>控制打印时，还可以使用flags更来定义更详细的输出信息，目前支持的flags如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">p    enables the pr_debug() callsite.<br>f    Include the function name in the printed message<br>l    Include line number in the printed message<br>m    Include module name in the printed message<br>t    Include thread ID in messages not generated from interrupt context<br>_    No flags are set. (Or&#x27;d with others on input)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">使能文件svcsock.c中1603行的输出</span><br>echo -n &quot;file svcsock.c line 1603 +p&quot; &gt; /sys/kernel/debug/dynamic_debug/control<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">打开函数svc_process中所有的动态输出</span><br>echo -n &#x27;func svc_process +p&#x27; &gt; /sys/kernel/debug/dynamic_debug/control<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">开启文件中的pr_debug或dev_dbg</span><br>echo -n &#x27;file $file_name +p&#x27; &gt; /sys/kernel/debug/dynaminc_debug/control<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">关闭文件中的打印</span><br>echo -n &#x27;file $file_name -p&#x27; &gt; /sys/kernel/debug/dynaminc_debug/control<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">打开模块中的打印</span><br>echo -n &#x27;module $mod_name +p&#x27; &gt; /sys/kernel/debug/dynaminc_debug/control<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p>参考链接：</p>
 <ul>
-<li>查看可跟踪的事件</li>
+<li><a target="_blank" rel="noopener" href="https://linux.laoqinren.net/kernel/kernel-dynamic-debug/">https://linux.laoqinren.net/kernel/kernel-dynamic-debug/</a></li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -e | grep snd<br><br>asoc:snd_soc_bias_level_start<br>asoc:snd_soc_bias_level_done<br>asoc:snd_soc_dapm_start<br>asoc:snd_soc_dapm_done<br>...<br></code></pre></td></tr></table></figure>
-
-<ul>
-<li>查看函数调用栈</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function -l do_mmap --func-stack<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">使用 ctrl-c 退出trace-cmd时，会在当前目录生成 trace.dat文件,使用report读取trace.dat</span><br>uos@uos-PC [~] ➜  trace-cmd report | head -20<br><br>CPU 0 is empty<br>cpus=16<br>    explorer.exe-14504 [008] 1274475.231218: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231223: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231269: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231271: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231285: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231286: kernel_stack:         &lt;stack trace&gt;<br><br></code></pre></td></tr></table></figure>
-
-<p>命令解释：</p>
-<ul>
-<li><p><code>-p</code>：指定当前的 tracer，类似 <code>echo function &gt; current_tracer</code>，可以是支持的 tracer 中的任意一个</p>
-</li>
-<li><p><code>-l</code>：指定跟踪的函数，可以设置多个，类似 <code>echo function_name &gt; set_ftrace_filter</code></p>
-</li>
-<li><p><code>--func-stack</code>：记录被跟踪函数的调用栈</p>
-</li>
-<li><p>-n 指定不跟踪的函数</p>
-<ul>
-<li>比如：<code>trace-cmd record -p function -l &#39;dev*&#39; -n dev_attr_show</code></li>
-<li>设置跟踪所有 dev 开头的函数，但是不跟踪 <code>dev_attr_show</code></li>
-</ul>
-</li>
-<li><p><code>-g</code>：指定 function_graph tracer 跟踪的 函数，类似 <code>echo function_name &gt; set_graph_function</code></p>
-</li>
-<li><p><code>-O</code>：设置 options，比如设置 <code>options/func_stack_trace</code> 可以用 <code>-O func_stack_trace</code>，在 optoin 名称前加上 <code>no</code> 就是将 option 清 0</p>
-</li>
-<li><p><code>-P</code>：设置跟踪的进程</p>
-</li>
-</ul>
-<p>注意，function_graph tracer 同时支持 <code>-l/-g</code> 参数，但是两者是有区别的，他们区别的本质还是 <code>set_ftrace_filter</code> 与 <code>set_graph_function</code> 的区别。</p>
-<ul>
-<li><code>-l</code> 表示被跟踪的函数是叶子函数，不会跟踪其内部的调用子函数。</li>
-<li><code>-g</code> 会跟踪函数内部调用的子函数。</li>
-</ul>
-<p>​	默认情况下，<code>trace-cmd</code> 的 <code>function_graph</code> 会记录所有嵌套的函数调用。可以通过设置 <code>--max-graph-depth</code> 来限制跟踪深度。例如要将深度设置为 2，可以使用以下命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph --max-graph-depth 2 -P 1656<br></code></pre></td></tr></table></figure>
-
-
-
-<ul>
-<li>直接跟踪执行命令</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph smartctl -i /dev/sg1<br>sudo trace-cmd report<br></code></pre></td></tr></table></figure>
-
-
-
 
                 
               </div>
@@ -419,7 +349,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/dbg-meth/" class="category-chain-item">dbg_meth</a>
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
   
   
 
@@ -434,7 +364,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/dbg-meth/" class="print-no-link">#dbg_meth</a>
+        <a href="/tags/debug/" class="print-no-link">#debug</a>
       
     </div>
   
@@ -446,8 +376,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>ftrace</div>
-      <div>https://tomwithkernel.github.io/dbg_meth/ftrace/</div>
+      <div>dynamic debug</div>
+      <div>https://tomwithkernel.github.io/debug/dynamic/</div>
     </div>
     <div class="license-meta">
       
@@ -459,7 +389,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年8月22日</div>
+          <div>2024年11月7日</div>
         </div>
       
       
@@ -491,18 +421,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/dbg_meth/kgdb/" title="kgdb">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">kgdb</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/dbg_meth/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/%E5%86%85%E5%AD%98%E8%B0%83%E8%AF%95%E5%B7%A5%E5%85%B7/" title="内存调试工具">
-                        <span class="hidden-mobile">内存调试工具</span>
+                      <a href="/boot/boot/" title="kernel boot">
+                        <span class="hidden-mobile">kernel boot</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
