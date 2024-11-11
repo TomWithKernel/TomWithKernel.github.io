@@ -26,11 +26,13 @@
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
 <meta property="og:description" content="I2C调试busybox  devmem在Linux系统，如果我们想要访问某个寄存器，就需要写一个驱动程序，在驱动中映射寄存器地址，转为虚拟地址后就可以访问。但有时候，我们只是单纯想知道某个寄存器的值，不想这么麻烦，怎么办呢？Linux早就想到这一点了，于是提供了一个工具devmem，通过devmem就可以直接读写寄存器，devmem是一个命令，在shell中输入devmem命令就可以非常方便的读">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/debug/I2C%E8%B0%83%E8%AF%95/I2C%E8%B0%83%E8%AF%95/i2c-tools.png">
 <meta property="article:published_time" content="2024-07-17T02:09:00.000Z">
 <meta property="article:modified_time" content="2024-11-07T06:01:32.830Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/debug/I2C%E8%B0%83%E8%AF%95/I2C%E8%B0%83%E8%AF%95/i2c-tools.png">
   
   
   
@@ -312,7 +314,7 @@
 
 
 <h3 id="i2c-tools"><a href="#i2c-tools" class="headerlink" title="i2c-tools"></a>i2c-tools</h3><p>应用层访问硬件肯定是需要驱动程序的。对于I2C设备，Linux内核已经提供驱动程序**<code>drivers/i2c/i2c-dev.c</code>**，通过它可以直接使用下面的I2C控制器驱动程序来访问I2C设备，而i2c-tools正是基于该驱动开发的一套示例代码，也是一套好用的调试工具。框架如下：</p>
-
+<img src="/debug/I2C%E8%B0%83%E8%AF%95/I2C%E8%B0%83%E8%AF%95/i2c-tools.png" srcset="/img/loading.gif" lazyload class="" title="i2c-tools">
 
 <p>i2c-tools 包括 ： <strong>i2cdetect</strong>（检测I2C器件工具） 、<strong>i2cdump</strong>（查看寄存器值工具） 、<strong>i2cget</strong>（读取寄存器值工具）、 <strong>i2cset</strong>（设置寄存器值工具）</p>
 <h4 id="i2cdetect"><a href="#i2cdetect" class="headerlink" title="i2cdetect"></a>i2cdetect</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs shell">Usage: i2cdetect [-y] [-a] [-q|-r] I2CBUS [FIRST LAST]		<br>       i2cdetect -F I2CBUS									<br>       i2cdetect -l											<br>  I2CBUS is an integer or an I2C bus name<br>  If provided, FIRST and LAST limit the probing range.<br><span class="hljs-meta prompt_">  #</span><span class="language-bash">-f		强制访问设备</span><br><span class="hljs-meta prompt_">  #</span><span class="language-bash">-y		禁用交互模式</span><br><span class="hljs-meta prompt_">  #</span><span class="language-bash">-a		扫描总显示所有设备</span><br><span class="hljs-meta prompt_">  #</span><span class="language-bash">-l		列出已知的I2C适配器</span><br><span class="hljs-meta prompt_">  #</span><span class="language-bash">I2CBUS	i2c总线编号</span><br><span class="hljs-meta prompt_">  #</span><span class="language-bash">FIRST LAST	扫描地址范围</span><br><span class="hljs-meta prompt_">  </span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">返回值</span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">	– ：		表示该地址被检测，但没有芯片应答；</span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">	UU ：	表示该地址当前由内核驱动程序使用。</span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">	** ：	表示以十六进制表示的设备地址编号，如 “2d”或“4e”。</span><br></code></pre></td></tr></table></figure>
