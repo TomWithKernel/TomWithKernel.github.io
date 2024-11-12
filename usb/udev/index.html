@@ -1,0 +1,821 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="udevudev 是一个用户空间系统，它使操作系统管理员能够为事件注册用户空间处理程序。udev 守护程序接收的事件主要由 （Linux） 内核生成，以响应与外围设备相关的物理事件。因此，udev的主要目的是对外设检测和热插拔采取行动，包括将控制权返回给内核的操作，udev 可提供所需的基础结构来动态维护 &#x2F;dev 目录中的设备节点文件和符号链接。udev 规则提供了将外部工具插入内核设">
+<meta property="og:type" content="article">
+<meta property="og:title" content="udev">
+<meta property="og:url" content="https://tomwithkernel.github.io/usb/udev/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="udevudev 是一个用户空间系统，它使操作系统管理员能够为事件注册用户空间处理程序。udev 守护程序接收的事件主要由 （Linux） 内核生成，以响应与外围设备相关的物理事件。因此，udev的主要目的是对外设检测和热插拔采取行动，包括将控制权返回给内核的操作，udev 可提供所需的基础结构来动态维护 &#x2F;dev 目录中的设备节点文件和符号链接。udev 规则提供了将外部工具插入内核设">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-11T09:04:08.000Z">
+<meta property="article:modified_time" content="2024-11-12T07:03:40.370Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="usb">
+<meta property="article:tag" content="udev">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>udev - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="udev"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-11 17:04" pubdate>
+          2024年11月11日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          67 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">udev</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="udev"><a href="#udev" class="headerlink" title="udev"></a>udev</h2><p>udev 是一个用户空间系统，它使操作系统管理员能够为事件注册用户空间处理程序。udev 守护程序接收的事件主要由 （Linux） 内核生成，以响应与外围设备相关的物理事件。因此，udev的主要目的是对外设检测和热插拔采取行动，包括将控制权返回给内核的操作，udev 可提供所需的基础结构来动态维护 &#x2F;dev 目录中的设备节点文件和符号链接。udev 规则提供了将外部工具插入内核设备事件处理的方式。</p>
+<h3 id="udevadm-命令介绍"><a href="#udevadm-命令介绍" class="headerlink" title="udevadm 命令介绍"></a>udevadm 命令介绍</h3><h4 id="主命令"><a href="#主命令" class="headerlink" title="主命令"></a>主命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">info			#查询sysfs或者udev的数据库<br>trigger			#从内核请求events<br>settle			#查看udev事件队列，如果所有的events已处理则退出<br>control			#修改udev后台的内部状态信息<br>monitor			#监控内核的uevents<br>hwdb			#处理硬件数据库索引<br>test			#调试<br></code></pre></td></tr></table></figure>
+
+<h4 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h4><h5 id="查看设备信息："><a href="#查看设备信息：" class="headerlink" title="查看设备信息："></a>查看设备信息：</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">udevadm info --query=all --name=sda #查询sda的所有信息<br>udevadm info --query=path --name=sda #查看sda的path<br>udevadm info --attribute-walk --name=/dev/nvme0n1  #查看nvme0n1的所有父设备一直到sysfs的根节点<br>--query=type		#从数据库中查询指定类型的设备。需要--path和--name来指定设备。合法的查询文件是：设备名，链接，路径，属性<br>--path=devpath		#设备的路径<br>--name=file			#设备节点或者链接<br>--attribute-walk	#打印指定设备的所有sysfs记录的属性，以用来udev规则匹配特殊的设备。该选项打印链上的所有设备信息，最大可能到sys目录。<br>--device-id-of-file=file	#打印主/从设备号<br>--export-db			#输出udev数据库中的内容<br></code></pre></td></tr></table></figure>
+
+<h5 id="监控设备事件："><a href="#监控设备事件：" class="headerlink" title="监控设备事件："></a>监控设备事件：</h5><p>udevadm monitor [options] 监听内核事件和udev发送的events事件。打印事件发出的设备。可以通过比较内核或者udev事件的时间戳来分析事件时序。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">udevadm monitor --property	#输出事件的属性<br>udevadm monitor --kernel --property --subsystem-match=usb    #过滤监听符合条件的时间<br>--kernel					#输出内核事件<br>--udev						#输出udev规则执行时的udev事件<br>--property					#输出事件的属性<br>--subsystem-match=string	#通过子系统或者设备类型过滤事件。只有匹配了子系统值的udev设备事件通过。<br>--tag-match=string			#通过属性过滤事件，只有匹配了标签的udev事件通过。<br></code></pre></td></tr></table></figure>
+
+<h5 id="模拟一个udev事件"><a href="#模拟一个udev事件" class="headerlink" title="模拟一个udev事件"></a>模拟一个udev事件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">udevadm test [options] devpath		#模拟一个udev事件，打印出debug信息<br></code></pre></td></tr></table></figure>
+
+<h5 id="接收内核发送来的设备事件"><a href="#接收内核发送来的设备事件" class="headerlink" title="接收内核发送来的设备事件"></a>接收内核发送来的设备事件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs shell">udevadm trigger [options]			#接收内核发送来的设备事件。主要用于重放coldplug事件信息<br><span class="hljs-meta prompt_">#</span><span class="language-bash">（内核在启动时已经检测到了系统的硬件设备，并把硬件设备信息通过sysfs内核虚拟文件系统导出。udev扫描sysfs文件系统，根据硬件设备信息生成热插拔（hotplug）事件，udev再读取这些事件，生成对应的硬件设备文件。由于没有实际的硬件插拔动作，所以这一过程被称为coldplug。）</span><br>--verbose							#输出将要被触发的设备列表。<br>--dry-run							#不真的触发事件<br>--type=type							#触发一个特殊的设备。合法的类型：devices,subsystem,failed.默认是devices<br>--action=action						#被触发的事件，默认是change<br>--subsystem-match=subsystem			#触发匹配子系统的设备事件。这个选项可以被多次指定，并且支持shell模式匹配。<br>--attr-match=attribute=value		#触发匹配sysfs属性的设备事件。如果属性值和属性一起指定，属性的值可以使用shell模式匹配。如果没有指定值，会重新确认现有属性。这个选项可以被多次指定。<br>--attr-nomatch=attribute=value		#不要触发匹配属性的设备事件。如果可以使用模式匹配。也可以多次指定<br>--property-match=property=value		#匹配属性吻合的设备。可以多次指定支持模式匹配<br>--tag-match=property				#匹配标签吻合的设备。可以多次指定。<br>--sysname-match=name				#匹配sys设备名相同的设备。可以多次指定支持模式匹配。<br><br></code></pre></td></tr></table></figure>
+
+<h5 id="查看udev事件队列"><a href="#查看udev事件队列" class="headerlink" title="查看udev事件队列"></a>查看udev事件队列</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">udevadm settle [options]			#查看udev事件队列，如果所有事件全部处理完就退出。<br>--timeout=seconds					#等待事件队列空的最大时间。默认是180秒。如果是0则立即退出。<br>--seq-start=seqnum					#只等待到给定的顺序号。<br>--seq-end=seqnum					#只等待到给定顺序号之前。<br>--exit-if-exists=file				#如果文件存在就退出<br>--quiet								#不输出任何信息<br></code></pre></td></tr></table></figure>
+
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">udev 规则支持使用占位符和替换项。请按照在其他任何脚本中的相同方式使用。在 udev 规则中可使用以下替换项：</span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">r、<span class="hljs-variable">$root</span>			<span class="hljs-comment">#设备目录 /dev（默认）</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">p、<span class="hljs-variable">$devpath</span>			<span class="hljs-comment">#DEVPATH 的值</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">k、<span class="hljs-variable">$kernel</span>			<span class="hljs-comment">#KERNEL 的值或内部设备名称</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">n、<span class="hljs-variable">$number</span>			<span class="hljs-comment">#设备号</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">N、<span class="hljs-variable">$tempnode</span>		<span class="hljs-comment">#设备文件的临时名称</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">M、<span class="hljs-variable">$major</span>			<span class="hljs-comment">#设备的主编号</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">m、<span class="hljs-variable">$minor</span>			<span class="hljs-comment">#设备的次编号</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">s&#123;ATTRIBUTE&#125;, <span class="hljs-variable">$attr</span>&#123;ATTRIBUTE&#125;			<span class="hljs-comment">#sysfs 属性的值（通过 ATTRIBUTE 指定）</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">E&#123;VARIABLE&#125;, <span class="hljs-variable">$env</span>&#123;VARIABLE&#125;			<span class="hljs-comment">#环境变量的值（通过 VARIABLE 指定）</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">c、<span class="hljs-variable">$result</span>								<span class="hljs-comment">#PROGRAM 的输出</span></span><br><span class="hljs-meta prompt_">%</span><span class="language-bash">%										<span class="hljs-comment">#% 字符</span></span><br><br></code></pre></td></tr></table></figure>
+
+<p>规则文件中的每个非注释行都由一个或多个键值对的列表组成，这些键值对由逗号分隔。有两种类型的键：</p>
+<ul>
+<li><p>匹配键：</p>
+<ul>
+<li>ACTION：匹配事件操作的名称.如 add 或 remove（添加或删除设备时。<br>DEVPATH：匹配事件设备的开发路径.如 DEVPATH&#x3D;&#x2F;bus&#x2F;pci&#x2F;drivers&#x2F;ipw3945，用于搜索与 ipw3945 驱动程序有关的所有事件。<br>KERNEL：匹配事件设备的名称。<br>KERNELS：让 udev 向上搜索设备路径，以查找匹配的设备名称。<br>SUBSYSTEM：匹配事件设备的子系统.如 SUBSYSTEM&#x3D;usb（用于与 USB 设备有关的所有事件）。<br>SUBSYSTEMS：让 udev 向上搜索设备路径，以查找匹配的设备子系统名称。<br>ENV{KEY}：环境变量的值，如 ENV{ID_BUS}&#x3D;”ieee1394，用于搜索与该 FireWire 总线 ID 有关的所有事件。<br>ATTR{FILENAME}：事件设备的 sysfs 属性。例如，要匹配 vendor 属性文件名中包含的字符串，可以使用 ATTR{vendor}&#x3D;&#x3D;“On[sS]tream”。<br>ATTRS{FILENAME}：让 udev 向上搜索设备路径，以查找与 sysfs 属性值匹配的设备。<br>TEST{octal mode mask}：测试文件是否存在。您可以指定八进制模式掩码。</li>
+</ul>
+</li>
+<li><p>分配键：</p>
+<ul>
+<li>NAME：用于网络接口的名称。Udev 无法更改设备节点的名称，只能创建其他符号链接.<br>SYMLINK：面向节点的符号链接的名称<br>OWNER, GROUP, MODE：设备节点的权限<br>ATTR{KEY}：指定要写入事件设备的 sysfs 属性的值。如果使用 &#x3D;&#x3D; 运算符，也将使用该键匹配 sysfs 属性的值。<br>ENV{KEY}：告知 udev 将变量导出到环境。如果使用 &#x3D;&#x3D; 运算符，也将使用该键匹配环境变量。<br>RUN：告知 udev 向程序列表添加要为该设备执行的程序。请记住，将此程序限制于很短的任务，以免妨碍此设备的后续事件。<br>OPTIONS：规则和设备选项。</li>
+</ul>
+</li>
+</ul>
+<p>如果所有匹配键都匹配其各自的值，则应用规则并为分配键分配指定的值。每个键都有不同的操作，具体取决于运算符。有效运算符包括：</p>
+<table>
+<thead>
+<tr>
+<th>&#x3D;&#x3D;</th>
+<th>比较相等</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>!&#x3D;</td>
+<td>比较不等式</td>
+</tr>
+<tr>
+<td>&#x3D;</td>
+<td>为键赋值</td>
+</tr>
+<tr>
+<td>+&#x3D;</td>
+<td>将值添加到键的当前值中</td>
+</tr>
+<tr>
+<td>:&#x3D;</td>
+<td>将最终值分配给键。禁止任何后续规则进行任何后续更改。</td>
+</tr>
+</tbody></table>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>修改网卡名字</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">KERNEL==&quot;eth0&quot;, SUBSYSTEM==&quot;net&quot;, SUBSYSTEMS==&quot;platform&quot;, DRIVERS==&quot;fec&quot;, NAME+=&quot;eth10&quot;<br></code></pre></td></tr></table></figure>
+
+<p>创建符号链接</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">SUBSYSTEM==&quot;tty&quot;, ATTRS&#123;idVendor&#125;==&quot;XXXX&quot;, ATTRS&#123;idProduct&#125;==&quot;XXXX&quot;, SYMLINK+=&quot;myUSB&quot;<br></code></pre></td></tr></table></figure>
+
+<p>禁用usb设备唤醒功能</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ACTION==&quot;add&quot;, SUBSYSTEM==&quot;usb&quot;, ATTR&#123;idVendor&#125;==&quot;XXXX&quot;, ATTR&#123;idProduct&#125;==&quot;XXXX&quot;, ATTR&#123;power/wakeup&#125;=&quot;disabled&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>参考链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42330983/article/details/126767290">https://blog.csdn.net/weixin_42330983/article/details/126767290</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/li_wen01/article/details/89435306">https://blog.csdn.net/li_wen01/article/details/89435306</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/usb/" class="category-chain-item">usb</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/usb/" class="print-no-link">#usb</a>
+      
+        <a href="/tags/udev/" class="print-no-link">#udev</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>udev</div>
+      <div>https://tomwithkernel.github.io/usb/udev/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月11日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/usb/wakeup/" title="usb-wakeup">
+                        <span class="hidden-mobile">usb-wakeup</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
