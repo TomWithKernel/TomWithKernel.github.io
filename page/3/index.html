@@ -246,6 +246,128 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/debug/kdump/" target="_self">
+          kdump
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/kdump/" target="_self">
+        <div>
+          Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC=yCONFIG_KEXEC_FILE=y   //两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP=y   //内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-10 10:09" pubdate>
+              2024-05-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/debug/">#debug</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/debug/perf/" target="_self">
+          perf
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/perf/" target="_self">
+        <div>
+          tar -xvf perf-5.10.0.tar.gzcd perf-5.10.0cd tools&#x2F;perf&#x2F;makesudo cp perf &#x2F;usr&#x2F;local&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin&#x2F;perf –version download:    https://cdn.kernel.org/pub
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-10 10:09" pubdate>
+              2024-05-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/debug/">#debug</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/debug/strace/" target="_self">
           strace
         </a>
@@ -315,7 +437,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/debug/bpftrace/bpftrace/" target="_self">
         <div>
-          bpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针  单行命令   1234bpftrac
+          bpftrace和trace-bpfccbpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针
         </div>
       </a>
 
@@ -742,72 +864,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/commands/vim_command/" target="_self">
-          vim
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/commands/vim_command/" target="_self">
-        <div>
-          vimvim打开文件：    Vi 使用的选项 说明    vim  filename 打开或新建一个文件，并将光标置于第一行的首部   vim   -r  filename 恢复上次 vim 打开时崩溃的文件   vim  -R  filename 把指定的文件以只读方式放入 Vim 编辑器中   vim  +  filename 打开文件，并将光标置于最后一行的首部   vim  +n  fi
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-01-26 10:09" pubdate>
-              2024-01-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="category-chain-item">常用命令</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">#常用命令</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><span class="page-number current">3</span>
+      <a class="extend prev" rel="prev" href="/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/#board">4</a><a class="extend next" rel="next" href="/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

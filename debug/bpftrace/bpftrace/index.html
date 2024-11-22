@@ -19,16 +19,16 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="bpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针  单行命令   1234bpftrac">
+    <meta name="description" content="bpftrace和trace-bpfccbpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针">
 <meta property="og:type" content="article">
 <meta property="og:title" content="bpftrace">
 <meta property="og:url" content="https://tomwithkernel.github.io/debug/bpftrace/bpftrace/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="bpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针  单行命令   1234bpftrac">
+<meta property="og:description" content="bpftrace和trace-bpfccbpftrace 探针    kprobeb&#x2F;kretprobe为动态跟踪、内核级探针，kprobeb是检测函数执行的开始，kretprobe为检测结束（返回） uprobe&#x2F;uretprobe为动态跟踪、用户级探针，uprobeb是检测用户级函数执行的开始，uretprobe为检测结束（返回）。tracepoint为静态跟踪、用户级探针">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tomwithkernel.github.io/debug/bpftrace/bpftrace/probe.jpg">
 <meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-11-07T06:00:09.390Z">
+<meta property="article:modified_time" content="2024-11-15T07:29:23.628Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
@@ -244,7 +244,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          361 字
+          892 字
         
       </span>
     
@@ -255,7 +255,7 @@
         
         
         
-          13 分钟
+          30 分钟
         
       </span>
     
@@ -306,7 +306,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="bpftrace"><a href="#bpftrace" class="headerlink" title="bpftrace"></a>bpftrace</h2><ul>
+                <h2 id="bpftrace和trace-bpfcc"><a href="#bpftrace和trace-bpfcc" class="headerlink" title="bpftrace和trace-bpfcc"></a>bpftrace和trace-bpfcc</h2><h3 id="bpftrace"><a href="#bpftrace" class="headerlink" title="bpftrace"></a>bpftrace</h3><ul>
 <li><p>探针</p>
 </li>
 <li><img src="/debug/bpftrace/bpftrace/probe.jpg" srcset="/img/loading.gif" lazyload class="" title="probe">
@@ -361,6 +361,16 @@ args-&gt;ret: kretprobe中获取函数返回值
 </ul>
 </li>
 </ul>
+<h3 id="trace-bpfcc"><a href="#trace-bpfcc" class="headerlink" title="trace-bpfcc"></a>trace-bpfcc</h3><p><code>trace-bpfcc</code> 是 Linux 上基于 eBPF 的一种跟踪工具，是 BCC（BPF Compiler Collection）工具集的一部分。它用于快速设置和运行 eBPF 程序，以在系统上执行跟踪和监控任务，帮助开发者分析内核和用户空间的行为。</p>
+<p>安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt install bpfcc-tools<br></code></pre></td></tr></table></figure>
+
+<p>使用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~] ➜  trace-bpfcc --help                                                                                           <br><br>usage: trace-bpfcc [-h] [-b BUFFER_PAGES] [-p PID] [-L TID] [-v]<br>                   [-Z STRING_SIZE] [-S] [-M MAX_EVENTS] [-t] [-T] [-C] [-B]<br>                   [-K] [-U] [-a] [-I header]<br>                   probe [probe ...]<br><br>Attach to functions and print trace messages.<br><br>positional arguments:<br>  probe                 probe specifier (see examples)<br><br>optional arguments:<br>  -h, --help            show this help message and exit<br>  -b BUFFER_PAGES, --buffer-pages BUFFER_PAGES<br>                        number of pages to use for perf_events ring buffer<br>                        (default: 64)<br>  -p PID, --pid PID     id of the process to trace (optional)<br>  -L TID, --tid TID     id of the thread to trace (optional)<br>  -v, --verbose         print resulting BPF program code before executing<br>  -Z STRING_SIZE, --string-size STRING_SIZE<br>                        maximum size to read from strings<br>  -S, --include-self    do not filter trace&#x27;s own pid from the trace<br>  -M MAX_EVENTS, --max-events MAX_EVENTS<br>                        number of events to print before quitting<br>  -t, --timestamp       print timestamp column (offset from trace start)<br>  -T, --time            print time column<br>  -C, --print_cpu       print CPU id<br>  -B, --bin_cmp         allow to use STRCMP with binary values<br>  -K, --kernel-stack    output kernel stack trace<br>  -U, --user-stack      output user stack trace<br>  -a, --address         print virtual address in stacks<br>  -I header, --include header<br>                        additional header files to include in the BPF program<br>                        as either full path, or relative to current working<br>                        directory, or relative to default kernel header search<br>                        path<br><br>EXAMPLES:<br><br>trace do_sys_open<br>        Trace the open syscall and print a default trace message when entered<br>trace &#x27;do_sys_open &quot;%s&quot;, arg2&#x27;<br>        Trace the open syscall and print the filename being opened<br>trace &#x27;sys_read (arg3 &gt; 20000) &quot;read %d bytes&quot;, arg3&#x27;<br>        Trace the read syscall and print a message for reads &gt;20000 bytes<br>trace &#x27;r::do_sys_open &quot;%llx&quot;, retval&#x27;<br>        Trace the return from the open syscall and print the return value<br>trace &#x27;c:open (arg2 == 42) &quot;%s %d&quot;, arg1, arg2&#x27;<br>        Trace the open() call from libc only if the flags (arg2) argument is 42<br>trace &#x27;c:malloc &quot;size = %d&quot;, arg1&#x27;<br>        Trace malloc calls and print the size being allocated<br>trace &#x27;p:c:write (arg1 == 1) &quot;writing %d bytes to STDOUT&quot;, arg3&#x27;<br>        Trace the write() call from libc to monitor writes to STDOUT<br>trace &#x27;r::__kmalloc (retval == 0) &quot;kmalloc failed!&quot;&#x27;<br>        Trace returns from __kmalloc which returned a null pointer<br>trace &#x27;r:c:malloc (retval) &quot;allocated = %x&quot;, retval&#x27;<br>        Trace returns from malloc and print non-NULL allocated buffers<br>trace &#x27;t:block:block_rq_complete &quot;sectors=%d&quot;, args-&gt;nr_sector&#x27;<br>        Trace the block_rq_complete kernel tracepoint and print # of tx sectors<br>trace &#x27;u:pthread:pthread_create (arg4 != 0)&#x27;<br>        Trace the USDT probe pthread_create when its 4th argument is non-zero<br>trace &#x27;p::SyS_nanosleep(struct timespec *ts) &quot;sleep for %lld ns&quot;, ts-&gt;tv_nsec&#x27;<br>        Trace the nanosleep syscall and print the sleep duration in ns<br>trace -I &#x27;linux/fs.h&#x27; \<br>      &#x27;p::uprobe_register(struct inode *inode) &quot;a_ops = %llx&quot;, inode-&gt;i_mapping-&gt;a_ops&#x27;<br>        Trace the uprobe_register inode mapping ops, and the symbol can be found<br>        in /proc/kallsyms<br>trace -I &#x27;kernel/sched/sched.h&#x27; \<br>      &#x27;p::__account_cfs_rq_runtime(struct cfs_rq *cfs_rq) &quot;%d&quot;, cfs_rq-&gt;runtime_remaining&#x27;<br>        Trace the cfs scheduling runqueue remaining runtime. The struct cfs_rq is defined<br>        in kernel/sched/sched.h which is in kernel source tree and not in kernel-devel<br>        package.  So this command needs to run at the kernel source tree root directory<br>        so that the added header file can be found by the compiler.<br>trace -I &#x27;net/sock.h&#x27; \<br>      &#x27;udpv6_sendmsg(struct sock *sk) (sk-&gt;sk_dport == 13568)&#x27;<br>        Trace udpv6 sendmsg calls only if socket&#x27;s destination port is equal<br>        to 53 (DNS; 13568 in big endian order)<br>trace -I &#x27;linux/fs_struct.h&#x27; &#x27;mntns_install &quot;users = %d&quot;, $task-&gt;fs-&gt;users&#x27;<br>        Trace the number of users accessing the file system of the current task<br></code></pre></td></tr></table></figure>
+
+<p>跟踪hw_check_phone_read_access调用栈和库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-bpfcc -UK &quot;hw_check_phone_read_access&quot;<br><br>PID     TID     COMM            FUNC   <br>131567  131636  pool            hw_check_phone_read_access <br>        hw_check_phone_read_access+0x0 [kernel]<br>        usbdev_ioctl+0x1608 [kernel]<br>        __arm64_sys_ioctl+0xa8 [kernel]<br>        el0_svc_common.constprop.4+0x84 [kernel]<br>        do_el0_svc+0x74 [kernel]<br>        el0_svc+0x1c [kernel]<br>        el0_sync_handler+0x88 [kernel]<br>        el0_sync+0x148 [kernel]<br>        __GI___ioctl+0xc [libc-2.28.so]<br>        libusb_submit_transfer+0x2b0 [libusb-1.0.so.0.1.0]<br>        [unknown] [libusb-1.0.so.0.1.0]<br>        gp_libusb1_read+0x50 [usb1.so]<br>        gp_port_read+0x74 [libgphoto2_port.so.12.0.0]<br>        ptp_usb_getpacket.constprop.7+0xc8 [ptp2.so]<br>        ptp_usb_getresp+0x8c [ptp2.so]<br>        ptp_transaction_new+0xd8 [ptp2.so]<br>        ptp_transaction+0x160 [ptp2.so]<br>        ptp_getobjectinfo+0x68 [ptp2.so]<br>        ptp_object_want+0xe0 [ptp2.so]<br>        folder_list_func+0x320 [ptp2.so]<br>        gp_filesystem_list_folders+0x14c [libgphoto2.so.6.1.0]<br>        gp_camera_folder_list_folders+0xbc [libgphoto2.so.6.1.0]<br>        [unknown] [gvfsd-gphoto2]<br>        g_vfs_job_run+0x24 [libgvfsdaemon.so]<br>        [unknown] [libgvfsdaemon.so]<br>        [unknown] [libglib-2.0.so.0.5800.3]<br>        [unknown] [libglib-2.0.so.0.5800.3]<br>        start_thread+0x18c [libpthread-2.28.so]<br>        thread_start+0xc [libc-2.28.so]<br><br><br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
@@ -422,6 +432,11 @@ args-&gt;ret: kretprobe中获取函数返回值
           <div>2024年5月10日</div>
         </div>
       
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2024年11月15日</div>
+        </div>
       
       
         <div class="license-meta-item">
