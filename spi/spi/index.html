@@ -1,0 +1,875 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="SPISPI 简介什么是SPI之前我们讲解了 I2C，I2C 是串行通信的一种，只需要两根线就可以完成主机和从机之间的通信，但是 I2C 的速度最高只能到 400KHz，如果对于访问速度要求比价高的话 I2C 就不适合了。本章我们就来学习一下另外一个和 I2C 一样广泛使用的串行通信：SPI，SPI 全称是 SerialPerripheral Interface，也就是串行外围设备接口。SPI 是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SPI">
+<meta property="og:url" content="https://tomwithkernel.github.io/spi/spi/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="SPISPI 简介什么是SPI之前我们讲解了 I2C，I2C 是串行通信的一种，只需要两根线就可以完成主机和从机之间的通信，但是 I2C 的速度最高只能到 400KHz，如果对于访问速度要求比价高的话 I2C 就不适合了。本章我们就来学习一下另外一个和 I2C 一样广泛使用的串行通信：SPI，SPI 全称是 SerialPerripheral Interface，也就是串行外围设备接口。SPI 是">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/spi/spi/a.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/spi/spi/b.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/spi/spi/c.png">
+<meta property="article:published_time" content="2024-11-22T07:50:59.000Z">
+<meta property="article:modified_time" content="2024-11-25T05:19:36.654Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="spi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/spi/spi/a.png">
+  
+  
+  
+  <title>SPI - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="SPI"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-22 15:50" pubdate>
+          2024年11月22日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          111 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">SPI</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="SPI"><a href="#SPI" class="headerlink" title="SPI"></a>SPI</h1><h2 id="SPI-简介"><a href="#SPI-简介" class="headerlink" title="SPI 简介"></a>SPI 简介</h2><h3 id="什么是SPI"><a href="#什么是SPI" class="headerlink" title="什么是SPI"></a>什么是SPI</h3><p>之前我们讲解了 I2C，I2C 是串行通信的一种，只需要两根线就可以完成主机和从机之间的通信，但是 I2C 的速度最高只能到 400KHz，如果对于访问速度要求比价高的话 I2C 就不适合了。本章我们就来学习一下另外一个和 I2C 一样广泛使用的串行通信：SPI，SPI 全称是 SerialPerripheral Interface，也就是串行外围设备接口。SPI 是 Motorola 公司推出的一种同步串行接口技术，是一种高速、全双工的同步通信总线，SPI 时钟频率相比 I2C 要高很多，最高可以工作在上百 MHz。</p>
+<h3 id="SPI-协议"><a href="#SPI-协议" class="headerlink" title="SPI 协议"></a>SPI 协议</h3><p>SPI 以主从方式工作，通常是有一个主设备和一个或多个从设备，一般 SPI 需要4 根线，但是也可以使用三根线(单向传输)，本章我们讲解标准的 4 线 SPI，这四根线如下：</p>
+<p>①、CS&#x2F;SS，Slave Select&#x2F;Chip Select，这个是片选信号线，用于选择需要进行通信的从设备。I2C 主机是通过发送从机设备地址来选择需要进行通信的从机设备的，SPI 主机不需要发送从机设备，直接将相应的从机设备片选信号拉低即可。</p>
+<p>②、SCK，Serial Clock，串行时钟，和 I2C 的 SCL 一样，为 SPI 通信提供时钟。</p>
+<p>③、MOSI&#x2F;SDO，Master Out Slave In&#x2F;Serial Data Output，简称主出从入信号线，这根数据线只能用于主机向从机发送数据，也就是主机输出，从机输入。</p>
+<p>④、MISO&#x2F;SDI，Master In Slave Out&#x2F;Serial Data Input，简称主入从出信号线，这根数据线只能用户从机向主机发送数据，也就是主机输入，从机输出。</p>
+<p>SPI 通信都是由主机发起的，主机需要提供通信的时钟信号。主机通过 SPI 线连接多个从设备的结构如图 27.1.1.1 所示：</p>
+<img src="/spi/spi/a.png" srcset="/img/loading.gif" lazyload class="" title="a">
+
+<p>SPI 有四种工作模式，通过串行时钟极性(CPOL)和相位(CPHA)的搭配来得到四种工作模式：</p>
+<p>①、CPOL&#x3D;0，串行时钟空闲状态为低电平。</p>
+<p>②、CPOL&#x3D;1，串行时钟空闲状态为高电平，此时可以通过配置时钟相位(CPHA)来选择具体的传输协议。</p>
+<p>③、CPHA&#x3D;0，串行时钟的第一个跳变沿(上升沿或下降沿)采集数据。</p>
+<p>④、CPHA&#x3D;1，串行时钟的第二个跳变沿(上升沿或下降沿)采集数据。</p>
+<p>这四种工作模式如图 27.1.1.2 所示：</p>
+<img src="/spi/spi/b.png" srcset="/img/loading.gif" lazyload class="" title="b">
+
+<p>跟 I2C 一样，SPI 也是有时序图的，以 CPOL&#x3D;0，CPHA&#x3D;0 这个工作模式为例，SPI 进行全双工通信的时序如图 27.1.1.3 所示：</p>
+<img src="/spi/spi/c.png" srcset="/img/loading.gif" lazyload class="" title="c">
+
+<p>从图 27.1.1.3 可以看出，SPI 的时序图很简单，不像 I2C 那样还要分为读时序和写时序，因为 SPI 是全双工的，所以读写时序可以一起完成。图 27.1.1.3 中，CS 片选信号先拉低，选中要通信的从设备，然后通过 MOSI 和 MISO 这两根数据线进行收发数据，MOSI 数据线发出了0XD2 这个数据给从设备，同时从设备也通过 MISO 线给主设备返回了 0X66 这个数据。这个就是 SPI 时序图。</p>
+<h2 id="SPI-驱动框架"><a href="#SPI-驱动框架" class="headerlink" title="SPI 驱动框架"></a>SPI 驱动框架</h2><p>SPI 驱动框架和 I2C 很类似，都分为主机控制器驱动和设备驱动，主机控制器也就是 SOC的 SPI 控制器接口。同一个主机不管是什么 SPI 设备，SPI 控制器部分的驱动都是一样，我们的重点就落在了种类繁多的 SPI 设备驱动。</p>
+<h3 id="SPI-主机驱动"><a href="#SPI-主机驱动" class="headerlink" title="SPI 主机驱动"></a>SPI 主机驱动</h3><p>SPI 主机驱动就是 SOC 的 SPI 控制器驱动，类似 I2C 驱动里面的适配器驱动。Linux 内核使用 spi_master 表示 SPI 主机驱动，spi_master 是个结构体，定义在 include&#x2F;linux&#x2F;spi&#x2F;spi.h 文件中，内容如下(有缩减)：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs c">示例代码 <span class="hljs-number">62.1</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span> spi_master 结构体<br><span class="hljs-number">315</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_master</span> &#123;</span><br><span class="hljs-number">316</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device</span> <span class="hljs-title">dev</span>;</span><br><span class="hljs-number">317</span><br><span class="hljs-number">318</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">list</span>;</span><br>......<br><span class="hljs-number">326</span>     s16 bus_num;<br><span class="hljs-number">327</span><br><span class="hljs-number">328</span>     <span class="hljs-comment">// chipselects will be integral to many controllers; some others</span><br><span class="hljs-number">329</span>     <span class="hljs-comment">// might use board-specific GPIOs.</span><br><span class="hljs-number">330</span>     <span class="hljs-comment">//</span><br><span class="hljs-number">331</span>     u16 num_chipselect;<br><span class="hljs-number">332</span><br><span class="hljs-number">333</span>     <span class="hljs-comment">// some SPI controllers pose alignment requirements on DMAable</span><br><span class="hljs-number">334</span>     <span class="hljs-comment">// buffers; let protocol drivers know about these requirements.</span><br><span class="hljs-number">335</span>     <span class="hljs-comment">//</span><br><span class="hljs-number">336</span>     u16 dma_alignment;<br><span class="hljs-number">337</span><br><span class="hljs-number">338</span>     <span class="hljs-comment">/* spi_device.mode flags understood by this controller driver */</span><br><span class="hljs-number">339</span>     u16 mode_bits;<br><span class="hljs-number">340</span><br><span class="hljs-number">341</span>     <span class="hljs-comment">/* bitmask of supported bits_per_word for transfers */</span><br><span class="hljs-number">342</span>     u32 bits_per_word_mask;<br>......<br><span class="hljs-number">347</span>     <span class="hljs-comment">/* limits on transfer speed */</span><br><span class="hljs-number">348</span>     u32 min_speed_hz;<br><span class="hljs-number">349</span>     u32 max_speed_hz;<br><span class="hljs-number">350</span><br><span class="hljs-number">351</span>     <span class="hljs-comment">/* other constraints relevant to this driver */</span><br><span class="hljs-number">352</span>     u16 flags;<br>......<br><span class="hljs-number">359</span>     <span class="hljs-comment">/* lock and mutex for SPI bus locking */</span><br><span class="hljs-number">360</span>     <span class="hljs-type">spinlock_t</span> bus_lock_spinlock;<br><span class="hljs-number">361</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mutex</span> <span class="hljs-title">bus_lock_mutex</span>;</span><br><span class="hljs-number">362</span><br><span class="hljs-number">363</span>     <span class="hljs-comment">/* flag indicating that the SPI bus is locked for exclusive use */</span><br><span class="hljs-number">364</span>     <span class="hljs-type">bool</span> bus_lock_flag;<br>......<br><span class="hljs-number">372</span>     <span class="hljs-type">int</span> (*setup)(<span class="hljs-keyword">struct</span> spi_device *spi);<br><span class="hljs-number">373</span><br>......<br><span class="hljs-number">393</span>     <span class="hljs-type">int</span> (*transfer)(<span class="hljs-keyword">struct</span> spi_device *spi,<br><span class="hljs-number">394</span>     					<span class="hljs-keyword">struct</span> spi_message *mesg);<br>......<br><span class="hljs-number">434</span>     <span class="hljs-type">int</span> (*transfer_one_message)(<span class="hljs-keyword">struct</span> spi_master *master,<br><span class="hljs-number">435</span>     								<span class="hljs-keyword">struct</span> spi_message *mesg);<br>......<br><span class="hljs-number">462</span> &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>第 393 行，transfer 函数，和 i2c_algorithm 中的 master_xfer 函数一样，控制器数据传输函数。</p>
+<p>第 434 行，transfer_one_message 函数，也用于 SPI 数据发送，用于发送一个 spi_message，SPI 的数据会打包成 spi_message，然后以队列方式发送出去。也就是 SPI 主机端最终会通过 transfer 函数与 SPI 设备进行通信，因此对于 SPI 主机控制器的驱动编写者而言 transfer 函数是需要实现的，因为不同的 SOC 其 SPI 控制器不同，寄存器都不一样。和 I2C 适配器驱动一样，SPI 主机驱动一般都是 SOC 厂商去编写的，所以我们作为 SOC 的使用者，这一部分的驱动就不用操心了，除非你是在 SOC 原厂工作，内容就是写 SPI 主机驱动。</p>
+<p>SPI 主机驱动的核心就是申请 spi_master，然后初始化 spi_master，最后向 Linux 内核注册spi_master。</p>
+<h4 id="spi-master-申请与释放"><a href="#spi-master-申请与释放" class="headerlink" title="spi_master 申请与释放"></a>spi_master 申请与释放</h4><p>spi_alloc_master 函数用于申请 spi_master，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">struct</span> spi_master *<span class="hljs-title function_">spi_alloc_master</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> device *dev, <span class="hljs-type">unsigned</span> size)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>dev：</strong>设备，一般是 platform_device 中的 dev 成员变量。<br><strong>size：</strong>私有数据大小，可以通过 spi_master_get_devdata 函数获取到这些私有数据。<br><strong>返回值：</strong>申请到的 spi_master。</p>
+<p>spi_master 的释放通过 spi_master_put 函数来完成，当我们删除一个 SPI 主机驱动的时候就需要释放掉前面申请的 spi_master，spi_master_put 函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">spi_master_put</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_master *master)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>master：</strong>要释放的 spi_master。<br><strong>返回值：</strong>无</p>
+<h4 id="spi-master-注册与注销"><a href="#spi-master-注册与注销" class="headerlink" title="spi_master 注册与注销"></a>spi_master 注册与注销</h4><p>当 spi_master 初始化完成以后就需要将其注册到 Linux 内核，spi_master 注册函数为spi_register_master，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">spi_register_master</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_master *master)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>master：</strong>要注册的 spi_master。<br><strong>返回值：</strong>0，成功；负值，失败。</p>
+<p>I.MX6U 的 SPI 主机驱动会采用 spi_bitbang_start 这个 API 函数来完成 spi_master 的注册，spi_bitbang_start 函数内部其实也是通过调用 spi_register_master 函数来完成 spi_master 的注册。</p>
+<p>如果要注销 spi_master 的话可以使用 spi_unregister_master 函数，此函数原型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">spi_unregister_master</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_master *master)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>master：</strong>要注销的 spi_master。<br><strong>返回值：</strong>无。</p>
+<p>如果使用 spi_bitbang_start 注册 spi_master 的话就要使用 spi_bitbang_stop 来注销掉spi_master。</p>
+<h3 id="SPI-设备驱动"><a href="#SPI-设备驱动" class="headerlink" title="SPI 设备驱动"></a>SPI 设备驱动</h3><p>spi 设备驱动和 i2c 设备驱动也很类似，Linux 内核使用 spi_driver 结构体来表示 spi 设备驱动，我们在编写 SPI 设备驱动的时候需要实现 spi_driver 。spi_driver 结构体定义在include&#x2F;linux&#x2F;spi&#x2F;spi.h 文件中，结构体内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_driver</span> &#123;</span><br>    <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_device_id</span> *<span class="hljs-title">id_table</span>;</span><br>    <span class="hljs-type">int</span> (*probe)(<span class="hljs-keyword">struct</span> spi_device *spi);<br>    <span class="hljs-type">int</span> (*remove)(<span class="hljs-keyword">struct</span> spi_device *spi);<br>    <span class="hljs-type">void</span> (*shutdown)(<span class="hljs-keyword">struct</span> spi_device *spi);<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device_driver</span> <span class="hljs-title">driver</span>;</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>可以看出，spi_driver 和 i2c_driver、platform_driver 基本一样，当 SPI 设备和驱动匹配成功以后 probe 函数就会执行。</p>
+<p>同样的，spi_driver 初始化完成以后需要向 Linux 内核注册，spi_driver 注册函数为spi_register_driver，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">spi_register_driver</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_driver *sdrv)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>sdrv：</strong>要注册的 spi_driver。<br><strong>返回值：</strong>0，注册成功；赋值，注册失败。</p>
+<p>注销 SPI 设备驱动以后也需要注销掉前面注册的 spi_driver，使用 spi_unregister_driver 函数完成 spi_driver 的注销，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">spi_unregister_driver</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_driver *sdrv)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>sdrv：</strong>要注销的 spi_driver。<br><strong>返回值：</strong>无。</p>
+<p>spi_driver 注册示例程序如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.1.1.3 spi_driver 注册示例程序</span><br><span class="hljs-comment">/* probe 函数 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">xxx_probe</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi)</span><br>&#123;<br>    <span class="hljs-comment">/* 具体函数内容 */</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-comment">/* remove 函数 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">xxx_remove</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi)</span><br>&#123;<br>    <span class="hljs-comment">/* 具体函数内容 */</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><span class="hljs-comment">/* 传统匹配方式 ID 列表 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_device_id</span> <span class="hljs-title">xxx_id</span>[] =</span> &#123;<br>    &#123;<span class="hljs-string">&quot;xxx&quot;</span>, <span class="hljs-number">0</span>&#125;, <br>    &#123;&#125;<br>&#125;;<br><br><span class="hljs-comment">/* 设备树匹配列表 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">of_device_id</span> <span class="hljs-title">xxx_of_match</span>[] =</span> &#123;<br>    &#123; .compatible = <span class="hljs-string">&quot;xxx&quot;</span> &#125;,<br>    &#123; <span class="hljs-comment">/* Sentinel */</span> &#125;<br>&#125;;<br><br><span class="hljs-comment">/* SPI 驱动结构体 */</span><br><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_driver</span> <span class="hljs-title">xxx_driver</span> =</span> &#123;<br>    .probe = xxx_probe,<br>    .remove = xxx_remove,<br>    .driver = &#123;<br>        .owner = THIS_MODULE,<br>        .name = <span class="hljs-string">&quot;xxx&quot;</span>,<br>        .of_match_table = xxx_of_match,<br>    &#125;,<br>    .id_table = xxx_id,<br>&#125;;<br><br><span class="hljs-comment">/* 驱动入口函数 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> __init <span class="hljs-title function_">xxx_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    <span class="hljs-keyword">return</span> spi_register_driver(&amp;xxx_driver);<br>&#125;<br><br><span class="hljs-comment">/* 驱动出口函数 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __exit <span class="hljs-title function_">xxx_exit</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    spi_unregister_driver(&amp;xxx_driver);<br>&#125;<br><br>module_init(xxx_init);<br>module_exit(xxx_exit);<br></code></pre></td></tr></table></figure>
+
+<p>第 1-36 行，spi_driver 结构体，需要 SPI 设备驱动人员编写，包括匹配表、probe 函数等。和 i2c_driver、platform_driver 一样，就不详细讲解了。</p>
+<p>第 39-42 行，在驱动入口函数中调用 spi_register_driver 来注册 spi_driver。</p>
+<p>第 45-48 行，在驱动出口函数中调用 spi_unregister_driver 来注销 spi_driver。</p>
+<h3 id="SPI-设备和驱动匹配过程"><a href="#SPI-设备和驱动匹配过程" class="headerlink" title="SPI 设备和驱动匹配过程"></a>SPI 设备和驱动匹配过程</h3><p>SPI 设备和驱动的匹配过程是由 SPI 总线来完成的，这点和 platform、I2C 等驱动一样，SPI总线为 spi_bus_type，定义在 drivers&#x2F;spi&#x2F;spi.c 文件中，内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.1.3.1 spi_bus_type 结构体</span><br><span class="hljs-number">131</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">bus_type</span> <span class="hljs-title">spi_bus_type</span> =</span> &#123;<br><span class="hljs-number">132</span>     .name = <span class="hljs-string">&quot;spi&quot;</span>,<br><span class="hljs-number">133</span>     .dev_groups = spi_dev_groups,<br><span class="hljs-number">134</span>     .match = spi_match_device,<br><span class="hljs-number">135</span>     .uevent = spi_uevent,<br><span class="hljs-number">136</span> &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>可以看出，SPI 设备和驱动的匹配函数为 spi_match_device，函数内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.1.3.2 spi_match_device 函数</span><br><span class="hljs-number">99</span> <span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">spi_match_device</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> device *dev, <span class="hljs-keyword">struct</span> device_driver *drv)</span><br>100 &#123;<br><span class="hljs-number">101</span>     <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_device</span> *<span class="hljs-title">spi</span> =</span> to_spi_device(dev);<br><span class="hljs-number">102</span>     <span class="hljs-type">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_driver</span> *<span class="hljs-title">sdrv</span> =</span> to_spi_driver(drv);<br><span class="hljs-number">103</span><br><span class="hljs-number">104</span>     <span class="hljs-comment">/* Attempt an OF style match */</span><br><span class="hljs-number">105</span>     <span class="hljs-keyword">if</span> (of_driver_match_device(dev, drv))<br><span class="hljs-number">106</span>     <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><span class="hljs-number">107</span> <br><span class="hljs-number">108</span>     <span class="hljs-comment">/* Then try ACPI */</span><br><span class="hljs-number">109</span>     <span class="hljs-keyword">if</span> (acpi_driver_match_device(dev, drv))<br><span class="hljs-number">110</span>     <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><span class="hljs-number">111</span> <br><span class="hljs-number">112</span>     <span class="hljs-keyword">if</span> (sdrv-&gt;id_table)<br><span class="hljs-number">113</span>     <span class="hljs-keyword">return</span> !!spi_match_id(sdrv-&gt;id_table, spi);<br><span class="hljs-number">114</span> <br><span class="hljs-number">115</span>     <span class="hljs-keyword">return</span> <span class="hljs-built_in">strcmp</span>(spi-&gt;modalias, drv-&gt;name) == <span class="hljs-number">0</span>;<br><span class="hljs-number">116</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>spi_match_device 函数和 i2c_match_device 函数对于设备和驱动的匹配过程基本一样。</p>
+<p>第 105 行，of_driver_match_device 函数用于完成设备树设备和驱动匹配。比较 SPI 设备节点的 compatible 属性和 of_device_id 中的 compatible 属性是否相等，如果相当的话就表示 SPI 设备和驱动匹配。</p>
+<p>第 109 行，acpi_driver_match_device 函数用于 ACPI 形式的匹配。</p>
+<p>第 113 行，spi_match_id 函数用于传统的、无设备树的 SPI 设备和驱动匹配过程。比较 SPI设备名字和 spi_device_id 的 name 字段是否相等，相等的话就说明 SPI 设备和驱动匹配。</p>
+<p>第 115 行，比较 spi_device 中 modalias 成员变量和 device_driver 中的 name 成员变量是否相等。</p>
+<h3 id="SPI-设备数据收发处理流程"><a href="#SPI-设备数据收发处理流程" class="headerlink" title="SPI 设备数据收发处理流程"></a>SPI 设备数据收发处理流程</h3><p>SPI 设备驱动的核心是 spi_driver，当我们向 Linux 内核注册成功 spi_driver 以后就可以使用 SPI 核心层提供的 API 函数来对设备进行读写操作了。首先是 spi_transfer 结构体，此结构体用于描述 SPI 传输信息，结构体内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.3.2.1 spi_transfer 结构体</span><br><span class="hljs-number">603</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_transfer</span> &#123;</span><br><span class="hljs-number">604</span>     <span class="hljs-comment">// it&#x27;s ok if tx_buf == rx_buf (right?)</span><br><span class="hljs-number">605</span>     <span class="hljs-comment">// for MicroWire, one buffer must be null</span><br><span class="hljs-number">606</span>     <span class="hljs-comment">// buffers must work with dma_*map_single() calls, unless</span><br><span class="hljs-number">607</span>     <span class="hljs-comment">// spi_message.is_dma_mapped reports a pre-existing mapping</span><br><span class="hljs-number">608</span>     <span class="hljs-comment">//</span><br><span class="hljs-number">609</span>     <span class="hljs-type">const</span> <span class="hljs-type">void</span> *tx_buf;<br><span class="hljs-number">610</span>     <span class="hljs-type">void</span> *rx_buf;<br><span class="hljs-number">611</span>     <span class="hljs-type">unsigned</span> len;<br><span class="hljs-number">612</span> <br><span class="hljs-number">613</span>     <span class="hljs-type">dma_addr_t</span> tx_dma;<br><span class="hljs-number">614</span>     <span class="hljs-type">dma_addr_t</span> rx_dma;<br><span class="hljs-number">615</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sg_table</span> <span class="hljs-title">tx_sg</span>;</span><br><span class="hljs-number">616</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sg_table</span> <span class="hljs-title">rx_sg</span>;</span><br><span class="hljs-number">617</span> <br><span class="hljs-number">618</span>     <span class="hljs-type">unsigned</span> cs_change:<span class="hljs-number">1</span>;<br><span class="hljs-number">619</span>     <span class="hljs-type">unsigned</span> tx_nbits:<span class="hljs-number">3</span>;<br><span class="hljs-number">620</span>     <span class="hljs-type">unsigned</span> rx_nbits:<span class="hljs-number">3</span>;<br><span class="hljs-number">621</span>     <span class="hljs-meta">#<span class="hljs-keyword">define</span> SPI_NBITS_SINGLE 0x01 <span class="hljs-comment">/* 1bit transfer */</span></span><br><span class="hljs-number">622</span>     <span class="hljs-meta">#<span class="hljs-keyword">define</span> SPI_NBITS_DUAL 0x02 <span class="hljs-comment">/* 2bits transfer */</span></span><br><span class="hljs-number">623</span>     <span class="hljs-meta">#<span class="hljs-keyword">define</span> SPI_NBITS_QUAD 0x04 <span class="hljs-comment">/* 4bits transfer */</span></span><br><span class="hljs-number">624</span>     u8 bits_per_word;<br><span class="hljs-number">625</span>     u16 delay_usecs;<br><span class="hljs-number">626</span>     u32 speed_hz;<br><span class="hljs-number">627</span> <br><span class="hljs-number">628</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">transfer_list</span>;</span><br><span class="hljs-number">629</span> &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>第 609 行，tx_buf 保存着要发送的数据。</p>
+<p>第 610 行，rx_buf 用于保存接收到的数据。</p>
+<p>第 611 行，len 是要进行传输的数据长度，SPI 是全双工通信，因此在一次通信中发送和接收的字节数都是一样的，所以 spi_transfer 中也就没有发送长度和接收长度之分。</p>
+<p>spi_transfer 需要组织成 spi_message，spi_message 也是一个结构体，内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.3.2.2 spi_message 结构体</span><br><span class="hljs-number">660</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_message</span> &#123;</span><br><span class="hljs-number">661</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">transfers</span>;</span><br><span class="hljs-number">662</span> <br><span class="hljs-number">663</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_device</span> *<span class="hljs-title">spi</span>;</span><br><span class="hljs-number">664</span> <br><span class="hljs-number">665</span>     <span class="hljs-type">unsigned</span> is_dma_mapped:<span class="hljs-number">1</span>;<br>......<br><span class="hljs-number">678</span>     <span class="hljs-comment">/* completion is reported through a callback */</span><br><span class="hljs-number">679</span>     <span class="hljs-type">void</span> (*complete)(<span class="hljs-type">void</span> *context);<br><span class="hljs-number">680</span>     <span class="hljs-type">void</span> *context;<br><span class="hljs-number">681</span>     <span class="hljs-type">unsigned</span> frame_length;<br><span class="hljs-number">682</span>     <span class="hljs-type">unsigned</span> actual_length;<br><span class="hljs-number">683</span>     <span class="hljs-type">int</span> status;<br><span class="hljs-number">684</span> <br><span class="hljs-number">685</span>     <span class="hljs-comment">// for optional use by whatever driver currently owns the</span><br><span class="hljs-number">686</span>     <span class="hljs-comment">// spi_message ... between calls to spi_async and then later</span><br><span class="hljs-number">687</span>     <span class="hljs-comment">// complete(), that&#x27;s the spi_master controller driver.</span><br><span class="hljs-number">688</span>     <span class="hljs-comment">//</span><br><span class="hljs-number">689</span>     <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">queue</span>;</span><br><span class="hljs-number">690</span>     <span class="hljs-type">void</span> *state;<br><span class="hljs-number">691</span> &#125;;<br></code></pre></td></tr></table></figure>
+
+<p>在使用spi_message之前需要对其进行初始化，spi_message初始化函数为spi_message_init，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">spi_message_init</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_message *m)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>m：</strong>要初始化的 spi_message。<br><strong>返回值：</strong>无。</p>
+<p>spi_message 初始化完成以后需要将 spi_transfer 添加到 spi_message 队列中，这里我们要用到 spi_message_add_tail 函数，此函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">spi_message_add_tail</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_transfer *t, <span class="hljs-keyword">struct</span> spi_message *m)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>t：</strong>要添加到队列中的 spi_transfer。<br><strong>m</strong>：spi_transfer 要加入的 spi_message。<br><strong>返回值：</strong>无。</p>
+<p>spi_message 准备好以后就可以进行数据传输了，数据传输分为同步传输和异步传输，同步传输会阻塞的等待 SPI 数据传输完成，同步传输函数为 spi_sync，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">spi_sync</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi, <span class="hljs-keyword">struct</span> spi_message *message)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>spi：</strong>要进行数据传输的 spi_device。<br><strong>message</strong>：要传输的 spi_message。<br><strong>返回值：</strong>无。</p>
+<p>异步传输不会阻塞的等到 SPI 数据传输完成，异步传输需要设置 spi_message 中的 complete成员变量，complete 是一个回调函数，当 SPI 异步传输完成以后此函数就会被调用。SPI 异步传输函数为 spi_async，函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">spi_async</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi, <span class="hljs-keyword">struct</span> spi_message *message)</span><br></code></pre></td></tr></table></figure>
+
+<p>函数参数和返回值含义如下：<br><strong>spi：</strong>要进行数据传输的 spi_device。<br><strong>message</strong>：要传输的 spi_message。<br><strong>返回值：</strong>无。</p>
+<p>我们采用同步传输方式来完成 SPI 数据的传输工作，也就是 spi_sync 函数。综上所述，SPI 数据传输步骤如下：</p>
+<p>Version:0.9 StartHTML:0000000105 EndHTML:0000004721 StartFragment:0000000141 EndFragment:0000004681</p>
+<p>①、申请并初始化 spi_transfer，设置 spi_transfer 的 tx_buf 成员变量，tx_buf 为要发送的数据。然后设置 rx_buf 成员变量，rx_buf 保存着接收到的数据。最后设置 len 成员变量，也就是要进行数据通信的长度。</p>
+<p>②、使用 spi_message_init 函数初始化 spi_message。</p>
+<p>③、使用spi_message_add_tail函数将前面设置好的spi_transfer添加到spi_message 队列中。</p>
+<p>④、使用 spi_sync 函数完成 SPI 数据同步传输。</p>
+<p>通过 SPI 进行 n 个字节的数据发送和接收的示例代码如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 62.3.2.3 SPI 数据读写操作</span><br><span class="hljs-comment">/* SPI 多字节发送 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">spi_send</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi, u8 *buf, <span class="hljs-type">int</span> len)</span><br>&#123;<br>    <span class="hljs-type">int</span> ret;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_message</span> <span class="hljs-title">m</span>;</span><br>    <br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_transfer</span> <span class="hljs-title">t</span> =</span> &#123;<br>        .tx_buf = buf,<br>        .len = len,<br>    &#125;;<br>    spi_message_init(&amp;m); <span class="hljs-comment">/* 初始化 spi_message */</span><br>    spi_message_add_tail(t, &amp;m);<span class="hljs-comment">/* 将 spi_transfer 添加到 spi_message 队列 */</span><br>    ret = spi_sync(spi, &amp;m); <span class="hljs-comment">/* 同步传输 */</span><br>    <span class="hljs-keyword">return</span> ret;<br>&#125;<br><span class="hljs-comment">/* SPI 多字节接收 */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">spi_receive</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> spi_device *spi, u8 *buf, <span class="hljs-type">int</span> len)</span><br>&#123;<br>    <span class="hljs-type">int</span> ret;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_message</span> <span class="hljs-title">m</span>;</span><br>    <br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">spi_transfer</span> <span class="hljs-title">t</span> =</span> &#123;<br>        .rx_buf = buf,<br>        .len = len,<br>    &#125;;<br>    spi_message_init(&amp;m); <span class="hljs-comment">/* 初始化 spi_message */</span><br>    spi_message_add_tail(t, &amp;m);<span class="hljs-comment">/* 将 spi_transfer 添加到 spi_message 队列 */</span><br>    ret = spi_sync(spi, &amp;m); <span class="hljs-comment">/* 同步传输 */</span><br>    <span class="hljs-keyword">return</span> ret;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>参考链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.yuanzige.com/">www.yuanzige.com</a></li>
+<li>[正点原子] I.MX6U嵌入式Linux驱动开发指南</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/spi/" class="category-chain-item">spi</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/spi/" class="print-no-link">#spi</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>SPI</div>
+      <div>https://tomwithkernel.github.io/spi/spi/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月22日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2024年11月25日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/i2c/i2c%E9%A9%B1%E5%8A%A8/" title="I2C">
+                        <span class="hidden-mobile">I2C</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
