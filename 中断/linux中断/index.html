@@ -26,11 +26,13 @@
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
 <meta property="og:description" content="Linux 中断中断 API 函数对于硬件的中断处理方法： ①、使能中断，初始化相应的寄存器。 ②、注册中断服务函数，也就是向 irqTable 数组的指定标号处写入中断服务函数 ②、中断发生以后进入 IRQ 中断服务函数，在 IRQ 中断服务函数在数组 irqTable 里面查找具体的中断处理函数，找到以后执行相应的中断处理函数。 在 Linux 内核中也提供了大量的中断相关的 API 函数，我">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E4%B8%AD%E6%96%AD/linux%E4%B8%AD%E6%96%AD/a.png">
 <meta property="article:published_time" content="2024-11-25T06:59:25.000Z">
 <meta property="article:modified_time" content="2024-11-26T08:00:45.643Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="irq">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/%E4%B8%AD%E6%96%AD/linux%E4%B8%AD%E6%96%AD/a.png">
   
   
   
@@ -314,7 +316,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">request_irq</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq, <span class="hljs-type">irq_handler_t</span> handler, <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *name, <span class="hljs-type">void</span> *dev)</span><br></code></pre></td></tr></table></figure>
 
 <p>函数参数和返回值含义如下：<br><strong>irq</strong>：要申请中断的中断号。<br><strong>handler</strong>：中断处理函数，当中断发生以后就会执行此中断处理函数。<br><strong>flags</strong>：中断标志，可以在文件 include&#x2F;linux&#x2F;interrupt.h 里面查看所有的中断标志，这里我们介绍几个常用的中断标志，如表 51.1.1.1 所示：</p>
-
+<img src="/%E4%B8%AD%E6%96%AD/linux%E4%B8%AD%E6%96%AD/a.png" srcset="/img/loading.gif" lazyload class="" title="a">
 
 <p>表 51.1.1.1 中的这些标志可以通过“|”来实现多种组合。<br><strong>name</strong>：中断名字，设置以后可以在&#x2F;proc&#x2F;interrupts 文件中看到对应的中断名字。<br><strong>dev：</strong>如果将 flags 设置为 IRQF_SHARED 的话，dev 用来区分不同的中断，一般情况下将dev 设置为设备结构体，dev 会传递给中断处理函数 irq_handler_t 的第二个参数。<br><strong>返回值：</strong>0 中断申请成功，其他负值 中断申请失败，如果返回-EBUSY 的话表示中断已经被申请了。</p>
 <h4 id="free-irq-函数"><a href="#free-irq-函数" class="headerlink" title="free_irq 函数"></a>free_irq 函数</h4><p>使用中断的时候需要通过 request_irq 函数申请，使用完成以后就要通过 free_irq 函数释放掉相应的中断。如果中断不是共享的，那么 free_irq 会删除中断处理函数并且禁止中断。free_irq函数原型如下所示：</p>
