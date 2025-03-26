@@ -19,22 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="常用脚本cat_usb_device_power_wakeup.sh查看USB设备是否支持电源唤醒">
+    <meta name="description" content="USBcat_usb_device_power_wakeup.sh12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849#!&#x2F;bin&#x2F;bash#       author: TomfileName&#x3D;&quot;&quot;productName&#x3D;&quot;&quot;for">
 <meta property="og:type" content="article">
-<meta property="og:title" content="常用脚本">
+<meta property="og:title" content="linux工具">
 <meta property="og:url" content="https://tomwithkernel.github.io/script/README/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="常用脚本cat_usb_device_power_wakeup.sh查看USB设备是否支持电源唤醒">
+<meta property="og:description" content="USBcat_usb_device_power_wakeup.sh12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849#!&#x2F;bin&#x2F;bash#       author: TomfileName&#x3D;&quot;&quot;productName&#x3D;&quot;&quot;for">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-20T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-17T02:34:11.899Z">
+<meta property="article:modified_time" content="2025-03-26T01:55:42.056Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="script">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>常用脚本 - TomWithKernel&#39;s Blog</title>
+  <title>linux工具 - TomWithKernel&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -219,7 +219,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="常用脚本"></span>
+            <span id="subtitle" data-typed-text="linux工具"></span>
           
         </div>
 
@@ -242,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          18 字
+          749 字
         
       </span>
     
@@ -253,7 +253,7 @@
         
         
         
-          1 分钟
+          25 分钟
         
       </span>
     
@@ -299,12 +299,15 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">常用脚本</h1>
+            <h1 id="seo-header">linux工具</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="常用脚本"><a href="#常用脚本" class="headerlink" title="常用脚本"></a>常用脚本</h2><p><code>cat_usb_device_power_wakeup.sh</code>查看USB设备是否支持电源唤醒</p>
+                <h2 id="USB"><a href="#USB" class="headerlink" title="USB"></a>USB</h2><h4 id="cat-usb-device-power-wakeup-sh"><a href="#cat-usb-device-power-wakeup-sh" class="headerlink" title="cat_usb_device_power_wakeup.sh"></a>cat_usb_device_power_wakeup.sh</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-comment">#       author: Tom</span><br><br>fileName=<span class="hljs-string">&quot;&quot;</span><br>productName=<span class="hljs-string">&quot;&quot;</span><br><br><span class="hljs-keyword">for</span> file <span class="hljs-keyword">in</span> /sys/bus/usb/devices/*/uevent; <span class="hljs-keyword">do</span><br>        content=$(<span class="hljs-built_in">cat</span> <span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span>)<br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$content</span>&quot;</span> | grep -q <span class="hljs-string">&quot;BUSNUM=<span class="hljs-variable">$1</span>&quot;</span> &amp;&amp; <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$content</span>&quot;</span> | grep -q <span class="hljs-string">&quot;DEVNUM=<span class="hljs-variable">$2</span>&quot;</span>; <span class="hljs-keyword">then</span><br>                fileName=<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;file%/*&#125;</span>/power/wakeup&quot;</span><br>                productName=<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;file%/*&#125;</span>/product&quot;</span><br><br>                <span class="hljs-keyword">if</span> [ -f <span class="hljs-string">&quot;<span class="hljs-variable">$fileName</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>                        busnum=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$content</span>&quot;</span> | grep -oE <span class="hljs-string">&#x27;BUSNUM=([0-9]+)&#x27;</span> | grep -oE <span class="hljs-string">&#x27;[0-9]+&#x27;</span>)<br>                        devnum=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$content</span>&quot;</span> | grep -oE <span class="hljs-string">&#x27;DEVNUM=([0-9]+)&#x27;</span> | grep -oE <span class="hljs-string">&#x27;[0-9]+&#x27;</span>)<br><br>                        result=$(<span class="hljs-built_in">cat</span> <span class="hljs-string">&quot;<span class="hljs-variable">$fileName</span>&quot;</span>)<br>                        productName=$(<span class="hljs-built_in">cat</span> <span class="hljs-string">&quot;<span class="hljs-variable">$productName</span>&quot;</span>)<br>                        <span class="hljs-built_in">printf</span> <span class="hljs-string">&quot;Bus %3s Device %3s : %-30s power wakeup: %10s (路径: %s)\n&quot;</span> <span class="hljs-variable">$busnum</span> <span class="hljs-variable">$devnum</span> <span class="hljs-string">&quot;<span class="hljs-variable">$productName</span>&quot;</span> <span class="hljs-variable">$result</span> <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;file%/*&#125;</span>/product&quot;</span><br>                <span class="hljs-keyword">fi</span><br>        <span class="hljs-keyword">fi</span><br><span class="hljs-keyword">done</span><br><br><span class="hljs-comment"># 读取用户输入的设备节点和开关状态</span><br><span class="hljs-built_in">read</span> -p <span class="hljs-string">&quot;请输入你要修改的设备的节点（例如 1-4.4.2 表示 BusNum-Port.Port.DevNum）: &quot;</span> modify_device<br><span class="hljs-built_in">read</span> -p <span class="hljs-string">&quot;请输入 enabled 或 disabled: &quot;</span> switch<br><br><span class="hljs-comment"># 检查用户输入的开关状态是否正确</span><br><span class="hljs-keyword">if</span> [[ <span class="hljs-string">&quot;<span class="hljs-variable">$switch</span>&quot;</span> != <span class="hljs-string">&quot;enabled&quot;</span> &amp;&amp; <span class="hljs-string">&quot;<span class="hljs-variable">$switch</span>&quot;</span> != <span class="hljs-string">&quot;disabled&quot;</span> ]]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;无效输入。请输入 &#x27;enabled&#x27; 或 &#x27;disabled&#x27;。&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 构造设备路径</span><br>device_path=<span class="hljs-string">&quot;/sys/bus/usb/devices/<span class="hljs-variable">$modify_device</span>/power/wakeup&quot;</span><br><br><span class="hljs-comment"># 检查设备路径是否存在</span><br><span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;<span class="hljs-variable">$device_path</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;设备路径不存在或无效: <span class="hljs-variable">$device_path</span>&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 修改设备的 power wakeup 状态</span><br><span class="hljs-built_in">echo</span> <span class="hljs-variable">$switch</span> | <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">tee</span> <span class="hljs-string">&quot;<span class="hljs-variable">$device_path</span>&quot;</span> &gt; /dev/null<br><br><span class="hljs-comment"># 确认修改结果</span><br>new_result=$(<span class="hljs-built_in">cat</span> <span class="hljs-string">&quot;<span class="hljs-variable">$device_path</span>&quot;</span>)<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;设备 <span class="hljs-variable">$modify_device</span> 的 power wakeup 状态已设置为: <span class="hljs-variable">$new_result</span>&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="GRUB"><a href="#GRUB" class="headerlink" title="GRUB"></a>GRUB</h3><h4 id="set-boot-kernel-sh"><a href="#set-boot-kernel-sh" class="headerlink" title="set_boot_kernel.sh"></a>set_boot_kernel.sh</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><br><span class="hljs-comment"># Usage: sudo ./set_boot_kernel.sh</span><br><span class="hljs-comment"># Author: tuhaowen</span><br><br><span class="hljs-built_in">set</span> -e<br><br><span class="hljs-comment"># GRUB 配置文件路径</span><br>GRUB_CFG=<span class="hljs-string">&quot;/boot/grub/grub.cfg&quot;</span><br>GRUB_DEFAULT=<span class="hljs-string">&quot;/etc/default/grub&quot;</span><br><br><span class="hljs-comment"># 检查 GRUB 配置文件是否存在</span><br><span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_CFG</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;无法找到 GRUB 配置文件，请检查 GRUB 是否正确安装。&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 获取内核列表</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;正在提取可用内核版本...&quot;</span><br>kernel_list=$(grep <span class="hljs-string">&quot;menuentry&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_CFG</span>&quot;</span> | grep <span class="hljs-string">&quot;Linux&quot;</span> | <span class="hljs-built_in">cut</span> -d <span class="hljs-string">&quot;&#x27;&quot;</span> -f2)<br><br><span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$kernel_list</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;未找到内核条目，请检查 GRUB 配置文件。&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 显示内核列表</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;检测到以下内核版本：&quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$kernel_list</span>&quot;</span> | <span class="hljs-built_in">nl</span> -w2 -s <span class="hljs-string">&#x27;. &#x27;</span><br><br><span class="hljs-comment"># 提示用户输入序号选择内核</span><br><span class="hljs-built_in">read</span> -p <span class="hljs-string">&quot;请输入要设置为默认启动内核的序号: &quot;</span> choice<br><br><span class="hljs-comment"># 验证输入是否为有效数字</span><br><span class="hljs-keyword">if</span> ! [[ <span class="hljs-string">&quot;<span class="hljs-variable">$choice</span>&quot;</span> =~ ^[0-9]+$ ]]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;输入无效，请输入有效的数字序号。&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 获取用户选择的内核条目</span><br>selected_kernel=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$kernel_list</span>&quot;</span> | sed -n <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;choice&#125;</span>p&quot;</span>)<br><br><span class="hljs-keyword">if</span> [ -z <span class="hljs-string">&quot;<span class="hljs-variable">$selected_kernel</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;无效的序号，请重新运行脚本并选择有效序号。&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 计算 GRUB_DEFAULT 的值</span><br><span class="hljs-comment"># 高级选项的序号固定为 &quot;1&quot;，内核序号为 (choice - 1)</span><br>grub_entry=<span class="hljs-string">&quot;1&gt;<span class="hljs-subst">$((choice - 1)</span>)&quot;</span><br><br><span class="hljs-comment"># 更新 GRUB 默认条目</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;设置默认启动内核为: <span class="hljs-variable">$selected_kernel</span>&quot;</span><br><span class="hljs-keyword">if</span> grep -q <span class="hljs-string">&quot;^GRUB_DEFAULT=&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_DEFAULT</span>&quot;</span>; <span class="hljs-keyword">then</span><br>    sed -i <span class="hljs-string">&quot;s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=\&quot;<span class="hljs-variable">$grub_entry</span>\&quot;/&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_DEFAULT</span>&quot;</span><br><span class="hljs-keyword">else</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;GRUB_DEFAULT=\&quot;<span class="hljs-variable">$grub_entry</span>\&quot;&quot;</span> &gt;&gt; <span class="hljs-string">&quot;<span class="hljs-variable">$GRUB_DEFAULT</span>&quot;</span><br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 更新 GRUB 配置</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;更新 GRUB 配置...&quot;</span><br><span class="hljs-built_in">sudo</span> update-grub<br><br><span class="hljs-comment"># 确保文件系统同步</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;同步文件系统...&quot;</span><br><span class="hljs-built_in">sync</span><br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;默认启动内核已更新为: <span class="hljs-variable">$selected_kernel</span> (GRUB_DEFAULT=\&quot;<span class="hljs-variable">$grub_entry</span>\&quot;)&quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;请重新启动系统以应用更改。&quot;</span><br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
@@ -350,7 +353,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>常用脚本</div>
+      <div>linux工具</div>
       <div>https://tomwithkernel.github.io/script/README/</div>
     </div>
     <div class="license-meta">
@@ -369,7 +372,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年10月17日</div>
+          <div>2025年3月26日</div>
         </div>
       
       
@@ -545,7 +548,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
     </div>
   
   

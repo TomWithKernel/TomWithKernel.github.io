@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tomwithkernel.github.io/bug/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png">
 <meta property="article:published_time" content="2024-10-15T06:41:24.000Z">
-<meta property="article:modified_time" content="2024-11-05T02:02:13.223Z">
+<meta property="article:modified_time" content="2025-03-24T01:28:07.218Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="bug">
 <meta name="twitter:card" content="summary_large_image">
@@ -244,7 +244,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          743 字
+          758 字
         
       </span>
     
@@ -255,7 +255,7 @@
         
         
         
-          25 分钟
+          26 分钟
         
       </span>
     
@@ -322,6 +322,7 @@
 <img src="/bug/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png" srcset="/img/loading.gif" lazyload class="" title="sn_buffer">
 
 <p>前面为控制字段，第四个字节为长度控制</p>
+<p>0x80 代表单元序列号VPD 页面，0x00为保留字节</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">modify_dev_sn</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> sg_io_hdr *hdr)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *buffer = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>,len_id = <span class="hljs-number">0</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *match = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> len_value = <span class="hljs-number">0xff</span>;<br>	<span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> pattern[] = &#123;<span class="hljs-number">0x80</span>, <span class="hljs-number">0x00</span>&#125;;<br><br>	<span class="hljs-keyword">if</span> (hdr-&gt;dxfer_len &gt; <span class="hljs-number">0x1024</span>) &#123;<br>		pr_err(<span class="hljs-string">&quot;hdr info len too long!\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -EFAULT;<br>	&#125;<br><br>	buffer = kzalloc(hdr-&gt;dxfer_len, GFP_KERNEL);<br>	<span class="hljs-keyword">if</span> (!buffer) &#123;<br>		pr_err(<span class="hljs-string">&quot;Memory allocation failed for buffer\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (copy_from_user(buffer, hdr-&gt;dxferp, hdr-&gt;dxfer_len)) &#123;<br>		pr_err(<span class="hljs-string">&quot;Failed to copy data from user space\n&quot;</span>);<br>		kfree(buffer);<br>		<span class="hljs-keyword">return</span> -EFAULT;<br>	&#125;<br><br>	<span class="hljs-keyword">while</span> (i &lt;= (hdr-&gt;dxfer_len - <span class="hljs-number">3</span>)) &#123;<br>		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">memcmp</span>(&amp;buffer[i], pattern, <span class="hljs-number">2</span>) == <span class="hljs-number">0</span>) &#123;<br>			match = &amp;buffer[i + <span class="hljs-number">3</span>];<br>			len_id = i + <span class="hljs-number">2</span>;<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>		i++;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (match) &#123;<br>		<span class="hljs-type">int</span> sn_len = <span class="hljs-number">33</span>;<br>		<span class="hljs-keyword">if</span> ((hdr-&gt;dxfer_len - <span class="hljs-number">3</span>) &gt;= (sn_len + <span class="hljs-number">1</span>)) &#123;<br>			<span class="hljs-built_in">memcpy</span>(&amp;buffer[len_id], &amp;len_value, <span class="hljs-number">1</span>);<br>			<span class="hljs-built_in">memcpy</span>(match, get_huawei_ufs_cid(), sn_len);<br>			match[sn_len] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">if</span>(copy_to_user(hdr-&gt;dxferp, buffer, hdr-&gt;dxfer_len))<br>		pr_err(<span class="hljs-string">&quot;%s: copy from user failed.\n&quot;</span>, __func__);<br>	kfree(buffer);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>此时我们就可以通过直接修改返回数据达到修改sn号的效果</p>
@@ -390,7 +391,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年11月5日</div>
+          <div>2025年3月24日</div>
         </div>
       
       
@@ -416,6 +417,29 @@
 
 
 
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="scsi子系统">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">scsi子系统</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/debug/kgdb/" title="kgdb">
+                        <span class="hidden-mobile">kgdb</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 
@@ -543,7 +567,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> 
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
     </div>
   
   

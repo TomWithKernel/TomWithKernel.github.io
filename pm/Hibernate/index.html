@@ -1,0 +1,796 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Hibernate (kernel 5.10)state_store1234567891011121314151617181920212223242526272829303132333435363738static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,			   const char *buf,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hibernate (kernel 5.10)">
+<meta property="og:url" content="https://tomwithkernel.github.io/pm/Hibernate/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="Hibernate (kernel 5.10)state_store1234567891011121314151617181920212223242526272829303132333435363738static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,			   const char *buf,">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-18T01:09:00.000Z">
+<meta property="article:modified_time" content="2025-03-26T07:42:16.187Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="Power Management">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Hibernate (kernel 5.10) - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Hibernate (kernel 5.10)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-18 09:09" pubdate>
+          2025年3月18日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          178 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Hibernate (kernel 5.10)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Hibernate-kernel-5-10"><a href="#Hibernate-kernel-5-10" class="headerlink" title="Hibernate (kernel 5.10)"></a>Hibernate (kernel 5.10)</h2><h3 id="state-store"><a href="#state-store" class="headerlink" title="state_store"></a>state_store</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ssize_t</span> <span class="hljs-title function_">state_store</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> kobject *kobj, <span class="hljs-keyword">struct</span> kobj_attribute *attr,</span><br><span class="hljs-params">			   <span class="hljs-type">const</span> <span class="hljs-type">char</span> *buf, <span class="hljs-type">size_t</span> n)</span><br>&#123;<br>	<span class="hljs-type">suspend_state_t</span> state;<br>	<span class="hljs-type">int</span> error;<br><br>	error = pm_autosleep_lock();		<span class="hljs-comment">//获取autosleep锁</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">return</span> error;<br><br>	<span class="hljs-keyword">if</span> (pm_autosleep_state() &gt; PM_SUSPEND_ON) &#123;	<span class="hljs-comment">//判断当前autosleep状态</span><br>		error = -EBUSY;<br>		<span class="hljs-keyword">goto</span> out;<br>	&#125;<br>    <span class="hljs-comment">/*关于suspend宏如下：</span><br><span class="hljs-comment">    	#define PM_SUSPEND_ON		((__force suspend_state_t) 0)</span><br><span class="hljs-comment">		#define PM_SUSPEND_TO_IDLE	((__force suspend_state_t) 1)</span><br><span class="hljs-comment">		#define PM_SUSPEND_STANDBY	((__force suspend_state_t) 2)</span><br><span class="hljs-comment">		#define PM_SUSPEND_MEM		((__force suspend_state_t) 3)</span><br><span class="hljs-comment">		#define PM_SUSPEND_MIN		PM_SUSPEND_TO_IDLE</span><br><span class="hljs-comment">		#define PM_SUSPEND_MAX		((__force suspend_state_t) 4)	*/</span><br><br>	state = decode_state(buf, n);		<span class="hljs-comment">//解析传入的state状态值</span><br>	<span class="hljs-keyword">if</span> (state &lt; PM_SUSPEND_MAX) &#123;<br>		<span class="hljs-keyword">if</span> (state == PM_SUSPEND_MEM)<br>			state = mem_sleep_current;<br><br>		error = pm_suspend(state);			<span class="hljs-comment">//S3</span><br>	&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (state == PM_SUSPEND_MAX) &#123;<br>		error = hibernate();				<span class="hljs-comment">//S4</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		error = -EINVAL;<br>	&#125;<br><br> out:<br>	pm_autosleep_unlock();<br>	<span class="hljs-keyword">return</span> error ? error : n;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="hibernate"><a href="#hibernate" class="headerlink" title="hibernate"></a>hibernate</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * hibernate - Carry out system hibernation, including saving the image.</span><br><span class="hljs-comment"> * hibernate - 执行系统休眠，包括保存镜像</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">hibernate</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">bool</span> snapshot_test = <span class="hljs-literal">false</span>;<br>	<span class="hljs-type">int</span> error;<br><br>	<span class="hljs-keyword">if</span> (!hibernation_available()) &#123;			<span class="hljs-comment">//检查系统是否支持休眠</span><br>		pm_pr_dbg(<span class="hljs-string">&quot;Hibernation not available.\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -EPERM;<br>	&#125;<br><br>	lock_system_sleep();				<span class="hljs-comment">//获取全局休眠锁，防止其他进程同时修改系统休眠状态</span><br>	<span class="hljs-comment">/* The snapshot device should not be opened while we&#x27;re running */</span><br>	<span class="hljs-keyword">if</span> (!hibernate_acquire()) &#123;			<span class="hljs-comment">//尝试获取休眠资源，如果设备正在被其他进程使用，则返回，并释放锁</span><br>		error = -EBUSY;<br>		<span class="hljs-keyword">goto</span> Unlock;<br>	&#125;<br><br>	pr_info(<span class="hljs-string">&quot;hibernation entry\n&quot;</span>);<br>	pm_prepare_console();				<span class="hljs-comment">//切换控制台</span><br>    <span class="hljs-comment">//触发电源管理通知，通知所有注册的子系统即将进入休眠</span><br>	error = pm_notifier_call_chain_robust(PM_HIBERNATION_PREPARE, PM_POST_HIBERNATION);<br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Restore;<br><br>	ksys_sync_helper();				<span class="hljs-comment">//同步磁盘数据，避免休眠过程中数据丢失</span><br><br>	error = freeze_processes();		<span class="hljs-comment">//冻结所有用户态进程，确保休眠时不会有进程修改系统状态</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Exit;<br><br>	lock_device_hotplug();			<span class="hljs-comment">//锁定设备热插拔，防止休眠期间设备被插拔导致状态不一致</span><br>	<span class="hljs-comment">/* Allocate memory management structures */</span><br>	error = create_basic_memory_bitmaps();	<span class="hljs-comment">//创建内存管理结构，用于记录需要保存到磁盘的内存状态</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Thaw;<br><br>	error = hibernation_snapshot(hibernation_mode == HIBERNATION_PLATFORM);	<span class="hljs-comment">//创建系统快照，捕获当前内存状态。</span><br>	<span class="hljs-keyword">if</span> (error || freezer_test_done)		<span class="hljs-comment">//如果 freezer_test_done 为 true，说明只是测试休眠，并不会实际写入镜像，直接跳转清理资源</span><br>		<span class="hljs-keyword">goto</span> Free_bitmaps;<br><br>	<span class="hljs-keyword">if</span> (in_suspend) &#123;				<span class="hljs-comment">//指示当前系统是否处于挂起状态</span><br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags = <span class="hljs-number">0</span>;<br><br>		<span class="hljs-keyword">if</span> (hibernation_mode == HIBERNATION_PLATFORM)<br>			flags |= SF_PLATFORM_MODE;	<span class="hljs-comment">//使用平台提供的休眠方式</span><br>		<span class="hljs-keyword">if</span> (nocompress)<br>			flags |= SF_NOCOMPRESS_MODE;<span class="hljs-comment">//不压缩休眠镜像（默认会压缩）</span><br>		<span class="hljs-keyword">else</span><br>		        flags |= SF_CRC32_MODE;<span class="hljs-comment">//启用 CRC32 校验，确保数据完整性</span><br><br>		pm_pr_dbg(<span class="hljs-string">&quot;Writing hibernation image.\n&quot;</span>);<br>		error = swsusp_write(flags);	<span class="hljs-comment">//将内存映像写入磁盘</span><br>		swsusp_free();					<span class="hljs-comment">//释放不再需要的休眠数据</span><br>		<span class="hljs-keyword">if</span> (!error) &#123;<br>			<span class="hljs-keyword">if</span> (hibernation_mode == HIBERNATION_TEST_RESUME)<br>				snapshot_test = <span class="hljs-literal">true</span>;<br>			<span class="hljs-keyword">else</span><br>				power_down();			<span class="hljs-comment">//关机</span><br>		&#125;<br>        <span class="hljs-comment">//清理状态</span><br>		in_suspend = <span class="hljs-number">0</span>;				<span class="hljs-comment">//表示休眠结束</span><br>		pm_restore_gfp_mask();		<span class="hljs-comment">//恢复分配内存的 GFP 标志</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		pm_pr_dbg(<span class="hljs-string">&quot;Hibernation image restored successfully.\n&quot;</span>);<br>	&#125;<br><br> Free_bitmaps:<br>	free_basic_memory_bitmaps();	<span class="hljs-comment">//释放创建的内存快照数据</span><br> Thaw:<br>	unlock_device_hotplug();		<span class="hljs-comment">//恢复设备热插拔</span><br>	<span class="hljs-keyword">if</span> (snapshot_test) &#123;<br>		pm_pr_dbg(<span class="hljs-string">&quot;Checking hibernation image\n&quot;</span>);<br>		error = swsusp_check();		<span class="hljs-comment">//校验休眠映像是否有效</span><br>		<span class="hljs-keyword">if</span> (!error)<br>			error = load_image_and_restore();	<span class="hljs-comment">//从磁盘恢复映像</span><br>	&#125;<br>	thaw_processes();				<span class="hljs-comment">//解冻所有进程</span><br><br>	<span class="hljs-comment">/* Don&#x27;t bother checking whether freezer_test_done is true */</span><br>	freezer_test_done = <span class="hljs-literal">false</span>;<br> Exit:<br>	pm_notifier_call_chain(PM_POST_HIBERNATION);	<span class="hljs-comment">//通知所有监听者休眠已经结束</span><br> Restore:<br>	pm_restore_console();			<span class="hljs-comment">//恢复终端</span><br>	hibernate_release();			<span class="hljs-comment">//释放快照设备</span><br> Unlock:<br>	unlock_system_sleep();			<span class="hljs-comment">//解锁系统</span><br>	pr_info(<span class="hljs-string">&quot;hibernation exit\n&quot;</span>);<br><br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="freeze-processes"><a href="#freeze-processes" class="headerlink" title="freeze_processes"></a>freeze_processes</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * freeze_processes - Signal user space processes to enter the refrigerator.</span><br><span class="hljs-comment"> * The current thread will not be frozen.  The same process that calls</span><br><span class="hljs-comment"> * freeze_processes must later call thaw_processes.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * On success, returns 0.  On failure, -errno and system is fully thawed.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">freeze_processes</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">int</span> error;<br><br>	error = __usermodehelper_disable(UMH_FREEZING);<span class="hljs-comment">//禁用用户模式辅助进程（usermode helper），如 modprobe、udev 等</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">return</span> error;<br><br>	<span class="hljs-comment">/* Make sure this task doesn&#x27;t get frozen */</span><br>	current-&gt;flags |= PF_SUSPEND_TASK;<span class="hljs-comment">//current是当前执行该函数的进程，一般是调用它的内核线程</span><br><br>	<span class="hljs-keyword">if</span> (!pm_freezing)<br>		<span class="hljs-type">atomic_inc</span>(&amp;system_freezing_cnt);<br><br>	pm_wakeup_clear(<span class="hljs-literal">true</span>);			<span class="hljs-comment">//清除所有唤醒事件，以防止系统在冻结过程中被意外唤醒</span><br>	pr_info(<span class="hljs-string">&quot;Freezing user space processes ... &quot;</span>);<br>	pm_freezing = <span class="hljs-literal">true</span>;				<span class="hljs-comment">//表示系统正在进行冻结进程的操作</span><br>	error = try_to_freeze_tasks(<span class="hljs-literal">true</span>);	<span class="hljs-comment">//这个函数会遍历所有进程，并尝试将它们冻结</span><br>	<span class="hljs-keyword">if</span> (!error) &#123;<br>		__usermodehelper_set_disable_depth(UMH_DISABLED);<span class="hljs-comment">//完全禁用用户模式辅助进程（之前只是进入冻结模式）</span><br>		pr_cont(<span class="hljs-string">&quot;done.&quot;</span>);<br>	&#125;<br>	pr_cont(<span class="hljs-string">&quot;\n&quot;</span>);<br>	BUG_ON(in_atomic());<span class="hljs-comment">//确保冻结状态下不处于原子上下文，因为冻结进程不能在原子上下文中执行。</span><br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Now that the whole userspace is frozen we need to disable</span><br><span class="hljs-comment">	 * the OOM killer to disallow any further interference with</span><br><span class="hljs-comment">	 * killable tasks. There is no guarantee oom victims will</span><br><span class="hljs-comment">	 * ever reach a point they go away we have to wait with a timeout.</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-keyword">if</span> (!error &amp;&amp; !oom_killer_disable(msecs_to_jiffies(freeze_timeout_msecs)))	<span class="hljs-comment">//禁用 OOM Killer</span><br>		error = -EBUSY;<br><br>	<span class="hljs-keyword">if</span> (error)<br>		thaw_processes();<br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="create-basic-memory-bitmaps"><a href="#create-basic-memory-bitmaps" class="headerlink" title="create_basic_memory_bitmaps"></a>create_basic_memory_bitmaps</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * create_basic_memory_bitmaps - Create bitmaps to hold basic page information.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Create bitmaps needed for marking page frames that should not be saved and</span><br><span class="hljs-comment"> * free page frames.  The forbidden_pages_map and free_pages_map pointers are</span><br><span class="hljs-comment"> * only modified if everything goes well, because we don&#x27;t want the bits to be</span><br><span class="hljs-comment"> * touched before both bitmaps are set up.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-comment">//	为了保证休眠和恢复的正确性，内核必须：</span><br><span class="hljs-comment">//		标记哪些页面不应该保存（例如：DMA 缓冲区、I/O 映射内存等）。</span><br><span class="hljs-comment">//		跟踪哪些页面是空闲的，以便在休眠映像中跳过它们，减少数据写入量。</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">create_basic_memory_bitmaps</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">memory_bitmap</span> *<span class="hljs-title">bm1</span>, *<span class="hljs-title">bm2</span>;</span><br>	<span class="hljs-type">int</span> error = <span class="hljs-number">0</span>;<br><br>	<span class="hljs-keyword">if</span> (forbidden_pages_map &amp;&amp; free_pages_map)<span class="hljs-comment">//如果 forbidden_pages_map 和 free_pages_map 都已经创建，直接返回 0，表示成功</span><br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">else</span><br>		BUG_ON(forbidden_pages_map || free_pages_map);<br><br>	bm1 = kzalloc(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> memory_bitmap), GFP_KERNEL);<br>	<span class="hljs-keyword">if</span> (!bm1)<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br><br>	error = memory_bm_create(bm1, GFP_KERNEL, PG_ANY);	<span class="hljs-comment">//用于创建 bm1 并分配位图数据</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Free_first_object;<br><br>	bm2 = kzalloc(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> memory_bitmap), GFP_KERNEL);<br>	<span class="hljs-keyword">if</span> (!bm2)<br>		<span class="hljs-keyword">goto</span> Free_first_bitmap;<br><br>	error = memory_bm_create(bm2, GFP_KERNEL, PG_ANY);<br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Free_second_object;<br><br>	forbidden_pages_map = bm1;<br>	free_pages_map = bm2;<br>	mark_nosave_pages(forbidden_pages_map);<span class="hljs-comment">//标记哪些页面是不应该保存的，例如 DMA 缓冲区、页表等</span><br><br>	pr_debug(<span class="hljs-string">&quot;Basic memory bitmaps created\n&quot;</span>);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br> Free_second_object:<br>	kfree(bm2);<br> Free_first_bitmap:<br> 	memory_bm_free(bm1, PG_UNSAFE_CLEAR);<br> Free_first_object:<br>	kfree(bm1);<br>	<span class="hljs-keyword">return</span> -ENOMEM;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="hibernation-snapshot"><a href="#hibernation-snapshot" class="headerlink" title="hibernation_snapshot"></a>hibernation_snapshot</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * hibernation_snapshot - Quiesce devices and create a hibernation image.</span><br><span class="hljs-comment"> * @platform_mode: If set, use platform driver to prepare for the transition.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * This routine must be called with system_transition_mutex held.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">hibernation_snapshot</span><span class="hljs-params">(<span class="hljs-type">int</span> platform_mode)</span><br>&#123;<br>	<span class="hljs-type">pm_message_t</span> msg;<br>	<span class="hljs-type">int</span> error;<br><br>	pm_suspend_clear_flags();<span class="hljs-comment">//清除之前可能存在的挂起（suspend）标志，确保新的休眠流程不受影响</span><br>	error = platform_begin(platform_mode);<br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Close;<br><br>	<span class="hljs-comment">/* Preallocate image memory before shutting down devices. */</span><br>	error = hibernate_preallocate_memory();<span class="hljs-comment">//预先分配休眠映像所需的内存，确保系统可以存储当前内存快照</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Close;<br><br>	error = freeze_kernel_threads();	<span class="hljs-comment">//冻结内核线程</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> Cleanup;<br><br>	<span class="hljs-keyword">if</span> (hibernation_test(TEST_FREEZER)) &#123;<br><br>		<span class="hljs-comment">/*</span><br><span class="hljs-comment">		 * Indicate to the caller that we are returning due to a</span><br><span class="hljs-comment">		 * successful freezer test.</span><br><span class="hljs-comment">		 */</span><br>		freezer_test_done = <span class="hljs-literal">true</span>;<br>		<span class="hljs-keyword">goto</span> Thaw;<br>	&#125;<br><br>	error = dpm_prepare(PMSG_FREEZE);	<span class="hljs-comment">//通知所有设备驱动程序即将进入冻结状态</span><br>	<span class="hljs-keyword">if</span> (error) &#123;<br>		dpm_complete(PMSG_RECOVER);		<span class="hljs-comment">//让设备恢复到正常状态，并跳转到 Thaw 进行解冻。</span><br>		<span class="hljs-keyword">goto</span> Thaw;<br>	&#125;<br><br>	suspend_console();		<span class="hljs-comment">//暂停控制台的输入输出，防止显示输出干扰休眠过程</span><br>	pm_restrict_gfp_mask();	<span class="hljs-comment">//限制内存分配，避免在 suspend 过程中分配不合适的内存</span><br><br>	error = dpm_suspend(PMSG_FREEZE);	<span class="hljs-comment">//负责挂起所有设备，并将它们置于低功耗状态</span><br><br>	<span class="hljs-keyword">if</span> (error || hibernation_test(TEST_DEVICES))	<span class="hljs-comment">//如果挂起失败则进入恢复流程</span><br>		platform_recover(platform_mode);<br>	<span class="hljs-keyword">else</span><br>		error = create_image(platform_mode);	<span class="hljs-comment">//如果设备挂起成功，则调用 create_image() 进行系统内存快照的创建</span><br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * In the case that we call create_image() above, the control</span><br><span class="hljs-comment">	 * returns here (1) after the image has been created or the</span><br><span class="hljs-comment">	 * image creation has failed and (2) after a successful restore.</span><br><span class="hljs-comment">	 */</span><br><br>	<span class="hljs-comment">/* We may need to release the preallocated image pages here. */</span><br>	<span class="hljs-keyword">if</span> (error || !in_suspend)<br>		swsusp_free();<br><br>	msg = in_suspend ? (error ? PMSG_RECOVER : PMSG_THAW) : PMSG_RESTORE;<br>    <span class="hljs-comment">//如果设备已经被冻结（dpm_suspend(PMSG_FREEZE)），映像创建成功，则使用 PMSG_THAW 恢复设备状态。</span><br>    <span class="hljs-comment">//如果设备已经被冻结，但创建休眠映像失败（或者其他原因导致不能继续休眠）。则需要恢复设备，使系统返回到正常状态。</span><br>    <span class="hljs-comment">//如果设备之前被冻结，但系统从未真正进入 suspend。例如，在测试模式（hibernation_test()）或者某些失败情况下，不执行真正的休眠，而是直接恢复设备。</span><br>	dpm_resume(msg);<span class="hljs-comment">//调用 dpm_resume() 以 msg 为参数，使所有设备恢复到正常运行状态：</span><br><br>	<span class="hljs-keyword">if</span> (error || !in_suspend)<br>		pm_restore_gfp_mask();	<span class="hljs-comment">//解除 pm_restrict_gfp_mask() 之前对 GFP（内存分配）的限制</span><br><br>	resume_console();	<span class="hljs-comment">//恢复控制台显示</span><br>	dpm_complete(msg);	<span class="hljs-comment">//让设备完成对应的状态转换</span><br><br> Close:<br>	platform_end(platform_mode);	<span class="hljs-comment">//进行平台相关的清理</span><br>	<span class="hljs-keyword">return</span> error;<br><br> Thaw:<br>	thaw_kernel_threads();		<span class="hljs-comment">//解冻内核线程，使其恢复运行</span><br> Cleanup:<br>	swsusp_free();<br>	<span class="hljs-keyword">goto</span> Close;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="dpm-prepare"><a href="#dpm-prepare" class="headerlink" title="dpm_prepare"></a>dpm_prepare</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * dpm_prepare - Prepare all non-sysdev devices for a system PM transition.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Execute the -&gt;prepare() callback(s) for all devices.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">dpm_prepare</span><span class="hljs-params">(<span class="hljs-type">pm_message_t</span> state)</span><br>&#123;<br>	<span class="hljs-type">int</span> error = <span class="hljs-number">0</span>;<br><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_prepare&quot;</span>), state.event, <span class="hljs-literal">true</span>);<span class="hljs-comment">//记录 dpm_prepare 过程的开始，便于调试和跟踪 PM 事件</span><br>	might_sleep();<span class="hljs-comment">//调试辅助函数，确保当前代码不会在不允许睡眠（如持有自旋锁）的情况下进入可能会睡眠的区域（如 wait_for_device_probe()）</span><br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Give a chance for the known devices to complete their probes, before</span><br><span class="hljs-comment">	 * disable probing of devices. This sync point is important at least</span><br><span class="hljs-comment">	 * at boot time + hibernation restore.</span><br><span class="hljs-comment">	 */</span><br>	wait_for_device_probe();<span class="hljs-comment">//确保所有设备的 probe（驱动绑定）过程完成，防止正在执行 probe 的设备在 suspend/hibernate 过程中发生问题。</span><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * It is unsafe if probing of devices will happen during suspend or</span><br><span class="hljs-comment">	 * hibernation and system behavior will be unpredictable in this case.</span><br><span class="hljs-comment">	 * So, let&#x27;s prohibit device&#x27;s probing here and defer their probes</span><br><span class="hljs-comment">	 * instead. The normal behavior will be restored in dpm_complete().</span><br><span class="hljs-comment">	 */</span><br>	device_block_probing();<span class="hljs-comment">//在 suspend 或 hibernate 期间，禁止新的设备探测和驱动绑定，防止系统行为不可预测</span><br><br>	mutex_lock(&amp;dpm_list_mtx);<span class="hljs-comment">//加锁 dpm_list_mtx，确保在遍历设备列表时不会有并发修改</span><br>	<span class="hljs-keyword">while</span> (!list_empty(&amp;dpm_list)) &#123;	<span class="hljs-comment">//dpm_list 是设备列表，存储了所有参与 suspend/hibernate 过程的设备</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device</span> *<span class="hljs-title">dev</span> =</span> to_device(dpm_list.next);	<span class="hljs-comment">//取出列表头部的设备</span><br><br>		get_device(dev);			<span class="hljs-comment">//增加设备的引用计数，防止设备在 suspend 过程中被释放</span><br>		mutex_unlock(&amp;dpm_list_mtx);	<span class="hljs-comment">//解锁 dpm_list_mtx，因为 device_prepare(dev, state) 可能会睡眠（sleep），避免死锁</span><br><br>		trace_device_pm_callback_start(dev, <span class="hljs-string">&quot;&quot;</span>, state.event);<br>		error = device_prepare(dev, state);		<span class="hljs-comment">//执行设备的 -&gt;prepare() 回调</span><br>		trace_device_pm_callback_end(dev, error);<br><br>		mutex_lock(&amp;dpm_list_mtx);<br>		<span class="hljs-keyword">if</span> (error) &#123;	<span class="hljs-comment">//处理 prepare() 失败情况</span><br>			<span class="hljs-keyword">if</span> (error == -EAGAIN) &#123;<br>				put_device(dev);<br>				error = <span class="hljs-number">0</span>;<br>				<span class="hljs-keyword">continue</span>;<br>			&#125;<br>			pr_info(<span class="hljs-string">&quot;Device %s not prepared for power transition: code %d\n&quot;</span>,<br>				dev_name(dev), error);<br>			put_device(dev);<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>		dev-&gt;power.is_prepared = <span class="hljs-literal">true</span>;	<span class="hljs-comment">//设备已准备好进入 suspend/hibernate</span><br>		<span class="hljs-keyword">if</span> (!list_empty(&amp;dev-&gt;power.entry))<br>			list_move_tail(&amp;dev-&gt;power.entry, &amp;dpm_prepared_list);	<span class="hljs-comment">//将设备从 dpm_list 移动到 dpm_prepared_list，确保后续阶段只处理已准备好的设备</span><br>		put_device(dev);	<span class="hljs-comment">//释放 get_device() 增加的引用计数</span><br>	&#125;<br>	mutex_unlock(&amp;dpm_list_mtx);<br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_prepare&quot;</span>), state.event, <span class="hljs-literal">false</span>);<br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h6 id="device-prepare"><a href="#device-prepare" class="headerlink" title="device_prepare"></a>device_prepare</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * device_prepare - Prepare a device for system power transition.</span><br><span class="hljs-comment"> * @dev: Device to handle.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Execute the -&gt;prepare() callback(s) for given device.  No new children of the</span><br><span class="hljs-comment"> * device may be registered after this function has returned.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">device_prepare</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> device *dev, <span class="hljs-type">pm_message_t</span> state)</span><br>&#123;<br>	<span class="hljs-type">int</span> (*callback)(<span class="hljs-keyword">struct</span> device *) = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * If a device&#x27;s parent goes into runtime suspend at the wrong time,</span><br><span class="hljs-comment">	 * it won&#x27;t be possible to resume the device.  To prevent this we</span><br><span class="hljs-comment">	 * block runtime suspend here, during the prepare phase, and allow</span><br><span class="hljs-comment">	 * it again during the complete phase.</span><br><span class="hljs-comment">	 */</span><br>	pm_runtime_get_noresume(dev);<span class="hljs-comment">//增加设备的 runtime PM（电源管理）引用计数，防止设备在 prepare() 过程中进入 runtime suspend</span><br><br>	<span class="hljs-keyword">if</span> (dev-&gt;power.syscore)<span class="hljs-comment">//syscore 设备通常是关键的核心设备，它们需要在整个系统 suspend 过程中保持运行，因此不需要 prepare() 处理</span><br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>	device_lock(dev);		<span class="hljs-comment">//保护 dev，防止并发访问</span><br><br>	dev-&gt;power.wakeup_path = <span class="hljs-literal">false</span>;		<span class="hljs-comment">//该标志表示设备是否能从 suspend 中唤醒系统，在 prepare() 开始前先清除，即清唤醒源</span><br><br>	<span class="hljs-keyword">if</span> (dev-&gt;power.no_pm_callbacks)		<span class="hljs-comment">//如果设备明确 不支持 PM 回调，直接跳过</span><br>		<span class="hljs-keyword">goto</span> unlock;<br><br>    <span class="hljs-comment">/* prepare() 回调的查找顺序：</span><br><span class="hljs-comment">     * 	PM domain（电源管理域）</span><br><span class="hljs-comment">     * 	设备类型（type）</span><br><span class="hljs-comment">     * 	设备类（class）</span><br><span class="hljs-comment">     */</span><br>	<span class="hljs-keyword">if</span> (dev-&gt;pm_domain)<br>		callback = dev-&gt;pm_domain-&gt;ops.prepare;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (dev-&gt;type &amp;&amp; dev-&gt;type-&gt;pm)<br>		callback = dev-&gt;type-&gt;pm-&gt;prepare;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (dev-&gt;class &amp;&amp; dev-&gt;class-&gt;pm)<br>		callback = dev-&gt;class-&gt;pm-&gt;prepare;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (dev-&gt;bus &amp;&amp; dev-&gt;bus-&gt;pm)<br>		callback = dev-&gt;bus-&gt;pm-&gt;prepare;<br><br>	<span class="hljs-keyword">if</span> (!callback &amp;&amp; dev-&gt;driver &amp;&amp; dev-&gt;driver-&gt;pm)<br>		callback = dev-&gt;driver-&gt;pm-&gt;prepare;<br><br>	<span class="hljs-keyword">if</span> (callback)<br>		ret = callback(dev);<br><br>unlock:<br>	device_unlock(dev);<br><br>	<span class="hljs-keyword">if</span> (ret &lt; <span class="hljs-number">0</span>) &#123;<br>		suspend_report_result(callback, ret);<br>		pm_runtime_put(dev);	<span class="hljs-comment">//释放 runtime PM 资源</span><br>		<span class="hljs-keyword">return</span> ret;<br>	&#125;<br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * A positive return value from -&gt;prepare() means &quot;this device appears</span><br><span class="hljs-comment">	 * to be runtime-suspended and its state is fine, so if it really is</span><br><span class="hljs-comment">	 * runtime-suspended, you can leave it in that state provided that you</span><br><span class="hljs-comment">	 * will do the same thing with all of its descendants&quot;.  This only</span><br><span class="hljs-comment">	 * applies to suspend transitions, however.</span><br><span class="hljs-comment">	 */</span><br>	spin_lock_irq(&amp;dev-&gt;power.lock);<br>    <span class="hljs-comment">//direct_complete主要用于设备已经处于runtime suspend状态，并且可以继续保持这个状态，从而优化suspend/resume流程，避免不必要的操作。</span><br>	dev-&gt;power.direct_complete = state.event == PM_EVENT_SUSPEND &amp;&amp;<br>		(ret &gt; <span class="hljs-number">0</span> || dev-&gt;power.no_pm_callbacks) &amp;&amp;<br>		!dev_pm_test_driver_flags(dev, DPM_FLAG_NO_DIRECT_COMPLETE);<br>	spin_unlock_irq(&amp;dev-&gt;power.lock);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="dpm-complete"><a href="#dpm-complete" class="headerlink" title="dpm_complete"></a>dpm_complete</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * dpm_complete - Complete a PM transition for all non-sysdev devices.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Execute the -&gt;complete() callbacks for all devices whose PM status is not</span><br><span class="hljs-comment"> * DPM_ON (this allows new devices to be registered).</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">dpm_complete</span><span class="hljs-params">(<span class="hljs-type">pm_message_t</span> state)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list_head</span> <span class="hljs-title">list</span>;</span><br><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_complete&quot;</span>), state.event, <span class="hljs-literal">true</span>);<span class="hljs-comment">// 用于跟踪 suspend/resume 过程</span><br>	might_sleep();<br><br>	INIT_LIST_HEAD(&amp;<span class="hljs-built_in">list</span>);<br>	mutex_lock(&amp;dpm_list_mtx);<br>	<span class="hljs-keyword">while</span> (!list_empty(&amp;dpm_prepared_list)) &#123;<span class="hljs-comment">//遍历 dpm_prepared_list，该列表存放的是处于 is_prepared = true 状态的设备</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device</span> *<span class="hljs-title">dev</span> =</span> to_device(dpm_prepared_list.prev);<br><br>		get_device(dev);<br>		dev-&gt;power.is_prepared = <span class="hljs-literal">false</span>;		<span class="hljs-comment">//清除 is_prepared 标志，表示设备已经完成 suspend 的准备状态</span><br>		list_move(&amp;dev-&gt;power.entry, &amp;<span class="hljs-built_in">list</span>);<span class="hljs-comment">//将设备从 dpm_prepared_list 移动到 list，即将处理完成的设备从 &quot;待处理&quot; 状态转移到 &quot;已完成&quot; 状态</span><br>		mutex_unlock(&amp;dpm_list_mtx);<br><br>		trace_device_pm_callback_start(dev, <span class="hljs-string">&quot;&quot;</span>, state.event);<br>		device_complete(dev, state);<span class="hljs-comment">//调用 device_complete(dev, state)，执行设备的 -&gt;complete() 回调</span><br>		trace_device_pm_callback_end(dev, <span class="hljs-number">0</span>);<br><br>		mutex_lock(&amp;dpm_list_mtx);<br>		put_device(dev);<br>	&#125;<br>	list_splice(&amp;<span class="hljs-built_in">list</span>, &amp;dpm_list);	<span class="hljs-comment">//将 list 中的设备合并到 dpm_list，表示这些设备已经完成了 complete() 处理</span><br>	mutex_unlock(&amp;dpm_list_mtx);<br><br>	<span class="hljs-comment">/* Allow device probing and trigger re-probing of deferred devices */</span><br>	device_unblock_probing();<span class="hljs-comment">//解除设备探测阻塞，允许新的设备注册，并重新探测之前由于 suspend/resume 过程被推迟的设备</span><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_complete&quot;</span>), state.event, <span class="hljs-literal">false</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="suspend-console"><a href="#suspend-console" class="headerlink" title="suspend_console"></a>suspend_console</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * suspend_console - suspend the console subsystem</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * This disables printk() while we go into suspend states</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">suspend_console</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-keyword">if</span> (!console_suspend_enabled)<br>		<span class="hljs-keyword">return</span>;<br>	pr_info(<span class="hljs-string">&quot;Suspending console(s) (use no_console_suspend to debug)\n&quot;</span>);<br>	console_lock();<br>	console_suspended = <span class="hljs-number">1</span>;<br>	up_console_sem();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="pm-restrict-gfp-mask"><a href="#pm-restrict-gfp-mask" class="headerlink" title="pm_restrict_gfp_mask"></a>pm_restrict_gfp_mask</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_restrict_gfp_mask</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>		<br>&#123;<br>	WARN_ON(!mutex_is_locked(&amp;system_transition_mutex));<br>	WARN_ON(saved_gfp_mask);<br>	saved_gfp_mask = gfp_allowed_mask;<br>	gfp_allowed_mask &amp;= ~(__GFP_IO | __GFP_FS);	<span class="hljs-comment">//限制 I/O 和文件系统操作</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="dpm-suspend"><a href="#dpm-suspend" class="headerlink" title="dpm_suspend"></a>dpm_suspend</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * dpm_suspend - Execute &quot;suspend&quot; callbacks for all non-sysdev devices.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">dpm_suspend</span><span class="hljs-params">(<span class="hljs-type">pm_message_t</span> state)</span><br>&#123;<br>	<span class="hljs-type">ktime_t</span> starttime = ktime_get();<br>	<span class="hljs-type">int</span> error = <span class="hljs-number">0</span>;<br><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_suspend&quot;</span>), state.event, <span class="hljs-literal">true</span>);<br>	might_sleep();	<span class="hljs-comment">//确保此函数不会在原子上下文中调用</span><br><br>	devfreq_suspend();<span class="hljs-comment">//挂起动态调频设备</span><br>	cpufreq_suspend();<span class="hljs-comment">//挂起cpu调频机制</span><br><br>	mutex_lock(&amp;dpm_list_mtx);<br>	pm_transition = state;<br>	async_error = <span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">while</span> (!list_empty(&amp;dpm_prepared_list)) &#123;	<span class="hljs-comment">//dpm_prepared_list 存放已准备suspend的设备</span><br>		<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">device</span> *<span class="hljs-title">dev</span> =</span> to_device(dpm_prepared_list.prev);<br><br>		get_device(dev);		<span class="hljs-comment">//增加设备引用计数，确保设备不会被释放</span><br>		mutex_unlock(&amp;dpm_list_mtx);<br><br>		error = device_suspend(dev);	<span class="hljs-comment">//执行设备suspend</span><br><br>		mutex_lock(&amp;dpm_list_mtx);<br>		<span class="hljs-keyword">if</span> (error) &#123;<br>			pm_dev_err(dev, state, <span class="hljs-string">&quot;&quot;</span>, error);<br>			dpm_save_failed_dev(dev_name(dev));	<span class="hljs-comment">//记录 suspend 失败的设备</span><br>			put_device(dev);	<span class="hljs-comment">//释放设备引用计数</span><br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>		<span class="hljs-keyword">if</span> (!list_empty(&amp;dev-&gt;power.entry))<br>			list_move(&amp;dev-&gt;power.entry, &amp;dpm_suspended_list);	<span class="hljs-comment">//设备挂起成功，移动到dpm_suspended_list</span><br>		put_device(dev);<br>		<span class="hljs-keyword">if</span> (async_error)<br>			<span class="hljs-keyword">break</span>;<br>	&#125;<br>	mutex_unlock(&amp;dpm_list_mtx);<br>	async_synchronize_full();<br>	<span class="hljs-keyword">if</span> (!error)<br>		error = async_error;<br>	<span class="hljs-keyword">if</span> (error) &#123;<br>		suspend_stats.failed_suspend++;<br>		dpm_save_failed_step(SUSPEND_SUSPEND);	<span class="hljs-comment">//记录 suspend 失败的阶段</span><br>	&#125;<br>	dpm_show_time(starttime, state, error, <span class="hljs-literal">NULL</span>);	<span class="hljs-comment">//计算并显示suspend过程耗时</span><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;dpm_suspend&quot;</span>), state.event, <span class="hljs-literal">false</span>);<br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h6 id="device-suspend"><a href="#device-suspend" class="headerlink" title="device_suspend"></a>device_suspend</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">device_suspend</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> device *dev)</span><br>&#123;<br>	<span class="hljs-keyword">if</span> (dpm_async_fn(dev, async_suspend))<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>	<span class="hljs-keyword">return</span> __device_suspend(dev, pm_transition, <span class="hljs-literal">false</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>__device_suspend</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * __device_suspend - Execute &quot;suspend&quot; callbacks for given device.</span><br><span class="hljs-comment"> * @dev: Device to handle.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> * @async: If true, the device is being suspended asynchronously.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> __device_suspend(<span class="hljs-keyword">struct</span> device *dev, <span class="hljs-type">pm_message_t</span> state, <span class="hljs-type">bool</span> async)<br>&#123;<br>	<span class="hljs-type">pm_callback_t</span> callback = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">const</span> <span class="hljs-type">char</span> *info = <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-type">int</span> error = <span class="hljs-number">0</span>;<br>	DECLARE_DPM_WATCHDOG_ON_STACK(wd);<br><br>	TRACE_DEVICE(dev);<br>	TRACE_SUSPEND(<span class="hljs-number">0</span>);<br><br>	dpm_wait_for_subordinate(dev, async);	<span class="hljs-comment">//等待子设备完成挂起</span><br><br>	<span class="hljs-keyword">if</span> (async_error) &#123;		<span class="hljs-comment">//检查是否有异步错误</span><br>		dev-&gt;power.direct_complete = <span class="hljs-literal">false</span>;<br>		<span class="hljs-keyword">goto</span> Complete;<br>	&#125;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Wait for possible runtime PM transitions of the device in progress</span><br><span class="hljs-comment">	 * to complete and if there&#x27;s a runtime resume request pending for it,</span><br><span class="hljs-comment">	 * resume it before proceeding with invoking the system-wide suspend</span><br><span class="hljs-comment">	 * callbacks for it.</span><br><span class="hljs-comment">	 *</span><br><span class="hljs-comment">	 * If the system-wide suspend callbacks below change the configuration</span><br><span class="hljs-comment">	 * of the device, they must disable runtime PM for it or otherwise</span><br><span class="hljs-comment">	 * ensure that its runtime-resume callbacks will not be confused by that</span><br><span class="hljs-comment">	 * change in case they are invoked going forward.</span><br><span class="hljs-comment">	 */</span><br>	pm_runtime_barrier(dev);		<span class="hljs-comment">// 刷新设备的运行时电源管理请求，并等待所有正在进行的运行时PM操作完成</span><br><br>	<span class="hljs-keyword">if</span> (pm_wakeup_pending()) &#123;		<span class="hljs-comment">//检测是否有未处理的唤醒请求。如果有，设备不会挂起，并返回 -EBUSY</span><br>		dev-&gt;power.direct_complete = <span class="hljs-literal">false</span>;<br>		async_error = -EBUSY;<br>		<span class="hljs-keyword">goto</span> Complete;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;power.syscore)		<span class="hljs-comment">//如果设备是 syscore 设备（例如 CPU、时钟控制器等），则不进行普通设备的挂起处理</span><br>		<span class="hljs-keyword">goto</span> Complete;<br><br>	<span class="hljs-comment">/* Avoid direct_complete to let wakeup_path propagate.</span><br><span class="hljs-comment">     * device_may_wakeup(dev)	检查设备是否支持唤醒功能，即该设备是否可以从低功耗状态中唤醒系统。</span><br><span class="hljs-comment">     * dev-&gt;power.wakeup_path	表示该设备已经被标记为唤醒路径，通常用于保证唤醒信号的传递</span><br><span class="hljs-comment">     */</span><br>	<span class="hljs-keyword">if</span> (device_may_wakeup(dev) || dev-&gt;power.wakeup_path)<br>		dev-&gt;power.direct_complete = <span class="hljs-literal">false</span>;<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;power.direct_complete) &#123;	<span class="hljs-comment">// 如果设备支持 direct_complete，且仍然处于 runtime suspend 状态，就可以直接跳到 Complete</span><br>		<span class="hljs-keyword">if</span> (pm_runtime_status_suspended(dev)) &#123;<br>			pm_runtime_disable(dev);	<span class="hljs-comment">// 禁用 runtime PM，避免状态变化</span><br>			<span class="hljs-keyword">if</span> (pm_runtime_status_suspended(dev)) &#123;<br>				pm_dev_dbg(dev, state, <span class="hljs-string">&quot;direct-complete &quot;</span>);<br>				<span class="hljs-keyword">goto</span> Complete;<br>			&#125;<br><br>			pm_runtime_enable(dev);		<span class="hljs-comment">// 如果状态发生变化，重新启用 runtime PM</span><br>		&#125;<br>		dev-&gt;power.direct_complete = <span class="hljs-literal">false</span>;		<span class="hljs-comment">// 清除 direct_complete 标志</span><br>	&#125;<br><br>	dev-&gt;power.may_skip_resume = <span class="hljs-literal">true</span>;<br>	dev-&gt;power.must_resume = !dev_pm_test_driver_flags(dev, DPM_FLAG_MAY_SKIP_RESUME);<br><br>	dpm_watchdog_set(&amp;wd, dev);<br>	device_lock(dev);<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;pm_domain) &#123;				<span class="hljs-comment">//挂起回调的查找和执行</span><br>		info = <span class="hljs-string">&quot;power domain &quot;</span>;<br>		callback = pm_op(&amp;dev-&gt;pm_domain-&gt;ops, state);<br>		<span class="hljs-keyword">goto</span> Run;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;type &amp;&amp; dev-&gt;type-&gt;pm) &#123;<br>		info = <span class="hljs-string">&quot;type &quot;</span>;<br>		callback = pm_op(dev-&gt;type-&gt;pm, state);<br>		<span class="hljs-keyword">goto</span> Run;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;class &amp;&amp; dev-&gt;class-&gt;pm) &#123;<br>		info = <span class="hljs-string">&quot;class &quot;</span>;<br>		callback = pm_op(dev-&gt;class-&gt;pm, state);<br>		<span class="hljs-keyword">goto</span> Run;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (dev-&gt;bus) &#123;<br>		<span class="hljs-keyword">if</span> (dev-&gt;bus-&gt;pm) &#123;<br>			info = <span class="hljs-string">&quot;bus &quot;</span>;<br>			callback = pm_op(dev-&gt;bus-&gt;pm, state);<br>		&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (dev-&gt;bus-&gt;suspend) &#123;<br>			pm_dev_dbg(dev, state, <span class="hljs-string">&quot;legacy bus &quot;</span>);<br>			error = legacy_suspend(dev, state, dev-&gt;bus-&gt;suspend,<br>						<span class="hljs-string">&quot;legacy bus &quot;</span>);<br>			<span class="hljs-keyword">goto</span> End;<br>		&#125;<br>	&#125;<br><br> Run:		<span class="hljs-comment">//执行驱动层面的挂起回调</span><br>	<span class="hljs-keyword">if</span> (!callback &amp;&amp; dev-&gt;driver &amp;&amp; dev-&gt;driver-&gt;pm) &#123;<br>		info = <span class="hljs-string">&quot;driver &quot;</span>;<br>		callback = pm_op(dev-&gt;driver-&gt;pm, state);<br>	&#125;<br><br>	error = dpm_run_callback(callback, dev, state, info);<br><br> End:<br>	<span class="hljs-keyword">if</span> (!error) &#123;		<span class="hljs-comment">//如果挂起成功，更新设备的suspend状态</span><br>		dev-&gt;power.is_suspended = <span class="hljs-literal">true</span>;<br>		<span class="hljs-keyword">if</span> (device_may_wakeup(dev))<br>			dev-&gt;power.wakeup_path = <span class="hljs-literal">true</span>;<br><br>        <span class="hljs-comment">//将当前设备的唤醒能力传播到其父设备，以确保整个设备树能够正确处理唤醒事件。</span><br>如果某个设备能够唤醒系统，其父设备通常也需要知道这一点，以便协同工作。<br>		dpm_propagate_wakeup_to_parent(dev);<br>        <span class="hljs-comment">//清除当前设备的父设备和供应商设备的 direct_complete 标志，确保这些设备在后续 suspend/resume 过程中不会因为被标记为 &quot;直接完成&quot; 而跳过状态转换</span><br>		dpm_clear_superiors_direct_complete(dev);<br>	&#125;<br><br>	device_unlock(dev);<br>	dpm_watchdog_clear(&amp;wd);<br><br> Complete:<br>	<span class="hljs-keyword">if</span> (error)<br>		async_error = error;<br><br>	complete_all(&amp;dev-&gt;power.completion);<br>	TRACE_SUSPEND(error);<br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>pm_wakeup_pending</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * pm_wakeup_pending - Check if power transition in progress should be aborted.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Compare the current number of registered wakeup events with its preserved</span><br><span class="hljs-comment"> * value from the past and return true if new wakeup events have been registered</span><br><span class="hljs-comment"> * since the old value was stored.  Also return true if the current number of</span><br><span class="hljs-comment"> * wakeup events being processed is different from zero.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">bool</span> <span class="hljs-title function_">pm_wakeup_pending</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br>	<span class="hljs-type">bool</span> ret = <span class="hljs-literal">false</span>;<br><br>	raw_spin_lock_irqsave(&amp;events_lock, flags);<br>	<span class="hljs-keyword">if</span> (events_check_enabled) &#123;		<span class="hljs-comment">//是否启用唤醒事件检测</span><br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> cnt, inpr;<br><br>		split_counters(&amp;cnt, &amp;inpr);	<span class="hljs-comment">//获取当前唤醒事件计数和正在处理的事件数</span><br>		ret = (cnt != saved_count || inpr &gt; <span class="hljs-number">0</span>);	<span class="hljs-comment">//如果当前唤醒事件计数 cnt 与之前保存的 saved_count 不同，表示有新的唤醒事件。如果正在处理的唤醒事件数 inpr &gt; 0，也需要中止休眠</span><br>		events_check_enabled = !ret;	<span class="hljs-comment">//如果检测到新的唤醒事件或正在处理唤醒事件，则暂时关闭 events_check_enabled，避免重复检测</span><br>	&#125;<br>	raw_spin_unlock_irqrestore(&amp;events_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (ret) &#123;<br>		pm_pr_dbg(<span class="hljs-string">&quot;Wakeup pending, aborting suspend\n&quot;</span>);<br>		pm_print_active_wakeup_sources();<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> ret || <span class="hljs-type">atomic_read</span>(&amp;pm_abort_suspend) &gt; <span class="hljs-number">0</span>;	<span class="hljs-comment">//如果有唤醒事件阻止挂起（ret == true）或者 pm_abort_suspend 的原子计数器大于 0，则返回 true，表示需要中止电源状态转换。</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="create-image"><a href="#create-image" class="headerlink" title="create_image"></a>create_image</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * create_image - Create a hibernation image.</span><br><span class="hljs-comment"> * @platform_mode: Whether or not to use the platform driver.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Execute device drivers&#x27; &quot;late&quot; and &quot;noirq&quot; freeze callbacks, create a</span><br><span class="hljs-comment"> * hibernation image and run the drivers&#x27; &quot;noirq&quot; and &quot;early&quot; thaw callbacks.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Control reappears in this routine after the subsequent restore.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">create_image</span><span class="hljs-params">(<span class="hljs-type">int</span> platform_mode)</span><br>&#123;<br>	<span class="hljs-type">int</span> error;<br><br>	error = dpm_suspend_end(PMSG_FREEZE);	<span class="hljs-comment">//发送PMSG_FREEZE消息以冻结设备</span><br>	<span class="hljs-keyword">if</span> (error) &#123;<br>		pr_err(<span class="hljs-string">&quot;Some devices failed to power down, aborting\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> error;<br>	&#125;<br><br>	error = platform_pre_snapshot(platform_mode);	<span class="hljs-comment">//预处理平台相关的操作，如 BIOS 或 ACPI 的挂起前准备。</span><br>	<span class="hljs-keyword">if</span> (error || hibernation_test(TEST_PLATFORM))<br>		<span class="hljs-keyword">goto</span> Platform_finish;<br><br>	error = suspend_disable_secondary_cpus();	<span class="hljs-comment">//关闭除主 CPU 之外的所有次级 CPU，以减少系统复杂度和同步开销</span><br>	<span class="hljs-keyword">if</span> (error || hibernation_test(TEST_CPUS))<br>		<span class="hljs-keyword">goto</span> Enable_cpus;<br><br>	local_irq_disable();	<span class="hljs-comment">//禁用本地中断</span><br><br>	system_state = SYSTEM_SUSPEND;<br><br>	error = syscore_suspend();	<span class="hljs-comment">//挂起系统核心设备（通常是时钟、计时器等关键硬件）</span><br>	<span class="hljs-keyword">if</span> (error) &#123;<br>		pr_err(<span class="hljs-string">&quot;Some system devices failed to power down, aborting\n&quot;</span>);<br>		<span class="hljs-keyword">goto</span> Enable_irqs;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (hibernation_test(TEST_CORE) || pm_wakeup_pending())		<span class="hljs-comment">//处理挂起测试与唤醒检测</span><br>		<span class="hljs-keyword">goto</span> Power_up;<br><br>	in_suspend = <span class="hljs-number">1</span>;<br>	save_processor_state();		<span class="hljs-comment">//保存处理器状态，包括寄存器、浮点状态等，以便恢复时重建。</span><br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;machine_suspend&quot;</span>), PM_EVENT_HIBERNATE, <span class="hljs-literal">true</span>);<br>	error = swsusp_arch_suspend();			<span class="hljs-comment">//进行体系结构相关的具体挂起操作</span><br>	<span class="hljs-comment">/* Restore control flow magically appears here */</span><br>	restore_processor_state();<br>	trace_suspend_resume(TPS(<span class="hljs-string">&quot;machine_suspend&quot;</span>), PM_EVENT_HIBERNATE, <span class="hljs-literal">false</span>);<br>	<span class="hljs-keyword">if</span> (error)<br>		pr_err(<span class="hljs-string">&quot;Error %d creating image\n&quot;</span>, error);<br><br>	<span class="hljs-keyword">if</span> (!in_suspend) &#123;<br>		events_check_enabled = <span class="hljs-literal">false</span>;<br>		clear_free_pages();<br>	&#125;<br><br>	platform_leave(platform_mode);<br><br> Power_up:<br>	syscore_resume();<br><br> Enable_irqs:<br>	system_state = SYSTEM_RUNNING;<br>	local_irq_enable();<br><br> Enable_cpus:<br>	suspend_enable_secondary_cpus();<br><br>	<span class="hljs-comment">/* Allow architectures to do nosmt-specific post-resume dances */</span><br>	<span class="hljs-keyword">if</span> (!in_suspend)<br>		error = arch_resume_nosmt();<br><br> Platform_finish:<br>	platform_finish(platform_mode);<br><br>	dpm_resume_start(in_suspend ?<br>		(error ? PMSG_RECOVER : PMSG_THAW) : PMSG_RESTORE);<br><br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h6 id="dpm-suspend-end"><a href="#dpm-suspend-end" class="headerlink" title="dpm_suspend_end"></a>dpm_suspend_end</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * dpm_suspend_end - Execute &quot;late&quot; and &quot;noirq&quot; device suspend callbacks.</span><br><span class="hljs-comment"> * @state: PM transition of the system being carried out.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">dpm_suspend_end</span><span class="hljs-params">(<span class="hljs-type">pm_message_t</span> state)</span><br>&#123;<br>	<span class="hljs-type">ktime_t</span> starttime = ktime_get();<br>	<span class="hljs-type">int</span> error;<br><br>	error = dpm_suspend_late(state);	<span class="hljs-comment">//进入设备挂起的late阶段，即设备挂起前的最后一个阶段</span><br>	<span class="hljs-keyword">if</span> (error)<br>		<span class="hljs-keyword">goto</span> out;<br><br>	error = dpm_suspend_noirq(state);	<span class="hljs-comment">//如果late挂起成功，则继续执行设备的noirq挂起回调，即无中断的设备挂起阶段</span><br>	<span class="hljs-keyword">if</span> (error)<br>		dpm_resume_early(resume_event(state));<br><br>out:<br>	dpm_show_time(starttime, state, error, <span class="hljs-string">&quot;end&quot;</span>);<br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br>EXPORT_SYMBOL_GPL(dpm_suspend_end);<br></code></pre></td></tr></table></figure>
+
+<h6 id="swsusp-arch-suspend"><a href="#swsusp-arch-suspend" class="headerlink" title="swsusp_arch_suspend"></a>swsusp_arch_suspend</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">swsusp_arch_suspend</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sleep_stack_data</span> <span class="hljs-title">state</span>;</span><br><br>	<span class="hljs-keyword">if</span> (cpus_are_stuck_in_kernel()) &#123;	<span class="hljs-comment">//此函数检查是否存在无法下线（offline）的CPU，通常是因为某些 CPU 被卡住在内核中，无法进入休眠状态</span><br>		pr_err(<span class="hljs-string">&quot;Can&#x27;t hibernate: no mechanism to offline secondary CPUs.\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -EBUSY;<br>	&#125;<br><br>	flags = local_daif_save();	<span class="hljs-comment">//保存当前中断状态标志。该函数保存当前的中断标志 DAIF（Debug, Abort, Interrupt, FIQ），以便稍后恢复</span><br><br>	<span class="hljs-keyword">if</span> (__cpu_suspend_enter(&amp;state)) &#123;		<span class="hljs-comment">//尝试进入 CPU 休眠状态</span><br>		<span class="hljs-comment">/* make the crash dump kernel image visible/saveable */</span><br>		crash_prepare_suspend();	<span class="hljs-comment">//使内核崩溃转储的内存区域可见，以便在休眠期间发生异常时可以记录调试信息。主要用于 kdump 调试。</span><br><br>		ret = swsusp_mte_save_tags();	<span class="hljs-comment">//保存 MTE 标记，用于标记内存块，检测内存越界或非法访问。</span><br>		<span class="hljs-keyword">if</span> (ret)<br>			<span class="hljs-keyword">return</span> ret;<br><br>		sleep_cpu = smp_processor_id();	<span class="hljs-comment">//获取当前执行的处理器 ID，存储到 sleep_cpu 变量，用于记录休眠时的CPU</span><br>		ret = swsusp_save();	<span class="hljs-comment">//系统休眠的核心操作，将当前内存状态保存创建</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-comment">/* Clean kernel core startup/idle code to PoC*/</span>		<span class="hljs-comment">//清理数据缓存的特定范围，确保内存一致性，避免缓存中的旧数据引发错误</span><br>		dcache_clean_range(__mmuoff_data_start, __mmuoff_data_end);<br>		dcache_clean_range(__idmap_text_start, __idmap_text_end);<br><br>		<span class="hljs-comment">/* Clean kvm setup code to PoC? */</span><br>		<span class="hljs-keyword">if</span> (el2_reset_needed()) &#123;		<span class="hljs-comment">//检查是否需要重置 EL2（Exception Level 2）。EL2主要用于虚拟化（KVM），如果需要重置则清理 Hypervisor相关代码缓存</span><br>			dcache_clean_range(__hyp_idmap_text_start, __hyp_idmap_text_end);<br>			dcache_clean_range(__hyp_text_start, __hyp_text_end);<br>		&#125;<br><br>		swsusp_mte_restore_tags();		<span class="hljs-comment">//恢复内存 MTE 标记，与保存阶段对应，确保内存访问的合法性</span><br><br>		<span class="hljs-comment">/* make the crash dump kernel image protected again */</span><br>		crash_post_resume();		<span class="hljs-comment">//恢复内核崩溃转储区域的保护状态，以确保调试信息不会被随意修改</span><br><br>		<span class="hljs-comment">/*</span><br><span class="hljs-comment">		 * Tell the hibernation core that we&#x27;ve just restored</span><br><span class="hljs-comment">		 * the memory</span><br><span class="hljs-comment">		 */</span><br>		in_suspend = <span class="hljs-number">0</span>;		<span class="hljs-comment">//标记系统已经恢复到活跃状态，不再处于挂起状态</span><br><br>		sleep_cpu = -EINVAL;	<span class="hljs-comment">//表示恢复时无效的 CPU ID，重置 sleep_cpu，避免误判</span><br>		__cpu_suspend_exit();	<span class="hljs-comment">//恢复 CPU 的休眠状态，允许再次进入休眠模式</span><br><br>		<span class="hljs-comment">/*</span><br><span class="hljs-comment">		 * Just in case the boot kernel did turn the SSBD</span><br><span class="hljs-comment">		 * mitigation off behind our back, let&#x27;s set the state</span><br><span class="hljs-comment">		 * to what we expect it to be.</span><br><span class="hljs-comment">		 */</span><br>		spectre_v4_enable_mitigation(<span class="hljs-literal">NULL</span>);		<span class="hljs-comment">//预防 Spectre V4 攻击，恢复对 “推测执行” 漏洞的缓解措施。Spectre 是一种 CPU 漏洞，可能导致数据泄漏</span><br>	&#125;<br><br>	local_daif_restore(flags);	<span class="hljs-comment">//恢复中断状态到保存的 flags，确保系统中断的正常工作</span><br><br>	<span class="hljs-keyword">return</span> ret;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>swsusp_save</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs c">asmlinkage __visible <span class="hljs-type">int</span> <span class="hljs-title function_">swsusp_save</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> nr_pages, nr_highmem;<br><br>	pr_info(<span class="hljs-string">&quot;Creating image:\n&quot;</span>);<br><br>	drain_local_pages(<span class="hljs-literal">NULL</span>);		<span class="hljs-comment">//清空本地 CPU 的页面缓存，防止在分配页表或快照时，缓存中的“冷页”（未使用页）影响内存状态的一致性</span><br>	nr_pages = count_data_pages();			<span class="hljs-comment">//计算内存页数</span><br>	nr_highmem = count_highmem_pages();<br>	pr_info(<span class="hljs-string">&quot;Need to copy %u pages\n&quot;</span>, nr_pages + nr_highmem);<br><br>	<span class="hljs-keyword">if</span> (!enough_free_mem(nr_pages, nr_highmem)) &#123;	<span class="hljs-comment">//检查系统可用的内存是否足够保存快照数据</span><br>		pr_err(<span class="hljs-string">&quot;Not enough free memory\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (swsusp_alloc(&amp;copy_bm, nr_pages, nr_highmem)) &#123;		<span class="hljs-comment">//分配页面拷贝位图</span><br>		pr_err(<span class="hljs-string">&quot;Memory allocation failed\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> -ENOMEM;<br>	&#125;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * During allocating of suspend pagedir, new cold pages may appear.</span><br><span class="hljs-comment">	 * Kill them.</span><br><span class="hljs-comment">	 */</span><br>	drain_local_pages(<span class="hljs-literal">NULL</span>);	<span class="hljs-comment">//再次清空本地 CPU 的页面缓存，确保没有新的冷页被分配，避免快照过程中状态不一致的问题</span><br>	copy_data_pages(&amp;copy_bm, &amp;orig_bm);		<span class="hljs-comment">//执行实际的内存页复制操作</span><br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * End of critical section. From now on, we can write to memory,</span><br><span class="hljs-comment">	 * but we should not touch disk. This specially means we must _not_</span><br><span class="hljs-comment">	 * touch swap space! Except we must write out our image of course.</span><br><span class="hljs-comment">	 */</span><br><br>	nr_pages += nr_highmem;<br>	nr_copy_pages = nr_pages;<br>	nr_meta_pages = DIV_ROUND_UP(nr_pages * <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">long</span>), PAGE_SIZE);<br><br>	pr_info(<span class="hljs-string">&quot;Image created (%d pages copied)\n&quot;</span>, nr_pages);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="swsusp-write"><a href="#swsusp-write" class="headerlink" title="swsusp_write"></a>swsusp_write</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> *	swsusp_write - Write entire image and metadata.</span><br><span class="hljs-comment"> *	@flags: flags to pass to the &quot;boot&quot; kernel in the image header</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> *	It is important _NOT_ to umount filesystems at this point. We want</span><br><span class="hljs-comment"> *	them synced (in case something goes wrong) but we DO not want to mark</span><br><span class="hljs-comment"> *	filesystem clean: it is not. (And it does not matter, if we resume</span><br><span class="hljs-comment"> *	correctly, we&#x27;ll mark system clean, anyway.)</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">swsusp_write</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> flags)</span><br>&#123;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">swap_map_handle</span> <span class="hljs-title">handle</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">snapshot_handle</span> <span class="hljs-title">snapshot</span>;</span><br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">swsusp_info</span> *<span class="hljs-title">header</span>;</span><br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> pages;<br>	<span class="hljs-type">int</span> error;<br><br>	pages = snapshot_get_image_size();	<span class="hljs-comment">//获取要写入的页面数量</span><br>	error = get_swap_writer(&amp;handle);	<span class="hljs-comment">//获取 swap 句柄</span><br>	<span class="hljs-keyword">if</span> (error) &#123;<br>		pr_err(<span class="hljs-string">&quot;Cannot get swap writer\n&quot;</span>);<br>		<span class="hljs-keyword">return</span> error;<br>	&#125;<br>	<span class="hljs-keyword">if</span> (flags &amp; SF_NOCOMPRESS_MODE) &#123;	<span class="hljs-comment">//SF_NOCOMPRESS_MODE不压缩模式</span><br>		<span class="hljs-keyword">if</span> (!enough_swap(pages)) &#123;		<span class="hljs-comment">//检查是否有足够的交换空间</span><br>			pr_err(<span class="hljs-string">&quot;Not enough free swap\n&quot;</span>);<br>			error = -ENOSPC;<br>			<span class="hljs-keyword">goto</span> out_finish;<br>		&#125;<br>	&#125;<br>	<span class="hljs-built_in">memset</span>(&amp;snapshot, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> snapshot_handle));<br>	error = snapshot_read_next(&amp;snapshot);		<span class="hljs-comment">//读取快照数据到 snapshot 结构体中</span><br>	<span class="hljs-keyword">if</span> (error &lt; (<span class="hljs-type">int</span>)PAGE_SIZE) &#123;<br>		<span class="hljs-keyword">if</span> (error &gt;= <span class="hljs-number">0</span>)<br>			error = -EFAULT;<br><br>		<span class="hljs-keyword">goto</span> out_finish;<br>	&#125;<br>	header = (<span class="hljs-keyword">struct</span> swsusp_info *)data_of(snapshot);	<span class="hljs-comment">//从 snapshot 结构体中获取快照头信息，并转换为 struct swsusp_info 结构体指针 header</span><br>	error = swap_write_page(&amp;handle, header, <span class="hljs-literal">NULL</span>);		<span class="hljs-comment">//将快照头信息写入交换分区中</span><br>	<span class="hljs-keyword">if</span> (!error) &#123;		<span class="hljs-comment">//写入内存快照数据</span><br>		error = (flags &amp; SF_NOCOMPRESS_MODE) ?<br>			save_image(&amp;handle, &amp;snapshot, pages - <span class="hljs-number">1</span>) :		<span class="hljs-comment">//直接写入不压缩的快照数据</span><br>			save_image_lzo(&amp;handle, &amp;snapshot, pages - <span class="hljs-number">1</span>);	<span class="hljs-comment">//将快照数据进行 LZO 压缩后再写入</span><br>	&#125;<br>out_finish:<br>	error = swap_writer_finish(&amp;handle, flags, error);		<span class="hljs-comment">//负责关闭交换区写入句柄并执行清理操作</span><br>	<span class="hljs-keyword">return</span> error;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="power-down"><a href="#power-down" class="headerlink" title="power_down"></a>power_down</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * power_down - Shut the machine down for hibernation.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Use the platform driver, if configured, to put the system into the sleep</span><br><span class="hljs-comment"> * state corresponding to hibernation, or try to power it off or reboot,</span><br><span class="hljs-comment"> * depending on the value of hibernation_mode.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">power_down</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_SUSPEND</span><br>	<span class="hljs-type">int</span> error;<br><br>	<span class="hljs-keyword">if</span> (hibernation_mode == HIBERNATION_SUSPEND) &#123;<br>		error = suspend_devices_and_enter(PM_SUSPEND_MEM);<br>		<span class="hljs-keyword">if</span> (error) &#123;<br>			hibernation_mode = hibernation_ops ?<br>						HIBERNATION_PLATFORM :<br>						HIBERNATION_SHUTDOWN;<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-comment">/* Restore swap signature. */</span><br>			error = swsusp_unmark();<br>			<span class="hljs-keyword">if</span> (error)<br>				pr_err(<span class="hljs-string">&quot;Swap will be unusable! Try swapon -a.\n&quot;</span>);<br><br>			<span class="hljs-keyword">return</span>;<br>		&#125;<br>	&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>	<span class="hljs-keyword">switch</span> (hibernation_mode) &#123;<br>	<span class="hljs-keyword">case</span> HIBERNATION_REBOOT:<br>		kernel_restart(<span class="hljs-literal">NULL</span>);<br>		<span class="hljs-keyword">break</span>;<br>	<span class="hljs-keyword">case</span> HIBERNATION_PLATFORM:<br>		hibernation_platform_enter();<br>		fallthrough;<br>	<span class="hljs-keyword">case</span> HIBERNATION_SHUTDOWN:<br>		<span class="hljs-keyword">if</span> (pm_power_off)<br>			kernel_power_off();<br>		<span class="hljs-keyword">break</span>;<br>	&#125;<br>	kernel_halt();		<span class="hljs-comment">//终止所有设备操作和 CPU 指令，使系统停止运行</span><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * Valid image is on the disk, if we continue we risk serious data</span><br><span class="hljs-comment">	 * corruption after resume.</span><br><span class="hljs-comment">	 */</span><br>	pr_crit(<span class="hljs-string">&quot;Power down manually\n&quot;</span>);<br>	<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>)<br>		cpu_relax();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Power-Management/" class="category-chain-item">Power Management</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Power-Management/" class="print-no-link">#Power Management</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Hibernate (kernel 5.10)</div>
+      <div>https://tomwithkernel.github.io/pm/Hibernate/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月18日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年3月26日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/config/clangd/" title="Clangd配置">
+                        <span class="hidden-mobile">Clangd配置</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
