@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>wakeup</title>
+    <link href="/pm/wakeup/"/>
+    <url>/pm/wakeup/</url>
+    
+    <content type="html"><![CDATA[<h3 id="usb-wakeup"><a href="#usb-wakeup" class="headerlink" title="usb wakeup"></a>usb wakeup</h3><h4 id="开启鼠标键盘唤醒"><a href="#开启鼠标键盘唤醒" class="headerlink" title="开启鼠标键盘唤醒"></a>开启鼠标键盘唤醒</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">usbhid_start</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> hid_device *hid)</span><br>&#123;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">usb_interface</span> *<span class="hljs-title">intf</span> =</span> to_usb_interface(hid-&gt;dev.parent);<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">usb_host_interface</span> *<span class="hljs-title">interface</span> =</span> intf-&gt;cur_altsetting;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">usb_device</span> *<span class="hljs-title">dev</span> =</span> interface_to_usbdev(intf);<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">usbhid_device</span> *<span class="hljs-title">usbhid</span> =</span> hid-&gt;driver_data;<br><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> n, insize = <span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> ret;<br><br>mutex_lock(&amp;usbhid-&gt;mutex);<br>    ...<br>    ...<br><span class="hljs-comment">/* Some keyboards don&#x27;t work until their LEDs have been set.</span><br><span class="hljs-comment"> * Since BIOSes do set the LEDs, it must be safe for any device</span><br><span class="hljs-comment"> * that supports the keyboard boot protocol.</span><br><span class="hljs-comment"> * In addition, enable remote wakeup by default for all keyboard</span><br><span class="hljs-comment"> * devices supporting the boot protocol.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">if</span> (interface-&gt;desc.bInterfaceSubClass == USB_INTERFACE_SUBCLASS_BOOT) &#123;<br><span class="hljs-keyword">if</span> (interface-&gt;desc.bInterfaceProtocol == USB_INTERFACE_PROTOCOL_KEYBOARD) &#123;<span class="hljs-comment">//键盘唤醒</span><br>usbhid_set_leds(hid);<br>device_set_wakeup_enable(&amp;dev-&gt;dev, <span class="hljs-number">1</span>);<br>&#125;<br><span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (interface-&gt;desc.bInterfaceProtocol == USB_INTERFACE_PROTOCOL_MOUSE) &#123;<span class="hljs-comment">//鼠标唤醒</span><br>device_set_wakeup_enable(&amp;dev-&gt;dev, <span class="hljs-number">1</span>);<br>&#125;<br>&#125;<br>    ...<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>pm</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>usb</tag>
+      
+      <tag>pm</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>kabi检查</title>
     <link href="/CICD/kabi%E6%A3%80%E6%9F%A5/"/>
     <url>/CICD/kabi%E6%A3%80%E6%9F%A5/</url>
