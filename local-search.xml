@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>linux上游提交步骤</title>
+    <link href="/upstream/linux%E4%B8%8A%E6%B8%B8%E6%8F%90%E4%BA%A4%E6%96%B9%E6%B3%95/"/>
+    <url>/upstream/linux%E4%B8%8A%E6%B8%B8%E6%8F%90%E4%BA%A4%E6%96%B9%E6%B3%95/</url>
+    
+    <content type="html"><![CDATA[<h3 id="linux上游提交步骤"><a href="#linux上游提交步骤" class="headerlink" title="linux上游提交步骤"></a>linux上游提交步骤</h3><h4 id="下载linux内核源码"><a href="#下载linux内核源码" class="headerlink" title="下载linux内核源码"></a>下载linux内核源码</h4><ul><li>通过<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/">kernel.org</a>下载</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git<br></code></pre></td></tr></table></figure><ul><li>通过<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华镜像</a>下载</li></ul><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://mirrors.tuna.tsinghua.edu.cn/git/linux.git<br></code></pre></td></tr></table></figure><h4 id="commit信息要求"><a href="#commit信息要求" class="headerlink" title="commit信息要求"></a>commit信息要求</h4><ul><li>第一部分：以子系统名字开头，例如dev&#x2F;parport，注意冒号后面加个空格，这一部分主要描述此patch大概做了什么事情</li><li>第二部分：详细解释你为何要做这个修改以及怎么修复问题的</li><li>第三部分：添加提交人</li></ul><div class="note note-warning">            <p>这三部分之间都要有一个空行隔开 ，每行不要超过75个字符</p>          </div><p>然后生成patch <code>git format-patch -1</code></p><h4 id="检查patch的格式"><a href="#检查patch的格式" class="headerlink" title="检查patch的格式"></a>检查patch的格式</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./scripts/checkpatch.pl 0001-XXX.patch<br></code></pre></td></tr></table></figure><h4 id="获取maintainer邮箱"><a href="#获取maintainer邮箱" class="headerlink" title="获取maintainer邮箱"></a>获取maintainer邮箱</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">./scripts/get_maintainer.pl -f kernel/power/console.c<br></code></pre></td></tr></table></figure><h4 id="配置-gitconfig"><a href="#配置-gitconfig" class="headerlink" title="配置.gitconfig"></a>配置.gitconfig</h4><p>在发送patch之前需要先配置好gitconfig</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">vim ~/.gitconfig<br></code></pre></td></tr></table></figure><p>添加以下内容</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">[user]<br>     email = tom@tom.com<br>     name = tom<br>[sendemail]                                                                                      smtpencryption = ssl                                                                        smtpserver = smtp.exmail.qq.com                                                            smtpserverport = 465                                                                       smtpuser = XXX@XXX.com<br>     smtppass = XXXXXX<br>[core]<br>     editor = vim<br></code></pre></td></tr></table></figure><p>或者使用命令进行设置</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell">git config --global sendemail.smtpencryption tls//加密方式<br>git config --global sendemail.smtpserver smtp.263.net//smtp发送邮件服务器<br>git config --global sendemail.smtpserverport 465//smtp发送邮件服务器端口<br>git config --global sendemail.smtpuser &lt;账号&gt;//公司邮箱账号<br>git config --global sendemail.smtppass &lt;密码&gt;//公司邮箱密码<br></code></pre></td></tr></table></figure><p>以上信息通过自己使用的邮箱获取，例如企业微信如下所示</p><img src="/upstream/linux%E4%B8%8A%E6%B8%B8%E6%8F%90%E4%BA%A4%E6%96%B9%E6%B3%95/a.png" class="" title="a"><h4 id="发送邮件"><a href="#发送邮件" class="headerlink" title="发送邮件"></a>发送邮件</h4><p>使用git send-email发送邮件</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt install git-email<br><br>git send-email -to pavel@kernel.org,len.brown@intel.com -cc linux-kernel@vger.kernel.org,linux-pm@vger.kernel.org 0001-XXX.patch<br><br></code></pre></td></tr></table></figure><h4 id="回复邮件"><a href="#回复邮件" class="headerlink" title="回复邮件"></a>回复邮件</h4><p>对于上游如果看到你的邮件以后你可以进行回复，发送的邮件在<a href="https://lore.kernel.org/">Linux内核邮件列表归档</a>查看，在最下面可以看到回复的方法</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">git send-email \<br>    --in-reply-to=20250519000000.00000-0-xxx@xxx.com \<br>    --to=xxx@xxx.com \<br>    --cc=len.brown@intel.com \<br>    --cc=linux-kernel@vger.kernel.org \<br>    --cc=linux-pm@vger.kernel.org \<br>    --cc=pavel@kernel.org \<br>    --cc=rafael@kernel.org \<br>    /path/to/YOUR_REPLY<br></code></pre></td></tr></table></figure><h4 id="更新patch版本"><a href="#更新patch版本" class="headerlink" title="更新patch版本"></a>更新patch版本</h4><p>对于上游给出的建议我们可能需要修改自己的补丁进行patch的版本更新</p><p>生成patch v2 给Subject添加头信息[PATCH v2]</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git format-patch -v2 -1<br></code></pre></td></tr></table></figure><p>修改commit信息</p><p>在Signed-off-by下面关于patch版本的修改</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell">Signed-off-by: tom@tom.com<br>---<br>Changes in v2:<br>- Added how to fix this issue.<br>- Link to v1: https://lore.kernel.org/all/20250519000000.00000-0-xxx@xxx.com<br><br><br>Signed-off-by: Author &lt;author@mail&gt;<br>---<br>V2 -&gt; V3: Removed redundant helper function<br>V1 -&gt; V2: Cleaned up coding style and addressed review comments<br></code></pre></td></tr></table></figure><h4 id="重发邮件"><a href="#重发邮件" class="headerlink" title="重发邮件"></a>重发邮件</h4><p>由于上游每天收到很多邮件，可能会导致我们的邮件没有被看见或者及时回复，通常为 2-3 周我们会收到回复，如果没有回复我们可以重新发送patch，在重新发送邮件的时候至少等待一周时间，在合并窗口等繁忙时段可能会更长。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">vim XXX.patch<br><br>Subject: [PATCH v2] #修改此行<br>Subject: [PATCH v2 RESEND]<br></code></pre></td></tr></table></figure><h4 id="上游参考手册"><a href="#上游参考手册" class="headerlink" title="上游参考手册"></a>上游参考手册</h4><p>更多详细方法可以参考<a href="https://www.kernel.org/doc/Documentation/process/submitting-patches.rst">submitting-patches.rst</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>upstream</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>upstream</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>wakeup</title>
     <link href="/pm/wakeup/"/>
     <url>/pm/wakeup/</url>
@@ -353,9 +378,9 @@
     
     <tags>
       
-      <tag>Power Management</tag>
-      
       <tag>usb</tag>
+      
+      <tag>Power Management</tag>
       
     </tags>
     
