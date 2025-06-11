@@ -308,7 +308,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Linux内核Kernel启动过程"><a href="#Linux内核Kernel启动过程" class="headerlink" title="Linux内核Kernel启动过程"></a>Linux内核Kernel启动过程</h1><h2 id="内核启动的基本流程"><a href="#内核启动的基本流程" class="headerlink" title="内核启动的基本流程"></a>内核启动的基本流程</h2><img src="/boot/boot/boot1.png" srcset="/img/loading.gif" lazyload class="" title="boot1">
+                <h1 id="Linux内核Kernel启动过程"><a href="#Linux内核Kernel启动过程" class="headerlink" title="Linux内核Kernel启动过程"></a>Linux内核Kernel启动过程</h1><h2 id="内核启动的基本流程"><a href="#内核启动的基本流程" class="headerlink" title="内核启动的基本流程"></a>内核启动的基本流程</h2><img src="/boot/boot/boot1.png" srcset="/img/loading.gif" lazyload class title="boot1">
 
 <h3 id="启动加载程序-Bootloader"><a href="#启动加载程序-Bootloader" class="headerlink" title="启动加载程序 (Bootloader)"></a>启动加载程序 (Bootloader)</h3><p>启动加载程序（如GRUB、LILO、syslinux等）负责将内核映像从存储设备加载到内存中，并准备好内核启动所需的环境。</p>
 <ul>
@@ -389,7 +389,7 @@
 <li><strong>zImage</strong>：在一些早期的 Android 设备上，内核映像可能采用 zImage 格式。这种格式的内核映像通常会被启动加载程序直接加载并解压，然后启动内核。</li>
 <li><strong>Image.gz</strong>：Image.gz 是指经过 gzip 压缩的内核映像。这种格式的内核映像通常是 Linux 内核编译过程中生成的 vmlinuz 文件，只是在 Android 系统中可能被重新命名为 Image.gz。启动加载程序会加载这个压缩的内核映像，并在加载到内存后解压缩，然后启动内核。</li>
 </ul>
-<h3 id="内核加载过程"><a href="#内核加载过程" class="headerlink" title="内核加载过程"></a>内核加载过程</h3><img src="/boot/boot/boot2.png" srcset="/img/loading.gif" lazyload class="" title="boot2">
+<h3 id="内核加载过程"><a href="#内核加载过程" class="headerlink" title="内核加载过程"></a>内核加载过程</h3><img src="/boot/boot/boot2.png" srcset="/img/loading.gif" lazyload class title="boot2">
 
 <h4 id="内核映像加载到内存中"><a href="#内核映像加载到内存中" class="headerlink" title="内核映像加载到内存中"></a>内核映像加载到内存中</h4><p>启动加载程序（Bootloader）负责将压缩的内核映像加载到内存中，并准备好启动内核的环境。</p>
 <ul>
@@ -508,7 +508,7 @@
 <li>2号进程通过kthreadd创建</li>
 </ul>
 <p>0号进程-&gt;1号内核进程-&gt;1号用户进程（init进程）-&gt;getty进程-&gt;shell进程</p>
-<img src="/boot/boot/boot3.png" srcset="/img/loading.gif" lazyload class="" title="boot3">
+<img src="/boot/boot/boot3.png" srcset="/img/loading.gif" lazyload class title="boot3">
 
 <h3 id="rest-init函数-初始化入口"><a href="#rest-init函数-初始化入口" class="headerlink" title="rest_init函数-初始化入口"></a><code>rest_init</code>函数-初始化入口</h3><p>rest_init函数负责创建初始进程并进行一些进一步的初始化工作。其代码实现如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> noinline <span class="hljs-type">void</span> __ref <span class="hljs-title function_">rest_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    <span class="hljs-comment">// 通知RCU（Read-Copy Update）子系统，调度器即将开始。这是确保RCU在调度器开始运行前正确初始化的关键步骤。</span><br>    rcu_scheduler_starting();<br>    <span class="hljs-comment">// 创建pid=1的1号进程</span><br>    pid = kernel_thread(kernel_init, <span class="hljs-literal">NULL</span>, CLONE_FS);<br>    <span class="hljs-comment">/** 处理1号进程相关代码 **/</span><br>    <br>    <span class="hljs-comment">// 创建pid=2的2号进程</span><br>    pid = kernel_thread(kthreadd, <span class="hljs-literal">NULL</span>, CLONE_FS | CLONE_FILES);<br>    <span class="hljs-comment">/** 处理2号进程相关代码 **/</span><br>    <span class="hljs-comment">/** 其他初始化代码 **/</span><br>&#125;<br></code></pre></td></tr></table></figure>

@@ -315,12 +315,12 @@
 <li>联想昭阳k4e-iml 待机自动唤醒</li>
 </ul>
 <p>首先我们看一下日志</p>
-<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" srcset="/img/loading.gif" lazyload class="" title="log">
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml.png" srcset="/img/loading.gif" lazyload class title="log">
 
 <p>我们可以看到在准备Disabling non-boot CPUs 的时候检测到wakeup事件了（wake up pending），abort CPU freeze</p>
 <p>一般这个wakeup事件产生可能是某些设备下电的时候出现异常，或者此时外部设备来了一个中断，打断S3的操作导致S3停止</p>
 <h3 id="S3-待机流程"><a href="#S3-待机流程" class="headerlink" title="S3 待机流程"></a>S3 待机流程</h3><p>我们先来了解一下S3的流程是怎么样的</p>
-<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" srcset="/img/loading.gif" lazyload class="" title="S3待机流程">
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/S3%E5%BE%85%E6%9C%BA.png" srcset="/img/loading.gif" lazyload class title="S3待机流程">
 
 <p>如上图所示，这是S3待机过程的流程图，简单介绍一下：</p>
 <ul>
@@ -339,10 +339,10 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">pm_system_irq_wakeup</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> irq_number)</span><br>&#123;<br>	<span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> flags;<br><br>	raw_spin_lock_irqsave(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">0</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">0</span>] = irq_number;<br>	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (wakeup_irq[<span class="hljs-number">1</span>] == <span class="hljs-number">0</span>)<br>		wakeup_irq[<span class="hljs-number">1</span>] = irq_number;<br>	<span class="hljs-keyword">else</span><br>		irq_number = <span class="hljs-number">0</span>;<br><br>	raw_spin_unlock_irqrestore(&amp;wakeup_irq_lock, flags);<br><br>	<span class="hljs-keyword">if</span> (irq_number)<br>		pm_system_wakeup();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>在这个函数里面我们可以添加printk打印出中断号，或者可以使用bpftrace工具进行打印，kprobe:pm_system_irq_wakeup</p>
-<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" srcset="/img/loading.gif" lazyload class="" title="int">
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/k4e-iml1.png" srcset="/img/loading.gif" lazyload class title="int">
 
 <p>此时发现中断号为122，接下来通过cat &#x2F;proc&#x2F;interrupts 查看这个中断相应的中断处理程序</p>
-<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" srcset="/img/loading.gif" lazyload class="" title="irq">
+<img src="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/122-irq.png" srcset="/img/loading.gif" lazyload class title="irq">
 
 <p>此中断所挂载的相关中断处理程序是aerdrv和pcie-dpc，这2个中断处理程序主要负责处理pcie上面的错误信号的</p>
 <p>通过lspci -tv查看到这个pcie总线上挂载了一张amd的显卡，此时基本可以判断问题出在显卡驱动上面</p>

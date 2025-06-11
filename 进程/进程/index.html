@@ -309,7 +309,7 @@
                 <h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体</p>
 <p>​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）</p>
 <p>​	Linux使用轻量级进程（lightweight process）对多线程应用程序提供更好的支持。两个轻量级进程基本上可以共享一些资源，诸如地址空间、打开的文件等等。只要其中一个修改共享资源，另一个就立即查看这种修改。当然，当两个线程访问共享资源时就必须同步它们自己。</p>
-<h3 id="进程描述符"><a href="#进程描述符" class="headerlink" title="进程描述符"></a>进程描述符</h3><img src="/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/process1.png" srcset="/img/loading.gif" lazyload class="" title="process1">
+<h3 id="进程描述符"><a href="#进程描述符" class="headerlink" title="进程描述符"></a>进程描述符</h3><img src="/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/process1.png" srcset="/img/loading.gif" lazyload class title="process1">
 
 <h4 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h4><p>state字段描述了进程当前所处的状态</p>
 <p>可运行状态（TASK_RUNNING)<br>        进程要么在CPU上执行，要么准备执行。</p>

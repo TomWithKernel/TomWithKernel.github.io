@@ -319,7 +319,7 @@
 <p>通过strace可以看到最后数据的返回是通过hdr-&gt;dxferp返回给用户空间的</p>
 <p>感兴趣的小伙伴可以使用ftrace跟踪一下底层调用流程，我看到的是scsi会通过dma_map映射一片空间然后发送inquiry命令给硬盘查询硬盘数据最后返回上来，但是我们魔改没必要修改太底层的代码</p>
 <p>此时我们可以解析一下dxferp返回数据的内容，从第5个字节开始是真正的SN号</p>
-<img src="/bug/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png" srcset="/img/loading.gif" lazyload class="" title="sn_buffer">
+<img src="/bug/%E4%BF%AE%E6%94%B9%E7%A1%AC%E7%9B%98SN%E5%8F%B7/sn_buffer.png" srcset="/img/loading.gif" lazyload class title="sn_buffer">
 
 <p>前面为控制字段，第四个字节为长度控制</p>
 <p>0x80 代表单元序列号VPD 页面，0x00为保留字节</p>

@@ -321,7 +321,7 @@
 <p>以上函数参数的含义如下。<br>1）inode和fp用来确定被操作的设备。<br>2）request就是用户程序下发的命令。<br>3）args就是用户程序在必要时传递的参数。</p>
 <p>返回值：可以在函数体中随意定义返回值，这个返回值也会被直接返回到用户程序中。通常使用非负数表示正确的返回，而返回一个负数系统会判定为ioctl调用失败。</p>
 <p>三、用户与驱动之间的ioctl协议构成<br>也就是request或cmd，本质上就是一个32位数字，理论上可以是任何一个数，但为了保证命令码的唯一性，linux定义了一套严格的规定，通过计算得到这个命令吗数字。linux将32位划分为四段</p>
-<img src="/ioctl/ioctl/ioctl.png" srcset="/img/loading.gif" lazyload class="" title="ioctl">
+<img src="/ioctl/ioctl/ioctl.png" srcset="/img/loading.gif" lazyload class title="ioctl">
 
 <ul>
 <li>dir，即direction，表示ioctl命令的访问模式，分为无数据(_IO)、读数据(_IOR)、写数据(_IOW)、读写数据(_IOWR)四种模式。</li>

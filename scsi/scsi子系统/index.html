@@ -307,7 +307,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="scsi子系统"><a href="#scsi子系统" class="headerlink" title="scsi子系统"></a>scsi子系统</h2><h3 id="硬件模型"><a href="#硬件模型" class="headerlink" title="硬件模型"></a>硬件模型</h3><img src="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_dev.png" srcset="/img/loading.gif" lazyload class="" title="scsi_hardware"> 
+                <h2 id="scsi子系统"><a href="#scsi子系统" class="headerlink" title="scsi子系统"></a>scsi子系统</h2><h3 id="硬件模型"><a href="#硬件模型" class="headerlink" title="硬件模型"></a>硬件模型</h3><img src="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_dev.png" srcset="/img/loading.gif" lazyload class title="scsi_hardware"> 
 
 <p>上图为scsi子系统的硬件拓扑图：</p>
 <ul>
@@ -337,7 +337,7 @@
 <p>因此这里的host(0),host(1)…host(k)是一个控制器抽象描述，真实的控制器可以是ufs、usb上接着的硬盘控制器(这个应该画在soc外面)或者pcie上挂着的硬盘控制器(这个也应该画在soc外面)。</p>
 <h4 id="device-0-k"><a href="#device-0-k" class="headerlink" title="device(0-k)"></a>device(0-k)</h4><p>图示中，例子device(0)是连接到host(0)控制器上的外设；device(k)是连接到host(k)控制器上的外设。外设可以是硬盘，光驱，ufs等。</p>
 <p>Host和device之间的连接方式用了一个双箭头表示，它是一个抽象描述，代表scsi命令通道。</p>
-<img src="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_2.png" srcset="/img/loading.gif" lazyload class="" title="scsi"> 
+<img src="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/scsi_2.png" srcset="/img/loading.gif" lazyload class title="scsi"> 
 
 <p>Scsi只是一个协议，因此各种五花八门的控制器都可以使用scsi进行交互。因此这个“通道”是借助各种控制器的驱动来完成的。有点像协议分层，scsi类似于协议层，而物理层，链路层则交给了各种控制器去完成。</p>
 <h4 id="channel-id"><a href="#channel-id" class="headerlink" title="channel + id"></a>channel + id</h4><h5 id="SCSI-channel"><a href="#SCSI-channel" class="headerlink" title="SCSI channel"></a>SCSI channel</h5><ul>

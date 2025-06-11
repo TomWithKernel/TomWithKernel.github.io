@@ -395,7 +395,7 @@
 <p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
 <p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
 <p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
-<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png" srcset="/img/loading.gif" lazyload class="" title="page">
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png" srcset="/img/loading.gif" lazyload class title="page">
 
 <h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
 <ul>
@@ -404,7 +404,7 @@
 <li>页中级目录</li>
 <li>页表</li>
 </ul>
-<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png" srcset="/img/loading.gif" lazyload class="" title="linux_page">
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png" srcset="/img/loading.gif" lazyload class title="linux_page">
 
 
 

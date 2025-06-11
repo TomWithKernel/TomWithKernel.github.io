@@ -1,0 +1,913 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/tom.png">
+  <link rel="icon" href="/img/tom.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Tom">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="根文件系统根文件系统常见目录1、&#x2F;bin 目录此目录下存放着系统需要的可执行文件，一般都是一些命令，比如 ls、mv 等命令。此目录下的命令所有的客户都可以使用。 2、&#x2F;dev 目录dev 是 device 的缩写，所以此目录下的文件都是和设备有关的，此目录下的文件都是设备文件。在 Linux 下一切皆文件，即使是硬件设备，也是以文件的形式存在的，比如&#x2F;dev&amp;#x2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="根文件系统">
+<meta property="og:url" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="TomWithKernel&#39;s Blog">
+<meta property="og:description" content="根文件系统根文件系统常见目录1、&#x2F;bin 目录此目录下存放着系统需要的可执行文件，一般都是一些命令，比如 ls、mv 等命令。此目录下的命令所有的客户都可以使用。 2、&#x2F;dev 目录dev 是 device 的缩写，所以此目录下的文件都是和设备有关的，此目录下的文件都是设备文件。在 Linux 下一切皆文件，即使是硬件设备，也是以文件的形式存在的，比如&#x2F;dev&amp;#x2">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/a.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/b.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/c.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/d.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/e.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/f.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/g.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/h.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/i.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/j.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/k.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/m.png">
+<meta property="article:published_time" content="2025-06-06T01:34:33.000Z">
+<meta property="article:modified_time" content="2025-06-11T07:30:33.097Z">
+<meta property="article:author" content="Tom">
+<meta property="article:tag" content="rootfs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/a.png">
+  
+  
+  
+  <title>根文件系统 - TomWithKernel&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/scrollAnimation.css">
+<link rel="stylesheet" href="/css/cloudedGlass.css">
+<link rel="stylesheet" href="/css/selection.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>TomWithKernel&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="根文件系统"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-06-06 09:34" pubdate>
+          2025年6月6日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          138 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">根文件系统</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="根文件系统"><a href="#根文件系统" class="headerlink" title="根文件系统"></a>根文件系统</h3><h4 id="根文件系统常见目录"><a href="#根文件系统常见目录" class="headerlink" title="根文件系统常见目录"></a>根文件系统常见目录</h4><h5 id="1、-bin-目录"><a href="#1、-bin-目录" class="headerlink" title="1、&#x2F;bin 目录"></a>1、&#x2F;bin 目录</h5><p>此目录下存放着系统需要的可执行文件，一般都是一些命令，比如 ls、mv 等命令。此目录下的命令所有的客户都可以使用。</p>
+<h5 id="2、-dev-目录"><a href="#2、-dev-目录" class="headerlink" title="2、&#x2F;dev 目录"></a>2、&#x2F;dev 目录</h5><p>dev 是 device 的缩写，所以此目录下的文件都是和设备有关的，此目录下的文件都是设备文件。在 Linux 下一切皆文件，即使是硬件设备，也是以文件的形式存在的，比如&#x2F;dev&#x2F;ttyS0就表示PC的串口 0，我们要想通过串口 0发送或者接收数据就要操作文件&#x2F;dev&#x2F;ttyS0，通过对文件&#x2F;dev&#x2F;ttyS0 的读写操作来实现串口0 的数据收发。</p>
+<h5 id="3、-etc-目录"><a href="#3、-etc-目录" class="headerlink" title="3、&#x2F;etc 目录"></a>3、&#x2F;etc 目录</h5><p>此目录下存放着各种配置文件。</p>
+<h5 id="4、-lib-目录"><a href="#4、-lib-目录" class="headerlink" title="4、&#x2F;lib 目录"></a>4、&#x2F;lib 目录</h5><p>lib 是 library 的简称，也就是库的意思，因此此目录下存放着 Linux 所必须的库文件。这些库文件是共享库，命令和用户编写的应用程序要使用这些库文件。</p>
+<h5 id="5、-mnt-目录"><a href="#5、-mnt-目录" class="headerlink" title="5、&#x2F;mnt 目录"></a>5、&#x2F;mnt 目录</h5><p>临时挂载目录，一般是空目录，可以在此目录下创建空的子目录，比如&#x2F;mnt&#x2F;sd、&#x2F;mnt&#x2F;usb，这样就可以将 SD 卡或者 U 盘挂载到&#x2F;mnt&#x2F;sd 或者&#x2F;mnt&#x2F;usb 目录中。</p>
+<h5 id="6、-proc-目录"><a href="#6、-proc-目录" class="headerlink" title="6、&#x2F;proc 目录"></a>6、&#x2F;proc 目录</h5><p>此目录一般是空的，当 Linux 系统启动以后会将此目录作为 proc 文件系统的挂载点，proc是个虚拟文件系统，没有实际的存储设备。proc 里面的文件都是临时存在的，一般用来存储系统运行信息文件。</p>
+<h5 id="7、-usr-目录"><a href="#7、-usr-目录" class="headerlink" title="7、&#x2F;usr 目录"></a>7、&#x2F;usr 目录</h5><p>要注意，usr 不是 user 的缩写，而是 Unix Software Resource 的缩写，也就是 Unix 操作系统软件资源目录。这里有个小知识点，那就是 Linux 一般被称为类 Unix 操作系统，苹果的 MacOS也是类 Unix 操作系统。关于 Linux 和 Unix 操作系统的渊源大家可以直接在网上找 Linux 的发展历史来看。既然是软件资源目录，因此&#x2F;usr 目录下也存放着很多软件，一般系统安装完成以后此目录占用的空间最多。</p>
+<h5 id="8、-var-目录"><a href="#8、-var-目录" class="headerlink" title="8、&#x2F;var 目录"></a>8、&#x2F;var 目录</h5><p>此目录存放一些可以改变的数据。</p>
+<h5 id="9、-sbin-目录"><a href="#9、-sbin-目录" class="headerlink" title="9、&#x2F;sbin 目录"></a>9、&#x2F;sbin 目录</h5><p>此目录页用户存放一些可执行文件，但是此目录下的文件或者说命令只有管理员才能使用，主要用户系统管理。</p>
+<h5 id="10、-sys-目录"><a href="#10、-sys-目录" class="headerlink" title="10、&#x2F;sys 目录"></a>10、&#x2F;sys 目录</h5><p>系统启动以后此目录作为 sysfs 文件系统的挂载点，sysfs 是一个类似于 proc 文件系统的特殊文件系统，sysfs 也是基于 ram 的文件系统，也就是说它也没有实际的存储设备。此目录是系统设备管理的重要目录，此目录通过一定的组织结构向用户提供详细的内核数据结构信息。</p>
+<h5 id="11、-opt-目录"><a href="#11、-opt-目录" class="headerlink" title="11、&#x2F;opt 目录"></a>11、&#x2F;opt 目录</h5><p>可选的文件、软件存放区，由用户选择将哪些文件或软件放到此目录中。</p>
+<h4 id="BusyBox-构建根文件系统"><a href="#BusyBox-构建根文件系统" class="headerlink" title="BusyBox 构建根文件系统"></a>BusyBox 构建根文件系统</h4><h5 id="BusyBox-简介"><a href="#BusyBox-简介" class="headerlink" title="BusyBox 简介"></a>BusyBox 简介</h5><p>BusyBox！其名字分为“Busy”和“Box”，也就是忙碌的盒子。盒子是用来放东西的，忙碌的是因为它要提供根文件系统所需的文件，所以忙碌。BusyBox 是一个集成了大量的 Linux 命令和工具的软件，像 ls、mv、ifconfig 等命令 BusyBox 都会提供。BusyBox 就是一个大的工具箱，这个工具箱里面集成了 Linux 的许多工具和命令。一般下载 BusyBox 的源码，然后配置 BusyBox，选择自己想要的功能，最后编译即可。</p>
+<p>Busybox下载链接：<a target="_blank" rel="noopener" href="https://busybox.net/downloads/">https://busybox.net/downloads/</a></p>
+<h5 id="编译-BusyBox-构建根文件系统"><a href="#编译-BusyBox-构建根文件系统" class="headerlink" title="编译 BusyBox 构建根文件系统"></a>编译 BusyBox 构建根文件系统</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">首先创建rootfs目录</span><br>mkdir rootfs<br><span class="hljs-meta prompt_"># </span><span class="language-bash">解压 busybox 源码</span><br>tar -vxjf busybox-1.29.0.tar.bz2<br></code></pre></td></tr></table></figure>
+
+<p>解压后如图所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/a.png" srcset="/img/loading.gif" lazyload class title="a">
+
+<h6 id="busybox-中文支持"><a href="#busybox-中文支持" class="headerlink" title="busybox 中文支持"></a>busybox 中文支持</h6><p>如果默认直接编译 busybox 的话，在使用 SecureCRT 的时候中文字符是显示不正常的，中文字符会显示为“?”，比如你的中文目录，中文文件都显示为“?”。不知道从哪个版本开始 busybox中的 shell 命令对中文输入即显示做了限制，即使内核支持中文但在 shell 下也依然无法正确显示。</p>
+<p>所以我们需要修改 busybox 源码，取消 busybox 对中文显示的限制，打开文件 busybox-1.29.0&#x2F;libbb&#x2F;printable_string.c，找到函数 printable_string，缩减后的函数内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">const</span> <span class="hljs-type">char</span>* FAST_FUNC <span class="hljs-title function_">printable_string</span><span class="hljs-params">(<span class="hljs-type">uni_stat_t</span> *stats, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *str)</span><br>&#123;<br>	<span class="hljs-type">char</span> *dst;<br>	<span class="hljs-type">const</span> <span class="hljs-type">char</span> *s;<br><br>	s = str;<br>	<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>		<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> c = *s;<br>		<span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>) &#123;<br>			<span class="hljs-comment">/* 99+% of inputs do not need conversion */</span><br>			<span class="hljs-keyword">if</span> (stats) &#123;<br>				stats-&gt;byte_count = (s - str);<br>				stats-&gt;unicode_count = (s - str);<br>				stats-&gt;unicode_width = (s - str);<br>			&#125;<br>			<span class="hljs-keyword">return</span> str;<br>		&#125;<br>		<span class="hljs-keyword">if</span> (c &lt; <span class="hljs-string">&#x27; &#x27;</span>)<br>			<span class="hljs-keyword">break</span>;<br>		<span class="hljs-keyword">if</span> (c &gt;= <span class="hljs-number">0x7f</span>)<br>			<span class="hljs-keyword">break</span>;<br>		s++;<br>	&#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">if</span> ENABLE_UNICODE_SUPPORT</span><br>	dst = unicode_conv_to_printable(stats, str);<br><span class="hljs-meta">#<span class="hljs-keyword">else</span></span><br>	&#123;<br>		<span class="hljs-type">char</span> *d = dst = xstrdup(str);<br>		<span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>			<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> c = *d;<br>			<span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)<br>				<span class="hljs-keyword">break</span>;<br>			<span class="hljs-keyword">if</span> (c &lt; <span class="hljs-string">&#x27; &#x27;</span> || c &gt;= <span class="hljs-number">0x7f</span>)<br>				*d = <span class="hljs-string">&#x27;?&#x27;</span>;<br>			d++;<br>		&#125;<br>		<span class="hljs-keyword">if</span> (stats) &#123;<br>			stats-&gt;byte_count = (d - dst);<br>			stats-&gt;unicode_count = (d - dst);<br>			stats-&gt;unicode_width = (d - dst);<br>		&#125;<br>	&#125;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>	<span class="hljs-keyword">return</span> auto_string(dst);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>if (c &gt;= 0x7f)</code> 当字符大于0x7f就跳出去了</p>
+<p><code>if (c &lt; &#39; &#39; || c &gt;= 0x7f)</code>如果支持unicode码的时候，字符大约0x7f就输出？</p>
+<p>所以需要进行修改，修改后如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs c">示例代码 <span class="hljs-number">38.2</span><span class="hljs-number">.2</span><span class="hljs-number">.3</span> libbb/printable_string.c 代码段<br><span class="hljs-number">12</span> <span class="hljs-type">const</span> <span class="hljs-type">char</span>* FAST_FUNC <span class="hljs-title function_">printable_string</span><span class="hljs-params">(<span class="hljs-type">uni_stat_t</span> *stats, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *str)</span><br>13 &#123;<br><span class="hljs-number">14</span>  <span class="hljs-type">char</span> *dst;<br><span class="hljs-number">15</span>  <span class="hljs-type">const</span> <span class="hljs-type">char</span> *s;<br><span class="hljs-number">16</span>  <br><span class="hljs-number">17</span>  s = str;<br><span class="hljs-number">18</span>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>...... <br><span class="hljs-number">30</span>      <span class="hljs-keyword">if</span> (c &lt; <span class="hljs-string">&#x27; &#x27;</span>)<br><span class="hljs-number">31</span>          <span class="hljs-keyword">break</span>;<br><span class="hljs-number">32</span>      <span class="hljs-comment">/* 注释掉下面这个两行代码 */</span><br><span class="hljs-number">33</span>      <span class="hljs-comment">/* if (c &gt;= 0x7f)</span><br><span class="hljs-comment">34          break; */</span><br><span class="hljs-number">35</span>      s++;<br><span class="hljs-number">36</span>  &#125;<br><span class="hljs-number">37</span><br><span class="hljs-number">38</span> <span class="hljs-meta">#<span class="hljs-keyword">if</span> ENABLE_UNICODE_SUPPORT</span><br><span class="hljs-number">39</span>      dst = unicode_conv_to_printable(stats, str);<br><span class="hljs-number">40</span> <span class="hljs-meta">#<span class="hljs-keyword">else</span></span><br><span class="hljs-number">41</span> &#123;<br><span class="hljs-number">42</span>  <span class="hljs-type">char</span> *d = dst = xstrdup(str);<br><span class="hljs-number">43</span>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br><span class="hljs-number">44</span>      <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> c = *d;<br><span class="hljs-number">45</span>      <span class="hljs-keyword">if</span> (c == <span class="hljs-string">&#x27;\0&#x27;</span>)<br><span class="hljs-number">46</span>          <span class="hljs-keyword">break</span>;<br><span class="hljs-number">47</span>      <span class="hljs-comment">/* 修改下面代码 */</span><br><span class="hljs-number">48</span>      <span class="hljs-comment">/* if (c &lt; &#x27; &#x27; || c &gt;= 0x7f) */</span><br><span class="hljs-number">49</span>      <span class="hljs-keyword">if</span>( c &lt; <span class="hljs-string">&#x27; &#x27;</span>)<br><span class="hljs-number">50</span>          *d = <span class="hljs-string">&#x27;?&#x27;</span>;<br><span class="hljs-number">51</span>      d++;<br><span class="hljs-number">52</span>  &#125;<br>......<br><span class="hljs-number">59</span>  <span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><span class="hljs-number">60</span>  <span class="hljs-keyword">return</span> auto_string(dst);<br><span class="hljs-number">61</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>主要就是禁止字符大于 0X7F 以后 break 和输出‘?’</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//示例代码 38.2.2.4 libbb/unicode.c 代码段</span><br><span class="hljs-number">1003</span> <span class="hljs-type">static</span> <span class="hljs-type">char</span>* FAST_FUNC <span class="hljs-title function_">unicode_conv_to_printable2</span><span class="hljs-params">(<span class="hljs-type">uni_stat_t</span> *stats, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *src, <span class="hljs-type">unsigned</span> width, <span class="hljs-type">int</span> flags)</span><br>1004 &#123;<br><span class="hljs-number">1005</span>    <span class="hljs-type">char</span> *dst;<br><span class="hljs-number">1006</span>    <span class="hljs-type">unsigned</span> dst_len;<br><span class="hljs-number">1007</span>    <span class="hljs-type">unsigned</span> uni_count;<br><span class="hljs-number">1008</span>    <span class="hljs-type">unsigned</span> uni_width;<br><span class="hljs-number">1009</span>    <br><span class="hljs-number">1010</span>    <span class="hljs-keyword">if</span> (unicode_status != UNICODE_ON) &#123;<br><span class="hljs-number">1011</span>        <span class="hljs-type">char</span> *d;<br><span class="hljs-number">1012</span>        <span class="hljs-keyword">if</span> (flags &amp; UNI_FLAG_PAD) &#123;<br><span class="hljs-number">1013</span>            d = dst = xmalloc(width + <span class="hljs-number">1</span>);<br>......<br><span class="hljs-number">1022</span>            *d++ = (c &gt;= <span class="hljs-string">&#x27; &#x27;</span> &amp;&amp; c &lt; <span class="hljs-number">0x7f</span>) ? c : <span class="hljs-string">&#x27;?&#x27;</span>;<br><span class="hljs-number">1023</span>            src++;<br><span class="hljs-number">1024</span>            &#125;<br><span class="hljs-number">1025</span>            *d = <span class="hljs-string">&#x27;\0&#x27;</span>;<br><span class="hljs-number">1026</span>        &#125; <span class="hljs-keyword">else</span> &#123;<br><span class="hljs-number">1027</span>            d = dst = xstrndup(src, width);<br><span class="hljs-number">1028</span>            <span class="hljs-keyword">while</span> (*d) &#123;<br><span class="hljs-number">1029</span>                <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> c = *d;<br><span class="hljs-number">1030</span>                <span class="hljs-keyword">if</span> (c &lt; <span class="hljs-string">&#x27; &#x27;</span> || c &gt;= <span class="hljs-number">0x7f</span>)<br><span class="hljs-number">1031</span>                    *d = <span class="hljs-string">&#x27;?&#x27;</span>;<br><span class="hljs-number">1032</span>                d++;<br><span class="hljs-number">1033</span>            &#125;<br><span class="hljs-number">1034</span>        &#125;<br>......<br><span class="hljs-number">1040</span>        <span class="hljs-keyword">return</span> dst;<br><span class="hljs-number">1041</span>    &#125;<br>......<br><span class="hljs-number">1130</span><br><span class="hljs-number">1131</span>    <span class="hljs-keyword">return</span> dst;<br><span class="hljs-number">1132</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>第 1022 行，当字符大于 0X7F 以后，*d++就为‘?’。</p>
+<p>第 1030 和 1031 行，当字符大于 0X7F 以后，*d 也为‘?’。</p>
+<p>修改示例代码 38.2.2.4，修改后内容如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-comment">//示例代码 38.2.2.5 libbb/unicode.c 代码段</span><br><span class="hljs-number">1003</span> <span class="hljs-type">static</span> <span class="hljs-type">char</span>* FAST_FUNC <span class="hljs-title function_">unicode_conv_to_printable2</span><span class="hljs-params">(<span class="hljs-type">uni_stat_t</span> *stats, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *src, <span class="hljs-type">unsigned</span> width, <span class="hljs-type">int</span> flags)</span><br>1004 &#123;<br><span class="hljs-number">1005</span>    <span class="hljs-type">char</span> *dst;<br><span class="hljs-number">1006</span>    <span class="hljs-type">unsigned</span> dst_len;<br><span class="hljs-number">1007</span>    <span class="hljs-type">unsigned</span> uni_count;<br><span class="hljs-number">1008</span>    <span class="hljs-type">unsigned</span> uni_width;<br><span class="hljs-number">1009</span>    <br><span class="hljs-number">1010</span>    <span class="hljs-keyword">if</span> (unicode_status != UNICODE_ON) &#123;<br><span class="hljs-number">1011</span>        <span class="hljs-type">char</span> *d;<br><span class="hljs-number">1012</span>        <span class="hljs-keyword">if</span> (flags &amp; UNI_FLAG_PAD) &#123;<br><span class="hljs-number">1013</span>            d = dst = xmalloc(width + <span class="hljs-number">1</span>);<br>......  <br><span class="hljs-number">1022</span>                <span class="hljs-comment">/* 修改下面一行代码 */</span><br><span class="hljs-number">1023</span>                <span class="hljs-comment">/* *d++ = (c &gt;= &#x27; &#x27; &amp;&amp; c &lt; 0x7f) ? c : &#x27;?&#x27;; */</span><br><span class="hljs-number">1024</span>                *d++ = (c &gt;= <span class="hljs-string">&#x27; &#x27;</span>) ? c : <span class="hljs-string">&#x27;?&#x27;</span>;<br><span class="hljs-number">1025</span>                src++;<br><span class="hljs-number">1026</span>            &#125;<br><span class="hljs-number">1027</span>            *d = <span class="hljs-string">&#x27;\0&#x27;</span>;<br><span class="hljs-number">1028</span>        &#125; <span class="hljs-keyword">else</span> &#123;<br><span class="hljs-number">1029</span>            d = dst = xstrndup(src, width);<br><span class="hljs-number">1030</span>            <span class="hljs-keyword">while</span> (*d) &#123;<br><span class="hljs-number">1031</span>                <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> c = *d;<br><span class="hljs-number">1032</span>                <span class="hljs-comment">/* 修改下面一行代码 */</span><br><span class="hljs-number">1033</span>                <span class="hljs-comment">/* if (c &lt; &#x27; &#x27; || c &gt;= 0x7f) */</span><br><span class="hljs-number">1034</span>                <span class="hljs-keyword">if</span>(c &lt; <span class="hljs-string">&#x27; &#x27;</span>)<br><span class="hljs-number">1035</span>                    *d = <span class="hljs-string">&#x27;?&#x27;</span>;<br><span class="hljs-number">1036</span>                d++;<br><span class="hljs-number">1037</span>            &#125;<br><span class="hljs-number">1038</span>        &#125;<br>......<br><span class="hljs-number">1044</span>        <span class="hljs-keyword">return</span> dst;<br><span class="hljs-number">1045</span>    &#125;<br>......<br><span class="hljs-number">1047</span><br><span class="hljs-number">1048</span>    <span class="hljs-keyword">return</span> dst;<br><span class="hljs-number">1049</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>同样主要是禁止字符大于 0X7F 的时候设置为‘?’。busybox 中文字符支持跟代码修改有关的就改好了，最后还需要配置 busybox来使能 unicode 码，这个稍后我们配置 busybox 的时候在设置。</p>
+<h6 id="配置-busybox"><a href="#配置-busybox" class="headerlink" title="配置 busybox"></a>配置 busybox</h6><p>根我们编译 Uboot、Linux kernel 一样，我们要先对 busybox 进行默认的配置，有以下几种配置选项：</p>
+<p>①、defconfig，缺省配置，也就是默认配置选项。</p>
+<p>②、allyesconfig，全选配置，也就是选中 busybox 的所有功能。</p>
+<p>③、allnoconfig，最小配置。</p>
+<p>我们一般使用默认配置即可，因此使用如下命令先使用默认配置来配置一下 busybox：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make defconfig<br></code></pre></td></tr></table></figure>
+
+<p>busybox 也支持图形化配置，通过图形化配置我们可以进一步选择自己想要的功能，输入如下命令打开图形化配置界面：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make menuconfig<br></code></pre></td></tr></table></figure>
+
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/b.png" srcset="/img/loading.gif" lazyload class title="b">
+
+<p>配置路径如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">Location: <br>	-&gt; Settings <br>		-&gt; Build static binary (no shared libs)<br></code></pre></td></tr></table></figure>
+
+<p>选项“Build static binary (no shared libs)”用来决定是静态编译 busybox 还是动态编译，静态编译的话就不需要库文件，但是编译出来的库会很大。动态编译的话要求根文件系统中有库文件，但是编译出来的 busybox 会小很多。这里我们不能采用静态编译！因为采用静态编译的话 DNS 会出问题！无法进行域名解析，配置如图 38.2.2.3 所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/c.png" srcset="/img/loading.gif" lazyload class title="c">
+
+<p>继续配置如下路径配置项：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">Location: <br>	-&gt; Settings <br>		-&gt; vi-style line editing commands<br></code></pre></td></tr></table></figure>
+
+<p>结果如图 38.2.2.4 所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/d.png" srcset="/img/loading.gif" lazyload class title="d">
+
+<p>继续配置如下路径配置项：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">Location: <br>	-&gt; Linux Module Utilities<br>		-&gt; Simplified modutils<br></code></pre></td></tr></table></figure>
+
+<p>默认会选中“Simplified modutils”，这里我们要取消勾选！！结果如图 38.2.2.5 所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/e.png" srcset="/img/loading.gif" lazyload class title="e">
+
+<p>继续配置如下路径配置项：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">Location: <br>	-&gt; Linux System Utilities <br>		-&gt; mdev (16 kb) //确保下面的全部选中，默认都是选中的<br></code></pre></td></tr></table></figure>
+
+<p>结果如图 38.2.2.6 所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/f.png" srcset="/img/loading.gif" lazyload class title="f">
+
+<p>最后就是使能 busybox 的 unicode 编码以支持中文，配置路径如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">Location: <br>	-&gt; Settings <br>		-&gt; Support Unicode			 //选中<br>			-&gt; Check $LC_ALL, $LC_CTYPE and $LANG environment variables 		//选中<br></code></pre></td></tr></table></figure>
+
+<p>结果如图 38.2.2.7 所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/g.png" srcset="/img/loading.gif" lazyload class title="g">
+
+<h6 id="编译-busybox"><a href="#编译-busybox" class="headerlink" title="编译 busybox"></a>编译 busybox</h6><p>配置好 busybox 以后就可以编译了，我们可以指定编译结果的存放目录，我们肯定要将编译结果存放到前面创建的 rootfs 目录中，输入如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">make<br>make install CONFIG_PREFIX=/home/uos/Desktop/rootfs	#COFIG_PREFIX 指定编译结果存放目录<br></code></pre></td></tr></table></figure>
+
+<p>编译完成以后如下所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/h.png" srcset="/img/loading.gif" lazyload class title="h">
+
+<p>编译完成以后会在 busybox 的所有工具和文件就会被安装到 rootfs 目录中，rootfs 目录内容如下所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/i.png" srcset="/img/loading.gif" lazyload class title="i">
+
+<p>从图可以看出，rootfs 目录下有 bin、sbin 和 usr 这三个目录，以及 linuxrc 这个文件。前面说过 Linux 内核 init 进程最后会查找用户空间的 init 程序，找到以后就会运行这个用户空间的 init 程序，从而切换到用户态。如果 bootargs 设置 init&#x3D;&#x2F;linuxrc，那么 linuxrc 就是可以作为用户空间的 init 程序，所以用户态空间的 init 程序是 busybox 来生成的。</p>
+<p>busybox 的工作就完成了，但是此时的根文件系统还不能使用，还需要一些其他的文件，我们继续来完善 rootfs。</p>
+<h5 id="向根文件系统添加lib库"><a href="#向根文件系统添加lib库" class="headerlink" title="向根文件系统添加lib库"></a>向根文件系统添加lib库</h5><h6 id="向-rootfs-的-lib-目录添加库文件"><a href="#向-rootfs-的-lib-目录添加库文件" class="headerlink" title="向 rootfs 的 &#x2F;lib 目录添加库文件"></a>向 rootfs 的 &#x2F;lib 目录添加库文件</h6><p>Linux 中的应用程序一般都是需要动态库的，当然你也可以编译成静态的，但是静态的可执行文件会很大。如果编译为动态的话就需要动态库，所以我们需要向根文件系统中添加动态库。在 rootfs 中创建一个名为“lib”的文件夹，命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir lib<br></code></pre></td></tr></table></figure>
+
+<p>我们可以把交叉编译器的库全部拿过来，进入如下目录</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">/usr/arm-linux-gnueabihf/lib<br></code></pre></td></tr></table></figure>
+
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/j.png" srcset="/img/loading.gif" lazyload class title="j">
+
+<p>可以看到此目录下有很多的.so和.a 文件，这些就是库文件，将此目录下所有的.so和.a文件都拷贝到 rootfs&#x2F;lib 目录中，拷贝命令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cp *so* *.a ~/Desktop/rootfs/lib/ -d<br></code></pre></td></tr></table></figure>
+
+<p>加上 <code>-d</code> 选项后，<code>cp</code> 会复制符号链接本身，这里有个比较特殊的库文件：ld-linux-armhf.so.3，此库文件也是个符号链接。会链接到库ld-2.28.so上</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/k.png" srcset="/img/loading.gif" lazyload class title="k">
+
+<p>ld-linux-armhf.so.3不能作为符号连接，否则在根文件系统中执行程序无法执行，所以我们先将其rm掉，然后直接cp过来</p>
+<h6 id="向-rootfs-的-usr-lib-目录添加库文件"><a href="#向-rootfs-的-usr-lib-目录添加库文件" class="headerlink" title="向 rootfs 的 usr&#x2F;lib 目录添加库文件"></a>向 rootfs 的 usr&#x2F;lib 目录添加库文件</h6><p>在 rootfs 的 usr 目录下创建一个名为 lib 的目录，将如下目录中的库文件拷贝到 rootfs&#x2F;usr&#x2F;lib目录下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cp arm-linux-gnueabihf/libc/usr/lib/*so arm-linux-gnueabihf/libc/usr/lib/*.a /rootfs/usr/lib/ -d<br></code></pre></td></tr></table></figure>
+
+<p>至此，根文件系统的库文件就全部添加好了</p>
+<h5 id="创建其他文件夹"><a href="#创建其他文件夹" class="headerlink" title="创建其他文件夹"></a>创建其他文件夹</h5><p>在根文件系统中创建其他文件夹，如 dev、proc、mnt、sys、tmp 和 root 等</p>
+<h5 id="完善根文件系统"><a href="#完善根文件系统" class="headerlink" title="完善根文件系统"></a>完善根文件系统</h5><h6 id="创建-etc-init-d-rcS-文件"><a href="#创建-etc-init-d-rcS-文件" class="headerlink" title="创建 &#x2F;etc&#x2F;init.d&#x2F;rcS 文件"></a>创建 &#x2F;etc&#x2F;init.d&#x2F;rcS 文件</h6><p>rcS 是个 shell 脚本，Linux 内核启动以后需要启动一些服务，而 rcS 就是规定启动哪些文件的脚本文件。在 rootfs 中创建&#x2F;etc&#x2F;init.d&#x2F;rcS 文件，然后在 rcS 中输入如下所示内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs shell">1 #!/bin/sh<br>2 <br>3 PATH=/sbin:/bin:/usr/sbin:/usr/bin:$PATH<br>4 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib:/usr/lib<br>5 export PATH LD_LIBRARY_PATH <br>6 <br>7 mount -a<br>8 mkdir /dev/pts<br>9 mount -t devpts devpts /dev/pts<br>10<br>11 echo /sbin/mdev &gt; /proc/sys/kernel/hotplug<br>12 mdev -s<br></code></pre></td></tr></table></figure>
+
+<p>第 1 行，表示这是一个 shell 脚本。</p>
+<p>第 3 行，PATH 环境变量保存着可执行文件可能存在的目录，这样我们在执行一些命令或者可执行文件的时候就不会提示找不到文件这样的错误。</p>
+<p>第 4 行，LD_LIBRARY_PATH 环境变量保存着库文件所在的目录。</p>
+<p>第 5 行，使用 export 来导出上面这些环境变量，相当于声明一些“全局变量”。</p>
+<p>第 7 行，使用 mount 命令来挂载所有的文件系统，这些文件系统由文件&#x2F;etc&#x2F;fstab 来指定，所以我们一会还要创建&#x2F;etc&#x2F;fstab 文件。</p>
+<p>第 8 和 9 行，创建目录&#x2F;dev&#x2F;pts，然后将 devpts 挂载到&#x2F;dev&#x2F;pts 目录中。</p>
+<p>第 11 和 12 行，使用 mdev 来管理热插拔设备，通过这两行，Linux 内核就可以在&#x2F;dev 目录下自动创建设备节点。关于 mdev 的详细内容可以参考 busybox 中的 docs&#x2F;mdev.txt 文档。</p>
+<p>上面代码中的 rcS 文件内容是最精简的，大家如果去看 Ubuntu 或者其他大型 Linux操作系统中的 rcS 文件，就会发现其非常复杂。因为我们是初次学习，所以不用搞这么复杂的，而且这么复杂的 rcS 文件也是借助其他工具创建的，比如 buildroot 等。</p>
+<div class="note note-warning">
+            <p>创建好文件&#x2F;etc&#x2F;init.d&#x2F;rcS 以后一定要给其可执行权限！</p>
+          </div>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">chmod 777 /etc/init.d/rcS<br></code></pre></td></tr></table></figure>
+
+<h6 id="创建-etc-fstab-文件"><a href="#创建-etc-fstab-文件" class="headerlink" title="创建 &#x2F;etc&#x2F;fstab 文件"></a>创建 &#x2F;etc&#x2F;fstab 文件</h6><p>在 rootfs 中创建&#x2F;etc&#x2F;fstab 文件，fstab 在 Linux 开机以后自动配置哪些需要自动挂载的分区，</p>
+<p>格式如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;file system&gt; &lt;mount point&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;<br></code></pre></td></tr></table></figure>
+
+<p><code>&lt;file system&gt;</code>：要挂载的特殊的设备，也可以是块设备，比如&#x2F;dev&#x2F;sda 等等。</p>
+<p><code>&lt;mount point&gt;</code>：挂载点。</p>
+<p><code>&lt;type&gt;</code>：文件系统类型，比如 ext2、ext3、proc、romfs、tmpfs 等等。</p>
+<p><code>&lt;options&gt;</code>：挂载选项，在 Ubuntu 中输入“man mount”命令可以查看具体的选项。一般使用 defaults，也就是默认选项，defaults 包含了 rw、suid、 dev、 exec、 auto、 nouser 和 async。</p>
+<p><code>&lt;dump&gt;</code>：为 1 的话表示允许备份，为 0 不备份，一般不备份，因此设置为 0。</p>
+<p><code>&lt;pass&gt;</code>：磁盘检查设置，为 0 表示不检查。根目录‘&#x2F;’设置为 1，其他的都不能设置为 1，其他的分区从 2 开始。一般不在 fstab 中挂载根目录，因此这里一般设置为 0。</p>
+<p>按照上述格式，在 fstab 文件中输入如下内容：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">1 #&lt;file system&gt;	&lt;mount point&gt;	&lt;type&gt;	&lt;options&gt;	&lt;dump&gt;	&lt;pass&gt;<br>2 proc	/proc	proc	defaults	0	0<br>3 tmpfs	/tmp	tmpfs	defaults	0	0<br>4 sysfs	/sys	sysfs	defaults	0	0<br></code></pre></td></tr></table></figure>
+
+<h6 id="创建-etc-inittab-文件"><a href="#创建-etc-inittab-文件" class="headerlink" title="创建 &#x2F;etc&#x2F;inittab 文件"></a>创建 &#x2F;etc&#x2F;inittab 文件</h6><p>inittab 的详细内容可以参考 busybox 下的文件 examples&#x2F;inittab。init 程序会读取&#x2F;etc&#x2F;inittab这个文件，inittab 由若干条指令组成。每条指令的结构都是一样的，由以“:”分隔的 4 个段组成，格式如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;id&gt;:&lt;runlevels&gt;:&lt;action&gt;:&lt;process&gt;<br></code></pre></td></tr></table></figure>
+
+<p><code>&lt;id&gt;</code>：每个指令的标识符，不能重复。但是对于 busybox 的 init 来说，<id>有着特殊意义。对于 busybox 而言<id>用来指定启动进程的控制 tty，一般我们将串口或者 LCD 屏幕设置为控制 tty。</id></id></p>
+<p><code>&lt;runlevels&gt;</code>：对 busybox 来说此项完全没用，所以空着。</p>
+<p><code>&lt;action&gt;</code>：动作，用于指定<code>&lt;process&gt;</code>可能用到的动作。busybox 支持的动作如表所示：</p>
+<img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/m.png" srcset="/img/loading.gif" lazyload class title="m">
+
+<p><code>&lt;process&gt;</code>：具体的动作，比如程序、脚本或命令等。</p>
+<p>参考 busybox 的 examples&#x2F;inittab 文件，我们也创建一个&#x2F;etc&#x2F;inittab，在里面输入如下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">1 #etc/inittab<br>2 ::sysinit:/etc/init.d/rcS<br>3 console::askfirst:-/bin/sh<br>4 ::restart:/sbin/init<br>5 ::ctrlaltdel:/sbin/reboot<br>6 ::shutdown:/bin/umount -a -r<br>7 ::shutdown:/sbin/swapoff -a<br></code></pre></td></tr></table></figure>
+
+<p>第 2 行，系统启动以后运行&#x2F;etc&#x2F;init.d&#x2F;rcS 这个脚本文件。</p>
+<p>第 3 行，将 console 作为控制台终端，也就是 ttymxc0。</p>
+<p>第 4 行，重启的话运行&#x2F;sbin&#x2F;init。</p>
+<p>第 5 行，按下 ctrl+alt+del 组合键的话就运行&#x2F;sbin&#x2F;reboot，看来 ctrl+alt+del 组合键用于重启系统。</p>
+<p>第 6 行，关机的时候执行&#x2F;bin&#x2F;umount，也就是卸载各个文件系统。</p>
+<p>第 7 行，关机的时候执行&#x2F;sbin&#x2F;swapoff，也就是关闭交换分区。</p>
+<p>&#x2F;etc&#x2F;inittab 文件创建好以后就可以重启开发板即可，至此！根文件系统要创建的文件就已经全部完成了。</p>
+<p>参考链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.yuanzige.com/">www.yuanzige.com</a></li>
+<li>[正点原子] I.MX6U嵌入式Linux驱动开发指南</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/rootfs/" class="category-chain-item">rootfs</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/rootfs/" class="print-no-link">#rootfs</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>根文件系统</div>
+      <div>https://tomwithkernel.github.io/rootfs/根文件系统/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Tom</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年6月6日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年6月11日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/upstream/linux%E4%B8%8A%E6%B8%B8%E6%8F%90%E4%BA%A4%E6%96%B9%E6%B3%95/" title="linux上游提交步骤">
+                        <span class="hidden-mobile">linux上游提交步骤</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","appKey":"jxVWH2hG2DLvf0KjiGZ93acw","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://tomwithkernel.github.io/" target="_blank" rel="nofollow noopener"><span>Tom</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/TomWithKernel/kernel" target="_blank" rel="nofollow noopener"><span>repository</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/scrollAnimation.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
