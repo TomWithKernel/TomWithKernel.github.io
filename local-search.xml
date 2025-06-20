@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>交叉编译环境搭建</title>
+    <link href="/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+    <url>/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+    
+    <content type="html"><![CDATA[<h3 id="arm交叉编译环境搭建"><a href="#arm交叉编译环境搭建" class="headerlink" title="arm交叉编译环境搭建"></a>arm交叉编译环境搭建</h3><p>交叉编译工具链下载地址：<a href="https://releases.linaro.org/components/toolchain/binaries/latest-7/">https://releases.linaro.org/components/toolchain/binaries/latest-7/</a></p><img src="/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/a.png" class title="a"><p>我们主要关注<a href="https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/">aarch64-linux-gnu</a>和<a href="https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/">arm-linux-gnueabihf</a>两个交叉编译工具，前者是针对arm64位处理器，后者针对arm32位处理器</p><p>我们下载arm64位的交叉编译工具，如图所示：</p><img src="/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/b.png" class title="b"><p>我们将其下载后，创建目录：&#x2F;usr&#x2F;local&#x2F;aarch64</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo mkdir /usr/local/aarch64<br></code></pre></td></tr></table></figure><p>创建完成后将文件拷贝到目录下</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo cp gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz /usr/local/aarch64/<br></code></pre></td></tr></table></figure><p>解压：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo tar -vxf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz<br></code></pre></td></tr></table></figure><p>修改环境变量：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo vim /etc/profile<br></code></pre></td></tr></table></figure><p>添加如下内容：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">export PATH=$PATH:/usr/local/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin<br></code></pre></td></tr></table></figure><h3 id="安装相关库"><a href="#安装相关库" class="headerlink" title="安装相关库"></a>安装相关库</h3><p>在使用交叉编译器之前还需要安装一下其它的库，命令如下：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get install lsb-core lib32stdc++6<br></code></pre></td></tr></table></figure><h3 id="交叉编译器验证"><a href="#交叉编译器验证" class="headerlink" title="交叉编译器验证"></a>交叉编译器验证</h3><p>首先查看一下交叉编译工具的版本号，输入如下命令：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">aarch64-linux-gnu-gcc -v<br></code></pre></td></tr></table></figure><p>如果交叉编译器安装正确的话就会显示版本号，如图所示：</p><img src="/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/c.png" class title="c"><h3 id="编译测试命令"><a href="#编译测试命令" class="headerlink" title="编译测试命令"></a>编译测试命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-<br><br>aarch64-linux-gnu-gcc test.c -o test<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>交叉编译</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>交叉编译</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>buildroot快速构建</title>
     <link href="/rootfs/buildroot%E6%9E%84%E5%BB%BA/"/>
     <url>/rootfs/buildroot%E6%9E%84%E5%BB%BA/</url>
