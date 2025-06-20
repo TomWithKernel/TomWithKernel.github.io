@@ -27,7 +27,7 @@
 <meta property="og:description" content="什么是ftrace​	ftrace是 Linux 内核中一个功能强大的跟踪框架，用于跟踪和分析内核及其模块的执行情况。它提供了一系列工具和功能，帮助开发者调试内核、分析性能瓶颈、查看系统调用、函数调用、上下文切换等信息。 ​	ftrace 的主要功能：  函数跟踪 (function tracing): 可以跟踪内核中每个函数的调用情况，包括函数进入、退出的时间和执行时间。 例如，可以跟踪某个特定">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-08-22T02:33:06.000Z">
-<meta property="article:modified_time" content="2024-11-07T06:00:16.358Z">
+<meta property="article:modified_time" content="2025-06-18T03:24:01.249Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
@@ -78,7 +78,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-08-07T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -242,7 +242,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          944 字
+          1.4k 字
         
       </span>
     
@@ -253,7 +253,7 @@
         
         
         
-          32 分钟
+          46 分钟
         
       </span>
     
@@ -343,64 +343,162 @@
 </li>
 <li><p>trace-cmd reset：禁用所有跟踪并恢复系统性能。</p>
 </li>
-<li><p>查看可用追踪器</p>
-</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd list -t<br>hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<br></code></pre></td></tr></table></figure>
+<h4 id="查看可用追踪器"><a href="#查看可用追踪器" class="headerlink" title="查看可用追踪器"></a>查看可用追踪器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd list -t<br>hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<br></code></pre></td></tr></table></figure>
 
-<ul>
-<li>查看可跟踪的函数</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -f | grep mmap<br><br>xen_hvm_exit_mmap<br>xen_dup_mmap<br>xen_exit_mmap<br>ldt_arch_exit_mmap<br>__ia32_compat_sys_ia32_mmap<br>...<br></code></pre></td></tr></table></figure>
+<div class="note note-warning">
+            <p>只有function_graph才能测量函数执行时间</p>
+          </div>
 
-<ul>
-<li>查看可跟踪的事件</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -e | grep snd<br><br>asoc:snd_soc_bias_level_start<br>asoc:snd_soc_bias_level_done<br>asoc:snd_soc_dapm_start<br>asoc:snd_soc_dapm_done<br>...<br></code></pre></td></tr></table></figure>
+<h4 id="查看可跟踪的函数"><a href="#查看可跟踪的函数" class="headerlink" title="查看可跟踪的函数"></a>查看可跟踪的函数</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -f | grep mmap<br><br>xen_hvm_exit_mmap<br>xen_dup_mmap<br>xen_exit_mmap<br>ldt_arch_exit_mmap<br>__ia32_compat_sys_ia32_mmap<br>...<br></code></pre></td></tr></table></figure>
 
-<ul>
-<li>查看函数调用栈</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function -l do_mmap --func-stack<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">使用 ctrl-c 退出trace-cmd时，会在当前目录生成 trace.dat文件,使用report读取trace.dat</span><br>uos@uos-PC [~] ➜  trace-cmd report | head -20<br><br>CPU 0 is empty<br>cpus=16<br>    explorer.exe-14504 [008] 1274475.231218: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231223: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231269: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231271: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231285: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231286: kernel_stack:         &lt;stack trace&gt;<br><br></code></pre></td></tr></table></figure>
+<h4 id="查看可跟踪的事件"><a href="#查看可跟踪的事件" class="headerlink" title="查看可跟踪的事件"></a>查看可跟踪的事件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">uos@uos-PC [~/tom-blog] ➜  sudo trace-cmd list -e | grep snd<br><br>asoc:snd_soc_bias_level_start<br>asoc:snd_soc_bias_level_done<br>asoc:snd_soc_dapm_start<br>asoc:snd_soc_dapm_done<br>...<br></code></pre></td></tr></table></figure>
 
-<p>命令解释：</p>
-<ul>
-<li><p><code>-p</code>：指定当前的 tracer，类似 <code>echo function &gt; current_tracer</code>，可以是支持的 tracer 中的任意一个</p>
-</li>
-<li><p><code>-l</code>：指定跟踪的函数，可以设置多个，类似 <code>echo function_name &gt; set_ftrace_filter</code></p>
-</li>
-<li><p><code>--func-stack</code>：记录被跟踪函数的调用栈</p>
-</li>
-<li><p>-n 指定不跟踪的函数</p>
-<ul>
-<li>比如：<code>trace-cmd record -p function -l &#39;dev*&#39; -n dev_attr_show</code></li>
-<li>设置跟踪所有 dev 开头的函数，但是不跟踪 <code>dev_attr_show</code></li>
-</ul>
-</li>
-<li><p><code>-g</code>：指定 function_graph tracer 跟踪的 函数，类似 <code>echo function_name &gt; set_graph_function</code></p>
-</li>
-<li><p><code>-O</code>：设置 options，比如设置 <code>options/func_stack_trace</code> 可以用 <code>-O func_stack_trace</code>，在 optoin 名称前加上 <code>no</code> 就是将 option 清 0</p>
-</li>
-<li><p><code>-P</code>：设置跟踪的进程</p>
-</li>
-</ul>
-<p>注意，function_graph tracer 同时支持 <code>-l/-g</code> 参数，但是两者是有区别的，他们区别的本质还是 <code>set_ftrace_filter</code> 与 <code>set_graph_function</code> 的区别。</p>
-<ul>
-<li><code>-l</code> 表示被跟踪的函数是叶子函数，不会跟踪其内部的调用子函数。</li>
-<li><code>-g</code> 会跟踪函数内部调用的子函数。</li>
-</ul>
-<p>​	默认情况下，<code>trace-cmd</code> 的 <code>function_graph</code> 会记录所有嵌套的函数调用。可以通过设置 <code>--max-graph-depth</code> 来限制跟踪深度。例如要将深度设置为 2，可以使用以下命令：</p>
+<h4 id="查看函数调用栈"><a href="#查看函数调用栈" class="headerlink" title="查看函数调用栈"></a>查看函数调用栈</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function -l do_mmap --func-stack<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash">使用 ctrl-c 退出trace-cmd时，会在当前目录生成 trace.dat文件,使用report读取trace.dat</span><br>uos@uos-PC [~] ➜  trace-cmd report | head -20<br><br>CPU 0 is empty<br>cpus=16<br>    explorer.exe-14504 [008] 1274475.231218: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231223: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231269: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231271: kernel_stack:         &lt;stack trace&gt;<br>=&gt; ftrace_trampoline (ffffffffc0d6106a)<br>=&gt; do_mmap (ffffffff94891c45)<br>=&gt; vm_mmap_pgoff (ffffffff94869ee4)<br>=&gt; ksys_mmap_pgoff (ffffffff9488f472)<br>=&gt; do_syscall_64 (ffffffff951e9690)<br>=&gt; entry_SYSCALL_64_after_hwframe (ffffffff952000ea)<br>    explorer.exe-14504 [008] 1274475.231285: function:             do_mmap<br>    explorer.exe-14504 [008] 1274475.231286: kernel_stack:         &lt;stack trace&gt;<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="参数介绍"><a href="#参数介绍" class="headerlink" title="参数介绍"></a>参数介绍</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>介绍</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-e event</td>
+<td>启用指定的事件进行跟踪</td>
+</tr>
+<tr>
+<td>-f filter</td>
+<td>为前一个 -e 事件设置过滤器</td>
+</tr>
+<tr>
+<td>-R trigger</td>
+<td>为前一个 -e 事件设置触发器</td>
+</tr>
+<tr>
+<td>-p plugin</td>
+<td>启用指定的插件进行跟踪，类似 <code>echo function &gt; current_tracer</code></td>
+</tr>
+<tr>
+<td>-F</td>
+<td>只过滤指定进程  例如 <code>-F cp tets.txt ~/</code></td>
+</tr>
+<tr>
+<td>-P pid</td>
+<td>跟踪指定 pid 的进程，类似于 -F</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>也跟踪由 -F 指定进程产生的子进程</td>
+</tr>
+<tr>
+<td>-C clock</td>
+<td>设置跟踪时使用的时钟类型</td>
+</tr>
+<tr>
+<td>-T</td>
+<td>对所有事件做堆栈跟踪（stacktrace）</td>
+</tr>
+<tr>
+<td>-l func</td>
+<td>过滤指定函数名，跟踪的函数是叶子函数，不会跟踪其内部的调用子函数</td>
+</tr>
+<tr>
+<td>-g func</td>
+<td>设置函数图跟踪的函数，会跟踪函数内部调用的子函数，指定 function_graph tracer 跟踪的 函数，类似 <code>echo function_name &gt; set_graph_function</code></td>
+</tr>
+<tr>
+<td>-n func</td>
+<td>不跟踪指定函数，例如 <code>trace-cmd record -p function -l &#39;dev*&#39; -n dev_attr_show</code></td>
+</tr>
+<tr>
+<td>-m max</td>
+<td>每个 CPU 的最大缓冲区大小（以 KB 为单位）</td>
+</tr>
+<tr>
+<td>-M mask</td>
+<td>设置要跟踪的 CPU 掩码</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>反转之后的所有 -e（禁用这些事件）</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>跑命令时禁用函数跟踪</td>
+</tr>
+<tr>
+<td>-D</td>
+<td>完全禁用函数跟踪（对所有用户）</td>
+</tr>
+<tr>
+<td>-o file</td>
+<td>输出数据文件（默认 trace.dat）</td>
+</tr>
+<tr>
+<td>-O option</td>
+<td>启用（或禁用）指定选项</td>
+</tr>
+<tr>
+<td>-r prio</td>
+<td>设置捕获线程的实时优先级</td>
+</tr>
+<tr>
+<td>-s usecs</td>
+<td>录制时的睡眠间隔（微秒，默认 1000）</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>与 –profile 一起用，只启用命令行列出的事件</td>
+</tr>
+<tr>
+<td>-N host:port</td>
+<td>连接到指定主机:端口（用于远程监听）</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>与 -N 一起使用，强制使用 TCP 进行实时跟踪</td>
+</tr>
+<tr>
+<td>-b size</td>
+<td>每 CPU 的内核缓冲区大小（KB）</td>
+</tr>
+<tr>
+<td>-B</td>
+<td>创建子缓冲区，后续事件将启用到这里</td>
+</tr>
+<tr>
+<td>-k</td>
+<td>跟踪后不重置缓冲区</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>如果找不到事件不报错</td>
+</tr>
+<tr>
+<td>–by-comm</td>
+<td>与 –profile 一起用，合并相关 comm 的事件</td>
+</tr>
+<tr>
+<td>–profile</td>
+<td>启用分析报告所需的跟踪选项，可以对我们追踪的函数执行时间进行统计</td>
+</tr>
+<tr>
+<td>–func-stack</td>
+<td>对函数跟踪器执行堆栈跟踪（慎用）</td>
+</tr>
+<tr>
+<td>–max-graph-depth</td>
+<td>限制 function_graph 的深度</td>
+</tr>
+</tbody></table>
+<p>function_graph有两种过滤条件可以配置：<br><code>-l func</code>：实际对应set_ftrace_filter，这种方式插桩的开销较小，只会追踪顶层func的执行时间且支持等通配符的设置。<br><code>-g func</code>：实际对应set_graph_function，这种方式插桩的开销较大，但能追踪func以及func所有子函数的的执行时间，不支持等通配符的设置。</p>
+<p>默认情况下，<code>trace-cmd</code> 的 <code>function_graph</code> 会记录所有嵌套的函数调用。可以通过设置 <code>--max-graph-depth</code> 来限制跟踪深度。例如要将深度设置为 2，可以使用以下命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph --max-graph-depth 2 -P 1656<br></code></pre></td></tr></table></figure>
 
+<h4 id="直接跟踪执行命令"><a href="#直接跟踪执行命令" class="headerlink" title="直接跟踪执行命令"></a>直接跟踪执行命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph smartctl -i /dev/sg1<br>sudo trace-cmd report<br></code></pre></td></tr></table></figure>
 
-
-<ul>
-<li>直接跟踪执行命令</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo trace-cmd record -p function_graph smartctl -i /dev/sg1<br>sudo trace-cmd report<br></code></pre></td></tr></table></figure>
-
-
-
+<h3 id="使用kernelshark图形化分析"><a href="#使用kernelshark图形化分析" class="headerlink" title="使用kernelshark图形化分析"></a>使用kernelshark图形化分析</h3><p>我们可以导出trace.dat文件，然后使用kernelshark打开逐个分析</p>
 
                 
               </div>
@@ -465,7 +563,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年11月7日</div>
+          <div>2025年6月18日</div>
         </div>
       
       

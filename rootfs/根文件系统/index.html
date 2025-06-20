@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/k.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/m.png">
 <meta property="article:published_time" content="2025-06-06T01:34:33.000Z">
-<meta property="article:modified_time" content="2025-06-11T07:30:33.097Z">
+<meta property="article:modified_time" content="2025-06-20T01:53:58.081Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="rootfs">
 <meta name="twitter:card" content="summary_large_image">
@@ -91,7 +91,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"tomwithkernel.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"mGugYoHICpLi8BnBygCpEblQ-MdYXbMMI","app_key":"jxVWH2hG2DLvf0KjiGZ93acw","server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2023-08-07T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -410,7 +410,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir lib<br></code></pre></td></tr></table></figure>
 
 <p>我们可以把交叉编译器的库全部拿过来，进入如下目录</p>
-<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">/usr/arm-linux-gnueabihf/lib<br></code></pre></td></tr></table></figure>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">/usr/aarch64-linux-gnu/lib/<br></code></pre></td></tr></table></figure>
 
 <img src="/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/j.png" srcset="/img/loading.gif" lazyload class title="j">
 
@@ -544,7 +544,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年6月11日</div>
+          <div>2025年6月20日</div>
         </div>
       
       
@@ -574,6 +574,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/rootfs/buildroot%E6%9E%84%E5%BB%BA/" title="buildroot快速构建">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">buildroot快速构建</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
