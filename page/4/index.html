@@ -738,15 +738,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/debug/gdb/" target="_self">
-          gdb
+        <a href="/debug/kdump/" target="_self">
+          kdump
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/debug/gdb/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/kdump/" target="_self">
         <div>
-          gdb编译程序加参数时生成调试信息 g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的    选项 解析    g 该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息   ggdb 使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx
+          Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC=yCONFIG_KEXEC_FILE=y   //两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP=y   //内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊
         </div>
       </a>
 
@@ -799,15 +799,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/debug/kdump/" target="_self">
-          kdump
+        <a href="/debug/gdb/" target="_self">
+          gdb
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/debug/kdump/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/gdb/" target="_self">
         <div>
-          Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC=yCONFIG_KEXEC_FILE=y   //两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP=y   //内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊
+          gdb编译程序加参数时生成调试信息 g 和 -ggdb 都是令 gcc 生成调试信息，但是它们也是有区别的    选项 解析    g 该选项可以利用操作系统的“原生格式（native format）”生成调试信息。GDB 可以直接利用这个信息，其它调试器也可以使用这个调试信息   ggdb 使 GCC为GDB 生成专用的更为丰富的调试信息，但是，此时就不能用其他的调试器来进行调试了 (如 ddx
         </div>
       </a>
 

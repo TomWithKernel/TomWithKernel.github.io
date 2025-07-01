@@ -27,6 +27,11 @@
 <meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，由段（segment）+偏移量（offset | displacement）组成，偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/a.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/b.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/c.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/d.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/e.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/f.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png">
 <meta property="article:published_time" content="2025-06-25T02:09:00.000Z">
@@ -324,7 +329,7 @@
 <li><p>段标识符：是一个16位长的字段，称为<strong>段选择符</strong>（Segment Selector），如下图所示，而偏移量是一个32位长的字段。<strong>段选择符只是在访问时作为索引，告诉CPU应该去GDT&#x2F;LDT的哪个位置找段描述符。</strong></p>
 </li>
 </ul>
-
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/b.png" srcset="/img/loading.gif" lazyload class title="b">
 
 <ul>
 <li>段寄存器：用于快速查找段选择符，存放段选择符。这些段寄存器称为cs，ss，ds，es，fs，gs，虽然只有6个段寄存器，但程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</li>
@@ -389,12 +394,12 @@
 <h5 id="代码段描述符"><a href="#代码段描述符" class="headerlink" title="代码段描述符"></a>代码段描述符</h5><p>表示这个段描述符代表一个代码段，它可以放在GDT或LDT中。该描述符置S标志为1（非系统段）。</p>
 <h5 id="数据段描述符"><a href="#数据段描述符" class="headerlink" title="数据段描述符"></a>数据段描述符</h5><p>表示这个段描述符代表一个数据段，它可以放在GDT或LDT中。该描述待置S标志为1。栈段是通过一般的数据段实现的。</p>
 <h5 id="任务状态段描述符（TSSD）"><a href="#任务状态段描述符（TSSD）" class="headerlink" title="任务状态段描述符（TSSD）"></a>任务状态段描述符（TSSD）</h5><p>表示这个段描述符代表一个任务状态段（Task State Segment，TSS），也就是说这个段用于保存处理器寄存器的内容（参见进程章节中的“任务状态段”一节）。它只能出现在GDT中。根据相应的进程是否正在CPU上运行，其Type字段的值分别为11或9，这个描述符的S标志置为0。</p>
-
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/c.png" srcset="/img/loading.gif" lazyload class title="c">
 
 <h5 id="局部描述符表描述符（LDTD）"><a href="#局部描述符表描述符（LDTD）" class="headerlink" title="局部描述符表描述符（LDTD）"></a>局部描述符表描述符（LDTD）</h5><p>表示这个段描述符代表一个包含LDT的段，它只出现在GDT中。相应的Type字段的值为2，S标志置为0。</p>
 <h4 id="快速访问段描述符"><a href="#快速访问段描述符" class="headerlink" title="快速访问段描述符"></a>快速访问段描述符</h4><p>逻辑地址由16位段选择符和32位偏移量组成，段寄存器仅仅存放段选择符。</p>
 <p>80x86处理器为了加速逻辑地址到线性地址的转换，为每个段寄存器都配备了一个不可编程的“描述符缓存寄存器”。每次将段选择符装载到段寄存器时，CPU会自动从内存中的GDT或LDT表中读取对应的段描述符，并缓存到这个寄存器中。后续进行逻辑地址到线性地址转换时，处理器可以直接使用缓存的段描述符，无需每次都访问内存里的GDT或LDT，极大提高了转换效率。只有当段寄存器内容发生变化时，CPU才会重新访问GDT&#x2F;LDT，重新加载段描述符到缓存寄存器。</p>
-
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/d.png" srcset="/img/loading.gif" lazyload class title="d">
 
 <h5 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h5><table>
 <thead>
@@ -418,7 +423,7 @@
 </tbody></table>
 <p>由于每个段描述符占8字节，段选择符的高13位（即索引号）乘以8就能得到该描述符在GDT或LDT表中的偏移地址。比如GDT基址为0x00020000（这个值保存在gdtr寄存器中），索引号为2时，对应的段描述符地址就是0x00020000 + (2 × 8) &#x3D; 0x00020010。</p>
 <p>GDT（全局描述符表）的第一个表项（索引号为0）总是被设为全0，这样当段选择符为0（即空段选择符）时，访问这个段就会被处理器认为是无效的，从而引发异常，用于捕捉错误的段访问。而由于段选择符的高13位用于索引描述符，所以GDT最多可以有8192项（2¹³），但由于第0项保留不用，实际最大可用的段描述符数是8191个。</p>
-<h4 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h4>
+<h4 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h4><img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/e.png" srcset="/img/loading.gif" lazyload class title="e">
 
 <p>图中详细显示了一个逻辑地址是怎么转换成相应的线性地址的。分段单元（Segmentation unit）执行以下操作：</p>
 <ul>
@@ -440,7 +445,7 @@
 <li>Linux设计目标之一是可以把它移植到绝大多数流行的处理器平台上。然而，RISC体系结构对分段的支持很有限。</li>
 </ul>
 <p>运行在用户态的所有Linux进程都使用一对相同的段来对指令和数据寻址。这两个段就是所谓的用户代码段和用户数据段。类似地，运行在内核态的所有Linux进程都使用一对相同的段对指令和数据寻址：它们分别叫做内核代码段和内核数据段。表2-3显示了这四个重要段的段描述符字段的值。</p>
-
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/f.png" srcset="/img/loading.gif" lazyload class title="f">
 
 <p>相应的段选择符由宏<code>__USER_CS</code>，<code>__USER_DS</code>，<code>__KERNEL_CS</code>，和<code>__KERNEL_DS</code>分别定义。例如，为了对内核代码段寻址，内核只需要把<code>__KERNEL_CS</code>宏产生的值装进cs段寄存器即可。</p>
 <p>注意，与段相关的线性地址从0开始，达到2³²-1的寻址限长。这就意味着在用户态或内核态下的所有进程可以使用相同的逻辑地址。</p>
