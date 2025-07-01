@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/k.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/rootfs/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/m.png">
 <meta property="article:published_time" content="2025-06-06T01:34:33.000Z">
-<meta property="article:modified_time" content="2025-06-20T01:53:58.081Z">
+<meta property="article:modified_time" content="2025-06-23T05:24:57.744Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="rootfs">
 <meta name="twitter:card" content="summary_large_image">
@@ -454,7 +454,7 @@
 <p><code>&lt;dump&gt;</code>：为 1 的话表示允许备份，为 0 不备份，一般不备份，因此设置为 0。</p>
 <p><code>&lt;pass&gt;</code>：磁盘检查设置，为 0 表示不检查。根目录‘&#x2F;’设置为 1，其他的都不能设置为 1，其他的分区从 2 开始。一般不在 fstab 中挂载根目录，因此这里一般设置为 0。</p>
 <p>按照上述格式，在 fstab 文件中输入如下内容：</p>
-<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">1 #&lt;file system&gt;	&lt;mount point&gt;	&lt;type&gt;	&lt;options&gt;	&lt;dump&gt;	&lt;pass&gt;<br>2 proc	/proc	proc	defaults	0	0<br>3 tmpfs	/tmp	tmpfs	defaults	0	0<br>4 sysfs	/sys	sysfs	defaults	0	0<br></code></pre></td></tr></table></figure>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">1 #&lt;file system&gt;	&lt;mount point&gt;	&lt;type&gt;	&lt;options&gt;	&lt;dump&gt;	&lt;pass&gt;<br>2 proc	/proc	proc	defaults	0	0<br>3 tmpfs	/tmp	tmpfs	defaults	0	0<br>4 sysfs	/sys	sysfs	defaults	0	0<br>5 tmpfs	/dev	tmpfs	defaults	0	0<br></code></pre></td></tr></table></figure>
 
 <h6 id="创建-etc-inittab-文件"><a href="#创建-etc-inittab-文件" class="headerlink" title="创建 &#x2F;etc&#x2F;inittab 文件"></a>创建 &#x2F;etc&#x2F;inittab 文件</h6><p>inittab 的详细内容可以参考 busybox 下的文件 examples&#x2F;inittab。init 程序会读取&#x2F;etc&#x2F;inittab这个文件，inittab 由若干条指令组成。每条指令的结构都是一样的，由以“:”分隔的 4 个段组成，格式如下：</p>
 <figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs txt">&lt;id&gt;:&lt;runlevels&gt;:&lt;action&gt;:&lt;process&gt;<br></code></pre></td></tr></table></figure>
@@ -544,7 +544,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年6月20日</div>
+          <div>2025年6月23日</div>
         </div>
       
       
@@ -902,6 +902,7 @@
 
   
 <script src="/js/scrollAnimation.js"></script>
+<script src="/js/expand-toc.js"></script>
 
 
 

@@ -19,21 +19,22 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+    <meta name="description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，由段（segment）+偏移量（offset | displacement）组成，偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存寻址">
 <meta property="og:url" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位 段选择">
+<meta property="og:description" content="内存寻址内存地址​	逻辑地址：用来指定一个操作数或一条指令的地址，由段（segment）+偏移量（offset | displacement）组成，偏移量指明了从段开始的地方到实际地址之间的距离 ​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff ​	物理地址：内存芯片级内存单元寻址 ​	在内存寻址中，我们通常以字节为单位">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/a.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png">
-<meta property="article:published_time" content="2024-07-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T05:59:54.690Z">
+<meta property="article:published_time" content="2025-06-25T02:09:00.000Z">
+<meta property="article:modified_time" content="2025-06-27T06:48:47.311Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="内存寻址">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/a.png">
   
   
   
@@ -233,8 +234,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-10 10:09" pubdate>
-          2024年7月10日 上午
+        <time datetime="2025-06-25 10:09" pubdate>
+          2025年6月25日 上午
         </time>
       </span>
     
@@ -245,7 +246,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          4.7k 字
         
       </span>
     
@@ -256,7 +257,7 @@
         
         
         
-          50 分钟
+          159 分钟
         
       </span>
     
@@ -307,64 +308,95 @@
             
               <div class="markdown-body">
                 
-                <h2 id="内存寻址"><a href="#内存寻址" class="headerlink" title="内存寻址"></a>内存寻址</h2><h3 id="内存地址"><a href="#内存地址" class="headerlink" title="内存地址"></a>内存地址</h3><p>​	逻辑地址：用来指定一个操作数或一条指令的地址，段（segment）+偏移量（offset | displacement），偏移量指明了从段开始的地方到实际地址之间的距离</p>
+                <h2 id="内存寻址"><a href="#内存寻址" class="headerlink" title="内存寻址"></a>内存寻址</h2><h3 id="内存地址"><a href="#内存地址" class="headerlink" title="内存地址"></a>内存地址</h3><p>​	逻辑地址：用来指定一个操作数或一条指令的地址，由段（segment）+偏移量（offset | displacement）组成，偏移量指明了从段开始的地方到实际地址之间的距离</p>
 <p>​	线性地址：也称作虚拟地址，32位无符号整数，通常用十六位进制数表示，值的范围从0x00000000~0xffffffff</p>
 <p>​	物理地址：内存芯片级内存单元寻址</p>
 <p>​	在内存寻址中，我们通常以字节为单位</p>
-<h3 id="段选择符和段寄存器"><a href="#段选择符和段寄存器" class="headerlink" title="段选择符和段寄存器"></a>段选择符和段寄存器</h3><p>​	逻辑地址：段标识符+段内相对地址偏移量</p>
-<p>​	<strong>段标识符</strong>是一个16位长的字段，成为<strong>段选择符</strong></p>
-<p>​	段寄存器：快速查找段选择符，cs，ss，ds，es，fs，gs，程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</p>
-<p>​		cs：代码段寄存器，指向包含程序指令的段，它含有一个两位的字段，指明CPU当前的特权级（CPL），0内核态，3用户态</p>
-<p>​		ss：栈段寄存器，指向包含当前程序栈的段</p>
-<p>​		ds：数据段寄存器，指向包含静态数据或全局数据段</p>
-<h3 id="段描述符"><a href="#段描述符" class="headerlink" title="段描述符"></a>段描述符</h3><p>​	每个段由一个8字节的段描述符表示，它描述段的特征。放在全局描述符表（GDT）或局部描述符表（LDT）中。</p>
-<p>​	通常只定义一个GDT，而每个进程除了存放在GDT的段以外如果还需创建附加段就可以有自己的LDT。GDT在主存中的地址和大小放在gdtr控制寄存器中，当前正被使用的LDT地址和大小放在ldtr控制寄存器中</p>
-<p>​	段描述符字段</p>
-<table>
+<p>内存控制单元（MMU）通过一种称为分段单元（segmentation unit）的硬件电路把一个逻辑地址转换成线性地址；接着，第二个称为分页单元（paging unit）的硬件电路把线性地址转换成一个物理地址。</p>
+<img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/a.png" srcset="/img/loading.gif" lazyload class title="a">
+
+<p>在多处理器系统中，所有CPU都共享同一内存，这意味着RAM芯片可以由独立的CPU并发地访问。因为在RAM芯片上的读或写操作必须串行地执行，因此一种所谓内存仲裁器（memory arbiter）的硬件电路插在总线和每个RAM芯片之间。其作用是如果某个RAM芯片空闲，就准予一个CPU访问，如果该芯片忙于为另一个处理器提出的请求服务，就延迟这个CPU的访问。即使在单处理器上也使用内存仲裁器，因为单处理器系统中包含一个叫做DMA控制器的特殊处理器，而DMA控制器与CPU并发操作（参见直接内存访问DMA一节）。在多处理器系统的情况下，因为仲裁器有多个输入端口，所以其结构更加复杂。例如，双Pentium在每个芯片的入口维持一个两端口仲裁器，并在试图使用公用总线前请求两个CPU交换同步信息。从编程观点看，因为仲裁器由硬件电路管理，因此它是隐藏的。</p>
+<h3 id="硬件中的分段"><a href="#硬件中的分段" class="headerlink" title="硬件中的分段"></a>硬件中的分段</h3><h4 id="段选择符和段寄存器"><a href="#段选择符和段寄存器" class="headerlink" title="段选择符和段寄存器"></a>段选择符和段寄存器</h4><ul>
+<li><p>逻辑地址：段选择符（段标识符 ）+ 段内相对地址偏移量</p>
+</li>
+<li><p>线性地址：段描述符的基地址（base address） + 段内偏移（offset）</p>
+</li>
+<li><p>段标识符：是一个16位长的字段，称为<strong>段选择符</strong>（Segment Selector），如下图所示，而偏移量是一个32位长的字段。<strong>段选择符只是在访问时作为索引，告诉CPU应该去GDT&#x2F;LDT的哪个位置找段描述符。</strong></p>
+</li>
+</ul>
+
+
+<ul>
+<li>段寄存器：用于快速查找段选择符，存放段选择符。这些段寄存器称为cs，ss，ds，es，fs，gs，虽然只有6个段寄存器，但程序可以把同一个段寄存器用于不同的目的，先将其值保存在内存中，用完后再恢复</li>
+</ul>
+<p>6个寄存器中有3个有专门的用途：</p>
+<ul>
+<li><p>cs：代码段寄存器，指向包含程序指令的段</p>
+</li>
+<li><p>ss：栈段寄存器，指向包含当前程序栈的段</p>
+</li>
+<li><p>ds：数据段寄存器，指向包含静态数据或全局数据段</p>
+</li>
+</ul>
+<p>其他三个段寄存器作一般用途，可以指向任意的数据段</p>
+<h4 id="段描述符"><a href="#段描述符" class="headerlink" title="段描述符"></a>段描述符</h4><p><strong>每个段由一个8字节的段描述符（Segment Descriptor）表示，它描述段的特征。</strong>段描述符放在全局描述符表（Global Descriptor Table，GDT）或局部描述符表（Local Descriptor Table，LDT）中。</p>
+<p>​	通常只定义一个GDT，而每个进程除了存放在GDT的段以外如果还需创建附加段就可以有自己的LDT。<strong>GDT在主存中的地址和大小放在gdtr控制寄存器中，当前正被使用的LDT地址和大小放在ldtr控制寄存器中</strong></p>
+<h5 id="段描述符字段"><a href="#段描述符字段" class="headerlink" title="段描述符字段"></a>段描述符字段</h5><table>
 <thead>
 <tr>
 <th>字段名</th>
-<th>描述</th>
+<th align="left">描述</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Base</td>
-<td>段首地址的线性地址</td>
+<td align="left">包含段首地址的线性地址</td>
 </tr>
 <tr>
 <td>G</td>
-<td>粒度标志：如果该位清0，则段大小以字节为单位，否则以4096字节的倍数计</td>
+<td align="left">粒度标志：如果该位清0，则段大小以字节为单位，否则以4096字节的倍数计</td>
 </tr>
 <tr>
 <td>Limit</td>
-<td>存放段中最后一个内存单元的偏移量，从而决定段的长度。如果G被置为0，则一个段的大小在1个字节到1MB之间变化；否则，将在4KB到4GB之间变化</td>
+<td align="left">存放段中最后一个内存单元的偏移量，从而决定段的长度。如果G被置为0，则一个段的大小在1个字节到1MB之间变化；否则，将在4KB到4GB之间变化</td>
 </tr>
 <tr>
 <td>S</td>
-<td>系统标志：如果它被清0，则这是一个系统段，存储诸如LDT这种关键的数据结构，否则它是一个普通的代码段或数据段</td>
+<td align="left">系统标志：如果它被清0，则这是一个系统段，存储诸如LDT这种关键的数据结构，否则它是一个普通的代码段或数据段</td>
 </tr>
 <tr>
 <td>Type</td>
-<td>描述了段的类型特征和它的存取权限（请看表下面的描述）</td>
+<td align="left">描述了段的类型特征和它的存取权限（请看表下面的描述）</td>
 </tr>
 <tr>
 <td>DPL</td>
-<td>描述符特权级（Descriptor Privilege Level）字段：用于限制对这个段的存取。它表示为访问这个段而要求的CPU最小的优先级。因此，DPL设为0的段只能当CPL为0时（即在内核态）才是可访问的，而DPL设为3的段对任何CPL值都是可访问的</td>
+<td align="left">描述符特权级（Descriptor Privilege Level）字段：用于限制对这个段的存取。它表示为访问这个段而要求的CPU最小的优先级。因此，DPL设为0的段只能当CPL为0时（即在内核态）才是可访问的，而DPL设为3的段对任何CPL值都是可访问的</td>
 </tr>
 <tr>
 <td>P</td>
-<td>Segment-Present标志：等于0表示段当前不在主存中。Linux总是把这个标志（第47位）设为1，因为它从来不把整个段交换到磁盘上去</td>
+<td align="left">Segment-Present标志：等于0表示段当前不在主存中。Linux总是把这个标志（第47位）设为1，因为它从来不把整个段交换到磁盘上去</td>
 </tr>
 <tr>
 <td>D或B</td>
-<td>称为D或B的标志，取决于是代码段还是数据段。D或B的含义在两种情况下稍微有所区别，但是如果段偏移量的地址是32位长，就基本上把它置为1，如果这个偏移量是16位长，它被清0（更详细的描述参见Intel使用手册）</td>
+<td align="left">称为D或B的标志，取决于是代码段还是数据段。D或B的含义在两种情况下稍微有所区别，但是如果段偏移量的地址是32位长，就基本上把它置为1，如果这个偏移量是16位长，它被清0（更详细的描述参见Intel使用手册）</td>
 </tr>
 <tr>
 <td>AVL标志</td>
-<td>可以由操作系统使用，但是被Linux忽略</td>
+<td align="left">可以由操作系统使用，但是被Linux忽略</td>
 </tr>
 </tbody></table>
-<h3 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h3><table>
+<p>有几种不同类型的段以及和它们对应的段描述符。下面列出了Linux中被广泛采用的类型：</p>
+<h5 id="代码段描述符"><a href="#代码段描述符" class="headerlink" title="代码段描述符"></a>代码段描述符</h5><p>表示这个段描述符代表一个代码段，它可以放在GDT或LDT中。该描述符置S标志为1（非系统段）。</p>
+<h5 id="数据段描述符"><a href="#数据段描述符" class="headerlink" title="数据段描述符"></a>数据段描述符</h5><p>表示这个段描述符代表一个数据段，它可以放在GDT或LDT中。该描述待置S标志为1。栈段是通过一般的数据段实现的。</p>
+<h5 id="任务状态段描述符（TSSD）"><a href="#任务状态段描述符（TSSD）" class="headerlink" title="任务状态段描述符（TSSD）"></a>任务状态段描述符（TSSD）</h5><p>表示这个段描述符代表一个任务状态段（Task State Segment，TSS），也就是说这个段用于保存处理器寄存器的内容（参见进程章节中的“任务状态段”一节）。它只能出现在GDT中。根据相应的进程是否正在CPU上运行，其Type字段的值分别为11或9，这个描述符的S标志置为0。</p>
+
+
+<h5 id="局部描述符表描述符（LDTD）"><a href="#局部描述符表描述符（LDTD）" class="headerlink" title="局部描述符表描述符（LDTD）"></a>局部描述符表描述符（LDTD）</h5><p>表示这个段描述符代表一个包含LDT的段，它只出现在GDT中。相应的Type字段的值为2，S标志置为0。</p>
+<h4 id="快速访问段描述符"><a href="#快速访问段描述符" class="headerlink" title="快速访问段描述符"></a>快速访问段描述符</h4><p>逻辑地址由16位段选择符和32位偏移量组成，段寄存器仅仅存放段选择符。</p>
+<p>80x86处理器为了加速逻辑地址到线性地址的转换，为每个段寄存器都配备了一个不可编程的“描述符缓存寄存器”。每次将段选择符装载到段寄存器时，CPU会自动从内存中的GDT或LDT表中读取对应的段描述符，并缓存到这个寄存器中。后续进行逻辑地址到线性地址转换时，处理器可以直接使用缓存的段描述符，无需每次都访问内存里的GDT或LDT，极大提高了转换效率。只有当段寄存器内容发生变化时，CPU才会重新访问GDT&#x2F;LDT，重新加载段描述符到缓存寄存器。</p>
+
+
+<h5 id="段选择符字段"><a href="#段选择符字段" class="headerlink" title="段选择符字段"></a>段选择符字段</h5><table>
 <thead>
 <tr>
 <th>字段名</th>
@@ -384,19 +416,71 @@
 <td>请求者特权级：当相应的段选择符装入到cs寄存器中时指示出CPU当前的特权级，它还可以用于在访问数据段时有选择地削弱处理器的特权级</td>
 </tr>
 </tbody></table>
-<h3 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h3><p>​	逻辑地址	—-&gt;	线性地址</p>
-<p>​	从段选择符的index字段计算段描述符的地址，index字段乘以8（一个段描述符大小），结果与gdtr或ldtr相加</p>
-<p>​	逻辑地址偏移量+段描述符地址	—&gt;	线性地址</p>
-<h3 id="Linux中的分段"><a href="#Linux中的分段" class="headerlink" title="Linux中的分段"></a>Linux中的分段</h3><p>​	分段可以给每一个进程分配不同的线性地址空间</p>
-<p>​	分页可以把同一线性地址空间映射到不同的物理空间（Linux多用这个）</p>
-<h3 id="硬件中的分页"><a href="#硬件中的分页" class="headerlink" title="硬件中的分页"></a>硬件中的分页</h3><p>​	分页单元把线性地址转换为物理地址</p>
-<p>​	其中一个关键任务，把请求访问的类型和线性地址的访问权限相比较，如果这次内存访问无效，就产生一个缺页异常</p>
-<p>​	线性地址被分为以固定长度位单位的组，称为<strong>页</strong>。页内部连续的线性地址被映射到连续的物理地址中</p>
-<p>​	分页单元把所有RAM分成固定长度的<strong>页框（page frame）</strong>（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。页框是主存的一部分，因此也是一个存储区域。页只是一个数据块，可以存放在任何页框或磁盘中。</p>
-<p>​	把线性地址映射到物理地址的数据结构称为<strong>页表（page table）</strong>。页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化</p>
-<p>​	正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的目录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置。由于它是12位长，故每一页含有4096字节的数据</p>
+<p>由于每个段描述符占8字节，段选择符的高13位（即索引号）乘以8就能得到该描述符在GDT或LDT表中的偏移地址。比如GDT基址为0x00020000（这个值保存在gdtr寄存器中），索引号为2时，对应的段描述符地址就是0x00020000 + (2 × 8) &#x3D; 0x00020010。</p>
+<p>GDT（全局描述符表）的第一个表项（索引号为0）总是被设为全0，这样当段选择符为0（即空段选择符）时，访问这个段就会被处理器认为是无效的，从而引发异常，用于捕捉错误的段访问。而由于段选择符的高13位用于索引描述符，所以GDT最多可以有8192项（2¹³），但由于第0项保留不用，实际最大可用的段描述符数是8191个。</p>
+<h4 id="分段单元"><a href="#分段单元" class="headerlink" title="分段单元"></a>分段单元</h4>
+
+<p>图中详细显示了一个逻辑地址是怎么转换成相应的线性地址的。分段单元（Segmentation unit）执行以下操作：</p>
+<ul>
+<li><p>先检查段选择符的TI字段，以决定段描述符保存在哪一个描述符表中。TI字段指明描述符是在GDT中（在这种情况下，分段单元从gdtr寄存器中得到GDT的线性基地址）还是在激活的LDT中（在这种情况下，分段单元从ldtr寄存器中得到LDT的线性基地址）。</p>
+</li>
+<li><p>从段选择符的index字段计算段描述符的地址，index字段的值乘以8（一个段描述符的大小），这个结果与gdtr或1dtr寄存器中的内容相加。</p>
+</li>
+<li><p>把逻辑地址的偏移量与段描述符Base字段的值相加就得到了线性地址。</p>
+</li>
+</ul>
+<div class="note note-warning">
+            <p>注意，有了与段寄存器相关的不可编程寄存器，只有当段寄存器的内容被改变时才需要执行前两个操作。</p>
+          </div>
+
+<h3 id="Linux中的分段"><a href="#Linux中的分段" class="headerlink" title="Linux中的分段"></a>Linux中的分段</h3><p>​	分段：可以给每一个进程分配不同的线性地址空间。</p>
+<p>​	分页：可以把同一线性地址空间映射到不同的物理空间。（Linux更多采取分页）</p>
+<ul>
+<li>当所有进程使用相同的段寄存器值时，内存管理变得更简单，也就是说它们能共享同样的一组线性地址。</li>
+<li>Linux设计目标之一是可以把它移植到绝大多数流行的处理器平台上。然而，RISC体系结构对分段的支持很有限。</li>
+</ul>
+<p>运行在用户态的所有Linux进程都使用一对相同的段来对指令和数据寻址。这两个段就是所谓的用户代码段和用户数据段。类似地，运行在内核态的所有Linux进程都使用一对相同的段对指令和数据寻址：它们分别叫做内核代码段和内核数据段。表2-3显示了这四个重要段的段描述符字段的值。</p>
+
+
+<p>相应的段选择符由宏<code>__USER_CS</code>，<code>__USER_DS</code>，<code>__KERNEL_CS</code>，和<code>__KERNEL_DS</code>分别定义。例如，为了对内核代码段寻址，内核只需要把<code>__KERNEL_CS</code>宏产生的值装进cs段寄存器即可。</p>
+<p>注意，与段相关的线性地址从0开始，达到2³²-1的寻址限长。这就意味着在用户态或内核态下的所有进程可以使用相同的逻辑地址。</p>
+<p>所有段都从0x00000000开始，这可以得出另一个重要结论，那就是在Linux下逻辑地址与线性地址是一致的，即逻辑地址的偏移量字段的值与相应的线性地址的值总是一致的。</p>
+<p>如前所述，CPU的当前特权级（CPL）反映了进程是在用户态还是内核态，并由存放在cs寄存器中的段选择符的RPL字段指定。只要当前特权级被改变，一些段寄存器必须相应地更新。例如，当CPL&#x3D;3时（用户态），ds寄存器必须含有用户数据段的段选择符，而当CPL&#x3D;0时，ds寄存器必须含有内核数据段的段选择符。</p>
+<h4 id="Linux-GDT"><a href="#Linux-GDT" class="headerlink" title="Linux GDT"></a>Linux GDT</h4><p>在单处理器系统电只有一个GDT。而在多处理器系统中每个CPU对应一个GDT。所有的GDT都存放在cpu_get_table数组中，而所有GDT的地址和它们的大小（当初始化gdtr寄存器时使用）被存放在cpu_gdt_descr数组中。如果你到源代码索引中查看，可以看到这些符号都在文件arch&#x2F;i386&#x2F;kernel&#x2F;head.S中被定义。</p>
+<p>图2-6是GDT的布局示意图。每个GDT包含18个段描述符和14个空的，未使用的，或保留的项。插入未使用的项的目的是为了使经常一起访问的描述符能够处于同一个32字节的硬件高速缓存行中（参见后面“硬件高速缓存”一节）。</p>
+
+
+<ol>
+<li>每个CPU都有自己的GDT副本。在多核（多处理器）系统中，每个处理器（CPU）都维护一份自己的GDT副本，这样可以满足每个CPU的特殊需求，比如每个CPU都有独立的TSS（任务状态段）。</li>
+<li>大多数GDT内容都一样。除了极少数表项（如TSS、LDT、TLS等），绝大部分GDT表项在所有CPU之间都是完全相同的。这保证了各个CPU访问内存时的规则一致，方便操作系统管理和调度。</li>
+<li>每个CPU的TSS（任务状态段）不同。每个CPU都有专属的TSS，GDT里的TSS描述符指向自己CPU的TSS内存区域，因此各CPU的GDT在TSS描述符项上是不同的。</li>
+<li>LDT和TLS等描述符可能不同。LDT（局部描述符表）和TLS（线程本地存储）相关的描述符可能会因为当前运行的进程或线程不同而有所变化，但这种特殊表项数量很少。</li>
+<li>某些特殊情况下GDT会被临时修改。例如调用APM BIOS等特殊功能时，内核可能会临时修改GDT中的某些描述符，以满足硬件或固件的特殊要求，这种修改通常只影响当前处理器的GDT副本，并且是暂时的。</li>
+</ol>
+<h4 id="Linux-LDT"><a href="#Linux-LDT" class="headerlink" title="Linux LDT"></a>Linux LDT</h4><p>大多数用户态下的Linux程序不会用到局部描述符表（LDT），所以内核为这些进程提供了一个默认的LDT，所有普通进程共享。默认LDT只包含5项，实际上只用到了两个，主要用于兼容一些老的可执行文件格式，比如iBCS和Solaris&#x2F;x86的调用门。</p>
+<p>有些特殊应用（比如Wine，需要运行Windows程序）会用到自定义的LDT。Linux通过<code>modify_ldt()</code>系统调用允许进程自行创建和修改自己的LDT；这些自定义LDT只对创建它们的进程有效。</p>
+<p>每当某个进程有自己的LDT时，CPU的GDT表中的LDT描述符会被修改，指向该进程专属的LDT。普通用户程序虽然可以用<code>modify_ldt()</code>分配新的段，但这些段仅在自己的自定义LDT里，内核本身不会用这些段，也不需要了解这些描述符的内容。</p>
+<h3 id="硬件中的分页"><a href="#硬件中的分页" class="headerlink" title="硬件中的分页"></a>硬件中的分页</h3><p>分页单元（Paging unit）把线性地址转换为物理地址。其中一个关键任务，把请求访问的类型和线性地址的访问权限相比较，如果这次内存访问无效，就产生一个缺页异常</p>
+<p>为了效率，<strong>线性地址被分为以固定长度位单位的组，称为页（Page）。页内部连续的线性地址被映射到连续的物理地址中。</strong>这样内核可以指定一个页的物理地址和其存取权限，而不用指定页所包含的全部线性地址的存取权限。我们遵循通常习惯，使用术语“页”既指一组线性地址，又指包含在这组地址中的数据。</p>
+<p><strong>分页单元把所有RAM分成固定长度的页框（page frame）（有时叫做物理页）。每一个页框包含一个页（page），也就是说一个页框的长度与一个页的长度一致。</strong>页框是主存的一部分，因此也是一个存储区域。区分一页和一个页框是很重要的，<strong>页只是一个数据块，可以存放在任何页框或磁盘中。</strong></p>
+<p><strong>把线性地址映射到物理地址的数据结构称为页表（page table）。</strong>页表存放在主存中，并在启用分页单元之前必须由内核对页表进行适当的初始化。</p>
+<h4 id="常规分页"><a href="#常规分页" class="headerlink" title="常规分页"></a>常规分页</h4><p>32位的线性地址被分成3个域：</p>
+<p>Directory（目录）最高10位</p>
+<p>Table（页表）中间10位</p>
+<p>Offset（偏移量）最低12位</p>
+<p>线性地址的转换分两步完成，每一步都基于一种转换表，第一种转换表称为页目录表（page directory），第二种转换表称为页表（page table）（在接下来的讨论中，小写的“page table”表示保存线性地址和物理地址之间映射的页，而利用”Page Table”表示在上层页表中的页。）。</p>
+<p>使用这种二级模式的目的在于减少每个进程页表所需RAM的数量。如果使用简单的一级页表，那将需要高达220个表项（也就是，在每项4个字节时，需要4MB RAM）来表示每个进程的页表（如果进程使用全部4GB线性地址空间），即使一个进程并不使用那个范围内的所有地址。<strong>二级模式通过只为进程实际使用的那些虚拟内存区请求页表来减少内存容量。</strong></p>
+<p>每个活动进程必须有一个分配给它的页目录。不过，没有必要马上为进程的所有页表都分配RAM。只有在进程实际需要一个页表时才给该页表分配RAM会更为有效率。</p>
+<p>正在使用的页目录的物理地址存放在控制寄存器cr3中。线性地址内的Directory字段决定页目录中的且录项，而目录项指向适当的页表。地址的Table字段依次又决定页表中的表项，而表项含有页所在页框的物理地址。Offset字段决定页框内的相对位置，如下图所示。由于它是12位长，故每一页含有4096字节的数据。</p>
 <img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png" srcset="/img/loading.gif" lazyload class title="page">
 
+<p>在32位x86分页机制下，虚拟地址被分成三部分：Directory字段（10位）、Table字段（10位）和Offset字段（12位）。</p>
+<ul>
+<li>Directory字段有10位，所以页目录最多有1024项（2的10次方）。</li>
+<li>Table字段也有10位，所以每个页表也最多有1024项。</li>
+<li>每一页的大小是4096字节（2的12次方）。</li>
+</ul>
+<p>因此，一个页目录最多可以管理的内存大小是：1024（目录项数） × 1024（每个页表的项数） × 4096（每页字节数）&#x3D; 4GB（2的32次方），这正好覆盖了32位处理器能寻址的全部虚拟内存空间。</p>
 <h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
 <ul>
 <li>页全局目录</li>
@@ -466,13 +550,13 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年7月10日</div>
+          <div>2025年6月25日</div>
         </div>
       
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年10月31日</div>
+          <div>2025年6月27日</div>
         </div>
       
       
@@ -503,9 +587,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/pm/S3%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/" title="S3 问题根因分析技术文档">
+                      <a href="/bug/%E9%9B%B7%E6%9F%8F%E9%BC%A0%E6%A0%87%E6%8F%92%E5%85%A5%E5%90%8E%E5%BC%80%E6%9C%BA%E9%87%8D%E5%90%AF/" title="雷柏鼠标接电脑开机自动重启">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">S3 问题根因分析技术文档</span>
+                        <span class="hidden-mobile">雷柏鼠标接电脑开机自动重启</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -513,8 +597,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/pm/Suspend/" title="Suspend (kernel 5.10)">
-                        <span class="hidden-mobile">Suspend (kernel 5.10)</span>
+                      <a href="/%E8%99%9A%E6%8B%9F%E6%9C%BA/qemu%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="qemu搭建arm64环境">
+                        <span class="hidden-mobile">qemu搭建arm64环境</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -830,6 +914,7 @@
 
   
 <script src="/js/scrollAnimation.js"></script>
+<script src="/js/expand-toc.js"></script>
 
 
 
