@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/page.png">
 <meta property="og:image" content="https://tomwithkernel.github.io/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png">
 <meta property="article:published_time" content="2025-06-25T02:09:00.000Z">
-<meta property="article:modified_time" content="2025-06-27T06:48:47.311Z">
+<meta property="article:modified_time" content="2025-07-03T01:28:26.409Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="内存寻址">
 <meta name="twitter:card" content="summary_large_image">
@@ -251,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.7k 字
+          7.4k 字
         
       </span>
     
@@ -262,7 +262,7 @@
         
         
         
-          159 分钟
+          246 分钟
         
       </span>
     
@@ -486,17 +486,131 @@
 <li>每一页的大小是4096字节（2的12次方）。</li>
 </ul>
 <p>因此，一个页目录最多可以管理的内存大小是：1024（目录项数） × 1024（每个页表的项数） × 4096（每页字节数）&#x3D; 4GB（2的32次方），这正好覆盖了32位处理器能寻址的全部虚拟内存空间。</p>
-<h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>​	四级分页模型</p>
+<h4 id="扩展分页"><a href="#扩展分页" class="headerlink" title="扩展分页"></a>扩展分页</h4><p>从Pentium模型开始，80x86微处理器引入了扩展分（extended paging），它允许页框太小为4MB而不是4KB如下图所示。扩展分页用于把大段连续的线性地址转换成相应的物理地址，在这些情况下，内核可以不用中间页表进行地址转换，从而节省内存并保留TLB项。</p>
+
+
+<p>正如前面所述，通过设置页目录项的Page size标志启用扩展分页功能。在这种情况下，分页单元把32位线性地址分成两个字段：</p>
+<p>Directory 最高10位	Offset 其余22位</p>
+<p>扩展分页和正常分页的页目录项基本相同，除了：</p>
 <ul>
-<li>页全局目录</li>
-<li>页上级目录</li>
-<li>页中级目录</li>
-<li>页表</li>
+<li>Page Size 标志必须被设置。</li>
+<li>20位物理地址字段只有最高10位是有意义的。这是因为每一个物理地址都是在以 4MB为边界的地方开始的，故这个地址的最低22位为0。</li>
+</ul>
+<p>通过设置cr4处理器寄存器的PSE标志能使扩展分页与常规分页共存。</p>
+<h5 id="TLB"><a href="#TLB" class="headerlink" title="TLB"></a>TLB</h5><p>TLB（Translation Lookaside Buffer，转换后援缓冲器）是CPU内部专门为<strong>加速虚拟地址（或线性地址）到物理地址</strong>转换而设计的一种<strong>硬件高速缓存</strong>。</p>
+<h6 id="为什么需要TLB？"><a href="#为什么需要TLB？" class="headerlink" title="为什么需要TLB？"></a>为什么需要TLB？</h6><ul>
+<li>现代操作系统使用虚拟内存，虚拟地址访问需要通过“页表”映射到物理地址。</li>
+<li>每次内存访问都查页表会很慢（因为页表本身在内存里）。</li>
+<li>TLB用来缓存最近的页表项，如果虚拟地址的映射在TLB中，就能极快地得到物理地址，提高访问速度。</li>
+</ul>
+<h6 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h6><ol>
+<li>CPU访问虚拟地址时，先查TLB。</li>
+<li>如果TLB命中（有对应的映射），直接拿到物理地址。</li>
+<li>如果TLB未命中（miss），就要访问内存里的页表，得到映射后会把它加载进TLB，以便下次用。</li>
+</ol>
+<h6 id="多处理器中的TLB"><a href="#多处理器中的TLB" class="headerlink" title="多处理器中的TLB"></a>多处理器中的TLB</h6><ul>
+<li>每个CPU&#x2F;核心有自己的本地TLB，<strong>不需要</strong>像Cache那样和其他CPU的TLB保持同步。</li>
+<li>这是因为每个CPU上的进程可以把同一个虚拟地址映射到不同的物理地址（不同进程有独立的页表），同步反而会出错。</li>
+</ul>
+<h6 id="TLB失效"><a href="#TLB失效" class="headerlink" title="TLB失效"></a>TLB失效</h6><ul>
+<li>当操作系统切换进程、重新加载页表时，会修改CR3寄存器（指向当前进程的页表）。</li>
+<li>一旦CR3变化，CPU会自动让本地TLB所有项失效（flush），以避免用到旧的、错误的映射。</li>
+</ul>
+<h5 id="CR3寄存器"><a href="#CR3寄存器" class="headerlink" title="CR3寄存器"></a>CR3寄存器</h5><p><strong>CR3寄存器</strong>是x86架构（包括Intel和AMD CPU）中非常重要的一个控制寄存器，主要用于<strong>分页机制</strong>下的内存管理。它的作用和本质如下：</p>
+<h6 id="CR3寄存器的作用"><a href="#CR3寄存器的作用" class="headerlink" title="CR3寄存器的作用"></a>CR3寄存器的作用</h6><ul>
+<li><strong>存放页目录的物理地址</strong><br>在启用分页（Paging）机制时，CR3寄存器保存当前活动页表（通常是页目录或PML4表，取决于32位还是64位模式）的物理地址。</li>
+<li><strong>内存地址转换的入口</strong><br>当CPU需要把虚拟地址（线性地址）转换为物理地址时，会首先从CR3寄存器中读取页目录的物理地址，然后查找对应的页表项。</li>
+</ul>
+<h6 id="CR3的别名"><a href="#CR3的别名" class="headerlink" title="CR3的别名"></a>CR3的别名</h6><ul>
+<li>有时也被称为<strong>页目录基址寄存器（Page Directory Base Register, PDBR）</strong>（在32位分页机制下）。</li>
+</ul>
+<h6 id="其他功能"><a href="#其他功能" class="headerlink" title="其他功能"></a>其他功能</h6><ul>
+<li><strong>切换进程时更换CR3</strong><br>每个进程有自己的页表。操作系统进行进程切换时，会把新进程的页表物理地址写入CR3，这样新进程的虚拟地址空间就生效了。</li>
+<li><strong>刷新TLB</strong><br>当CR3被写入新值时，CPU会自动使本地的TLB（转换后援缓冲器）所有项失效（清空），以避免不一致的地址映射。</li>
+</ul>
+<h6 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h6><ul>
+<li>操作系统内核在进程切换、内存管理等场景都会频繁操作CR3寄存器。</li>
+</ul>
+<p><strong>CR3寄存器</strong>是保存当前页表（或页目录）物理地址的寄存器，是虚拟地址到物理地址转换的关键起点。切换CR3可以切换虚拟内存空间，写CR3时会自动刷新TLB。</p>
+<h4 id="硬件高速缓存-Cache"><a href="#硬件高速缓存-Cache" class="headerlink" title="硬件高速缓存 Cache"></a>硬件高速缓存 Cache</h4><p>当今的微处理器时钟频率接近几个GHz，而动态RAM（DRAM）芯片的存取时间是时钟周期的数百倍。这意味着，当从RAM中取操作数或向RAM中存放结果这样的指令执行时，CPU可能等待很长时间。为了缩小CPU和RAM之间的速度不匹配，引入了硬件高速缓存内存（hardware cache memory）。</p>
+<h5 id="1-为什么需要Cache"><a href="#1-为什么需要Cache" class="headerlink" title="1. 为什么需要Cache"></a>1. 为什么需要Cache</h5><ul>
+<li>CPU的速度远高于主内存（RAM），但RAM访问速度较慢。</li>
+<li>为了减少CPU等待内存的时间，提高整体系统性能，引入了硬件Cache（高速缓存）。</li>
+</ul>
+<h5 id="2-局部性原理"><a href="#2-局部性原理" class="headerlink" title="2. 局部性原理"></a>2. 局部性原理</h5><ul>
+<li><strong>时间局部性</strong>：最近访问过的数据&#x2F;指令很可能马上还会再次被访问。</li>
+<li><strong>空间局部性</strong>：与当前访问地址相邻的数据&#x2F;指令很可能很快会被访问。</li>
+<li>Cache正是利用了这两个原理，把最近常用的数据和指令缓存在更快的小容量存储区内。</li>
+</ul>
+<h5 id="3-Cache结构与工作方式"><a href="#3-Cache结构与工作方式" class="headerlink" title="3. Cache结构与工作方式"></a>3. Cache结构与工作方式</h5><ul>
+<li>Cache以“行（Line）”为单位管理数据，一行通常有几十个连续字节。</li>
+<li>Cache单元一般插在分页单元与主内存之间，包括：<ul>
+<li><strong>Cache存储体</strong>（Cache memory）：实际存放数据的高速SRAM。</li>
+<li><strong>Cache控制器</strong>（Cache controller）：管理Cache行、标签和状态。</li>
+</ul>
+</li>
+<li>每个Cache行有一个<strong>标签（Tag）</strong>和若干<strong>状态标志（Flag）</strong>，用来标记和管理该行数据。</li>
+</ul>
+<h5 id="4-地址分解"><a href="#4-地址分解" class="headerlink" title="4. 地址分解"></a>4. 地址分解</h5><ul>
+<li>物理地址在Cache中通常被分为三部分：<ul>
+<li><strong>标签（Tag）</strong>：用于判断这行Cache当前映射的是主内存的哪个块。</li>
+<li><strong>组索引（Set Index）</strong>：决定地址映射到Cache的哪一组或位置。</li>
+<li><strong>行内偏移（Block Offset）</strong>：定位到Cache行内的具体字节。</li>
+</ul>
+</li>
+</ul>
+<h5 id="5-Cache映射方式"><a href="#5-Cache映射方式" class="headerlink" title="5. Cache映射方式"></a>5. Cache映射方式</h5><ul>
+<li><strong>直接映射（Direct Mapped）</strong>：主存中的每一行只能存到Cache的唯一位置。</li>
+<li><strong>全相联（Fully Associative）</strong>：主存中的任意一行都可以存到Cache的任何位置。</li>
+<li><strong>N路组相联（N-way Set Associative）</strong>：Cache被分为若干组，每组有N行，主存的一行可以映射到某组内的任意一行。实际中最常用。</li>
+</ul>
+<h5 id="6-Cache命中与未命中"><a href="#6-Cache命中与未命中" class="headerlink" title="6. Cache命中与未命中"></a>6. Cache命中与未命中</h5><ul>
+<li><strong>命中（Cache Hit）</strong>：访问数据时Cache中已有，直接返回，高速。</li>
+<li><strong>未命中（Cache Miss）</strong>：Cache中没有，需从RAM读入数据，并可能替换掉旧的Cache行。</li>
+</ul>
+<h5 id="7-Cache的写入策略"><a href="#7-Cache的写入策略" class="headerlink" title="7. Cache的写入策略"></a>7. Cache的写入策略</h5><ul>
+<li><strong>通写（Write-through）</strong>：写操作同时写入Cache和RAM，保持一致性但速度较慢。</li>
+<li><strong>回写（Write-back）</strong>：只写Cache，等Cache行被替换或刷新时再写回RAM，速度快，但一致性依赖于刷新操作。</li>
+</ul>
+<h5 id="8-多处理器系统中的Cache一致性"><a href="#8-多处理器系统中的Cache一致性" class="headerlink" title="8. 多处理器系统中的Cache一致性"></a>8. 多处理器系统中的Cache一致性</h5><ul>
+<li>多核&#x2F;多处理器系统中，每个CPU有自己的Cache。</li>
+<li>为保证数据一致性，各CPU的Cache需要通过专门的硬件电路（如总线嗅探、MESI协议等）进行同步。</li>
+<li>当一个CPU修改了某数据，需要通知其他CPU的Cache使相应数据失效或更新，以避免数据冲突。</li>
+</ul>
+<h5 id="9-多级Cache"><a href="#9-多级Cache" class="headerlink" title="9. 多级Cache"></a>9. 多级Cache</h5><ul>
+<li>早期的Pentium芯片只集成了一级Cache（L1-cache）。</li>
+<li>现代处理器通常有多级Cache：L1（小容量、最快），L2（容量更大、速度稍慢），L3（容量更大、速度更慢）。</li>
+<li>这些多级Cache都集成在芯片上，由硬件自动保证各级Cache之间的数据一致性。</li>
+<li>Linux等操作系统一般不关心多级Cache的细节，默认系统只有一级Cache。</li>
+</ul>
+<h5 id="10-Cache控制相关寄存器"><a href="#10-Cache控制相关寄存器" class="headerlink" title="10. Cache控制相关寄存器"></a>10. Cache控制相关寄存器</h5><ul>
+<li>处理器的cr0寄存器中的CD标志（Cache Disable）可以用来启用或关闭Cache电路。</li>
+<li>cr0寄存器中的NW标志（Not Write-through）用于控制Cache的写入策略（回写或通写）。</li>
+</ul>
+<h5 id="11-页表项中的Cache管理标志"><a href="#11-页表项中的Cache管理标志" class="headerlink" title="11. 页表项中的Cache管理标志"></a>11. 页表项中的Cache管理标志</h5><ul>
+<li>每个页目录项和页表项都包含两个与Cache相关的标志位：<ul>
+<li><strong>PCD（Page Cache Disable）</strong>：指示访问该页框时是否启用Cache功能。</li>
+<li><strong>PWT（Page Write-Through）</strong>：指示对该页框采用通写还是回写策略。</li>
+</ul>
+</li>
+<li>这样，操作系统可以为每个内存页单独设置Cache管理策略。</li>
+</ul>
+<h5 id="12-Linux的做法"><a href="#12-Linux的做法" class="headerlink" title="12. Linux的做法"></a>12. Linux的做法</h5><ul>
+<li>Linux系统默认会清除所有页目录项和页表项中的PCD和PWT标志。</li>
+<li>结果是：所有页框都启用Cache，写操作总是采用回写策略（write-back）。</li>
+</ul>
+<h3 id="Linux中的分页"><a href="#Linux中的分页" class="headerlink" title="Linux中的分页"></a>Linux中的分页</h3><p>Linux采用了一种同时适用于32位和64位系统的普通分页模型。正像前面“64位系统中的分页”一节所解释的那样，两级页表对32位系统来说已经足够了，但64位系统需要更多数量的分页级别。直到2.6.10版本，Linux采用三级分页的模型。从2.6.11版本开始，采用了四级分页模型，这个变化用来全力支持x86_64平台使用的对线性地址的位的划分。下图中展示的4种页表分别被为：</p>
+<ul>
+<li>页全局目录（Page Global Directory）</li>
+<li>页上级目录（Page Upper Directory）</li>
+<li>页中间目录（Page Middle Directory)</li>
+<li>页表（Page Table)</li>
 </ul>
 <img src="/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/%E5%86%85%E5%AD%98%E5%AF%BB%E5%9D%80/linux_page.png" srcset="/img/loading.gif" lazyload class title="linux_page">
 
-
-
+<p>页全局目录包含若干页上级目录的地址，页上级目录又依次包含若干页中间目录的地址，而页中间目录又包含若干页表的地址。每一个页表项指向一个页框。线性地址因此被分成五个部分。上图没有显示位数，因为每一部分的大小与具体的计算机体系结构有关。</p>
+<p>对于没有启用物理地址扩展的32位系统，两级页表已经足够了。Linux通过使“页上级目录”位和“页中间目录”位全为0，从根本上取消了页上级目录和页中间目录字段。不过，页上级自录和页中间自录在指针序列中的位置被保留，以使同样的代码在32位系统和64位系统下都能使用。内核为页上级目录和页中间目录保留了一个位置，这是通过把它们的页目录项数设置为1，并把这两个目录项映射到页全局目录的一个适当的目录项而实现的。</p>
+<p>启用了物理地址扩展的32位系统使用了三级页表。Linux的页全局目录对应80x86的页 目录指针表（PDPT），取消了页上级目录，页中间目录对应80x86的页目录，Linux的页表对应80x86的页表。 最后，64位系统使用三级还是四级分页取决于硬件对线性地址的位的划分。</p>
 
                 
               </div>
@@ -561,7 +675,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年6月27日</div>
+          <div>2025年7月3日</div>
         </div>
       
       
