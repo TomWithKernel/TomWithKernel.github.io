@@ -19,18 +19,20 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产生">
+    <meta name="description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。 中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产">
 <meta property="og:type" content="article">
 <meta property="og:title" content="中断">
 <meta property="og:url" content="https://tomwithkernel.github.io/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产生">
+<meta property="og:description" content="中断和异常中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。 中断通常分为同步（synchronous）中断和异步（asynchronous）中断：  同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。 异步中断是由其他硬件设备依照CPU时钟信号随机产">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/a.png">
 <meta property="article:published_time" content="2024-10-31T05:45:42.000Z">
-<meta property="article:modified_time" content="2024-11-25T07:00:10.371Z">
+<meta property="article:modified_time" content="2025-07-10T08:43:06.308Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="irq">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/a.png">
   
   
   
@@ -242,7 +244,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          3k 字
         
       </span>
     
@@ -253,7 +255,7 @@
         
         
         
-          66 分钟
+          102 分钟
         
       </span>
     
@@ -304,48 +306,24 @@
             
               <div class="markdown-body">
                 
-                <h2 id="中断和异常"><a href="#中断和异常" class="headerlink" title="中断和异常"></a>中断和异常</h2><p>中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。<br>中断通常分为同步（synchronous）中断和异步（asynchronous）中断：</p>
+                <h2 id="中断和异常"><a href="#中断和异常" class="headerlink" title="中断和异常"></a>中断和异常</h2><p>中断（interrupt）通常被定义为一个事件，该事件改变处理器执行的指令顺序。这样的事件与CPU芯片内外部硬件电路产生的电信号相对应。</p>
+<p>中断通常分为同步（synchronous）中断和异步（asynchronous）中断：</p>
 <ul>
-<li>同步中断是当指令执行时由CPU控制单元产生的，之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。</li>
+<li>同步中断是当指令执行时由CPU控制单元产生的，<strong>之所以称为同步，是因为只有在一条指令终止执行后CPU才会发出中断。</strong></li>
 <li>异步中断是由其他硬件设备依照CPU时钟信号随机产生的。</li>
 </ul>
 <p>在Intel微处理器手册中，把同步和异步中断分别称为<strong>异常</strong>（exception）和<strong>中断</strong>（interrupt）。我们也采用这种分类，当然有时我们也用术语“中断信号”指这两种类型（同步及异步）。</p>
-<p>中断是由间隔定时器和I&#x2F;O设备产生的，例如，用户的一次按键会引起一个中断。另一方面，异常是由程序的错误产生的，或者是由内核必须处理的异常条件产生的。第一种情况下，内核通过发送一个每个Unix程序员都熟悉的信号来处理异常。第二种情况下，内核执行恢复异常需要的所有步骤，例如缺页，或对内核服务的一个请求（通过一条int或sysenter指令）。</p>
-<h3 id="中断和异常-1"><a href="#中断和异常-1" class="headerlink" title="中断和异常"></a>中断和异常</h3><ul>
-<li><p>中断：</p>
-<ul>
-<li><p>可屏蔽中断</p>
-<p>I&#x2F;O设备发出的所有中断请求（IRQ)都产生可屏蔽中断。可屏蔽中断可以处于两种状态：屏蔽的（masked）或非屏蔽的（unmasked）：一个屏蔽的中断只要还是屏蔽的，控制单元就忽略它。</p>
-</li>
-<li><p>非屏蔽中断</p>
-<p>只有几个危急事件（如硬件故障）才引起非屏蔽中断，非屏蔽中断总是由CPU辨认</p>
-</li>
-</ul>
-</li>
-<li><p>异常</p>
-<ul>
-<li><p>处理器探测异常</p>
-<p>当CPU执行指令时探测到的一个反常条件所产生的异常。可以进一步分为三组，这取决于CPU控制单元产生异常时保存在内核态堆栈eip寄存器（在 x86 指令集中，EIP 寄存器存储着 CPU 将要执行的下一条指令的内存地址）中的值。</p>
-<ul>
-<li><p>故障</p>
-<p>通常可以纠正；一且纠正，程序就可以在不失连贯性的情况下重新开始。保存在eip中的值是引起故障的指令地址，因此，当异常处理程序终止时，那条指令会被重新执行。我们将在“缺页异常处理程序”一节中看到，只要处理程序能纠正引起异常的反常条件，重新执行同一指令就是必要的。</p>
-</li>
-<li><p>陷阱</p>
-<p>在陷指令执行后立即报告：内核把控制权返回给程序后就可以继续它的执行而不失连贯性。保存在eip中的值是一个随后要执行的指令地址。只有当没有必要重新执行已终止的指令时，才触发陷阱。陷阱的主要用途是为了调试程序。在这种情况下，中断信号的作用是通知调试程序一条特殊指令已被执行（例如到了一个程序内的断点）。一旦用户检查到调试程序所提供的数据，她就可能要求被调试程序从下一条指令重新开始执行。</p>
-</li>
-<li><p>异常终止</p>
-<p>发生一个严重的错误：控制单元出了问题，不能在eip寄存器中保存引起异常的指令所在的确切位置。异常中止用于报告严重的错误，如硬件故障或系统表中无效的值或不一致的值。由控制单元发送的这个中断信号是紧急信号，用来把控制权切换到相应的异常中止处理程序，这个异常中止处理程序除了强制受影响的进程终止外，没有别的选择。</p>
-</li>
-<li><p>编程异常</p>
-<p>在编程者发出请求时发生。是由int或int3指令触发的：当into（检查溢出）和bound（检查地址出界）指令检查的条件不为真时，也引起编程异常。控制单元把编程异常作为陷来处理。编程异常通常也叫做软中断（software interrupt）。这样的异常有两种常用的用途：执行系统调用及给调试程序通报一个特定的事件。</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<p><strong>中断是由间隔定时器和I&#x2F;O设备产生的</strong>，例如，用户的一次按键会引起一个中断。</p>
+<p>另一方面，<strong>异常是由程序的错误产生的，或者是由内核必须处理的异常条件产生的</strong>。第一种情况下，内核通过发送一个每个Unix程序员都熟悉的信号来处理异常。第二种情况下，内核执行恢复异常需要的所有步骤，例如缺页，或对内核服务的一个请求（通过一条int或sysenter指令）。</p>
+<h3 id="中断和异常-1"><a href="#中断和异常-1" class="headerlink" title="中断和异常"></a>中断和异常</h3><h4 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h4><h5 id="可屏蔽中断-（maskable-Interrupt）"><a href="#可屏蔽中断-（maskable-Interrupt）" class="headerlink" title="可屏蔽中断 （maskable Interrupt）"></a>可屏蔽中断 （maskable Interrupt）</h5><p>I&#x2F;O设备发出的所有中断请求(IRQ)都产生可屏蔽中断。可屏蔽中断可以处于两种状态：屏蔽的（masked）或非屏蔽的（unmasked）：一个屏蔽的中断只要还是屏蔽的，控制单元就忽略它。</p>
+<h5 id="非屏蔽中断-（nonmaskable-Interrupt，NMI）"><a href="#非屏蔽中断-（nonmaskable-Interrupt，NMI）" class="headerlink" title="非屏蔽中断 （nonmaskable Interrupt，NMI）"></a>非屏蔽中断 （nonmaskable Interrupt，NMI）</h5><p>只有几个危急事件（如硬件故障）才引起非屏蔽中断，非屏蔽中断总是由CPU辨认。</p>
+<h4 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h4><h6 id="处理器探测异常-（processor-detected-exception）"><a href="#处理器探测异常-（processor-detected-exception）" class="headerlink" title="处理器探测异常 （processor-detected exception）"></a>处理器探测异常 （processor-detected exception）</h6><p>当CPU执行指令时探测到的一个反常条件所产生的异常。可以进一步分为三组，这取决于CPU控制单元产生异常时保存在内核态堆栈eip寄存器（在 x86 指令集中，EIP 寄存器存储着 CPU 将要执行的下一条指令的地址）中的值。</p>
+<h6 id="故障-（fault）"><a href="#故障-（fault）" class="headerlink" title="故障 （fault）"></a>故障 （fault）</h6><p>通常可以纠正；一且纠正，程序就可以在不失连贯性的情况下重新开始。保存在eip中的值是引起故障的指令地址，因此，当异常处理程序终止时，那条指令会被重新执行。我们将在“缺页异常处理程序”一节中看到，只要处理程序能纠正引起异常的反常条件，重新执行同一指令就是必要的。</p>
+<h6 id="陷阱-（trap）"><a href="#陷阱-（trap）" class="headerlink" title="陷阱 （trap）"></a>陷阱 （trap）</h6><p>在陷指令执行后立即报告：内核把控制权返回给程序后就可以继续它的执行而不失连贯性。保存在eip中的值是一个随后要执行的指令地址。只有当没有必要重新执行已终止的指令时，才触发陷阱。陷阱的主要用途是为了调试程序。在这种情况下，中断信号的作用是通知调试程序一条特殊指令已被执行（例如到了一个程序内的断点）。一旦用户检查到调试程序所提供的数据，她就可能要求被调试程序从下一条指令重新开始执行。</p>
+<h6 id="异常终止-（abort）"><a href="#异常终止-（abort）" class="headerlink" title="异常终止 （abort）"></a>异常终止 （abort）</h6><p>发生一个严重的错误：控制单元出了问题，不能在eip寄存器中保存引起异常的指令所在的确切位置。异常中止用于报告严重的错误，如硬件故障或系统表中无效的值或不一致的值。由控制单元发送的这个中断信号是紧急信号，用来把控制权切换到相应的异常中止处理程序，这个异常中止处理程序除了强制受影响的进程终止外，没有别的选择。</p>
+<h6 id="编程异常-（programmed-exception）"><a href="#编程异常-（programmed-exception）" class="headerlink" title="编程异常 （programmed exception）"></a>编程异常 （programmed exception）</h6><p>在编程者发出请求时发生。是由int或int3指令触发的：当into（检查溢出）和bound（检查地址出界）指令检查的条件不为真时，也引起编程异常。控制单元把编程异常作为陷来处理。编程异常通常也叫做软中断（software interrupt）。这样的异常有两种常用的用途：执行系统调用及给调试程序通报一个特定的事件。</p>
 <p>每个中断和异常是由0~255之间的一个数来标识。因为一些未知的原因，Intel把这个8位的无符号整数叫做一个向量（vector）。非屏蔽中断的向量和异常的向量是固定的，而可屏蔽中断的向量可以通过对中断控制器的编程来改变。</p>
-<h3 id="IRQ和中断"><a href="#IRQ和中断" class="headerlink" title="IRQ和中断"></a>IRQ和中断</h3><p>​	每个能够发出中断请求的硬件设备控制器都有一条名为IRQ（Interrupt ReQuest）的输出线（复杂一些的设备有几条IRQ线，例知，PCI卡可能使用多达4条IRQ线）。所有现有的IRQ线（IRQ line）都与一个名为可编程中断控制器（Programmable Interrupt Controller，PIC)的硬件电路的输入引脚相连，可编程中断控制器执行下列动作：</p>
+<h3 id="IRQ和中断"><a href="#IRQ和中断" class="headerlink" title="IRQ和中断"></a>IRQ和中断</h3><p>每个能够发出中断请求的硬件设备控制器都有一条名为IRQ（Interrupt ReQuest）的输出线（复杂一些的设备有几条IRQ线，例知，PCI卡可能使用多达4条IRQ线）。所有现有的IRQ线（IRQ line）都与一个名为可编程中断控制器（Programmable Interrupt Controller，PIC)的硬件电路的输入引脚相连，可编程中断控制器执行下列动作：</p>
 <pre><code class="hljs"> 1. 监视IRQ线，检查产生的信号（raised signal）。如果有条或两条以上的IRQ线上产生信号，就选择引脚编号较小的IRQ线
  2. 如果一个引发信号出现在IRQ线上：
   - 把接收到的引发信号转换成对应的向量
@@ -354,8 +332,46 @@
   - 等待，直到CPU通过把这个中断信号写进可编程中断控制器的一个I/O端口来确认他；当这种情况发生时，清INTR线
  3. 返回到第一步
 </code></pre>
-<p>​	IRQ线是从0开始顺序编号的，因此，第一条IRQ线通常表示成IRQ0。与IRQn关联的Intel的缺省向量是n+32。如前所述，通过向中断控制器端口发布合适的指令，就可以修改IRQ和向量之间的映射。</p>
-<p>​	可以有选择地禁止每条IRQ线。因此，可以对PIC编程从而禁止IRQ，也就是说，可以告诉PIC停止对给定的IRQ线发布中断，或者激活它们。禁止的中断是丢失不了的，它们一旦被激活，PIC就又把它们发送到CPU。这个特点被大多数中断处理程序使用，因为这允许中断处理程序逐次地处理同一类型的IRQ</p>
+<p>IRQ线是从0开始顺序编号的，因此，第一条IRQ线通常表示成IRQ0。与IRQn关联的Intel的缺省向量是n+32。如前所述，通过向中断控制器端口发布合适的指令，就可以修改IRQ和向量之间的映射。</p>
+<p>可以有选择地禁止每条IRQ线。因此，可以对PIC编程从而禁止IRQ，也就是说，可以告诉PIC停止对给定的IRQ线发布中断，或者激活它们。禁止的中断是丢失不了的，它们一旦被激活，PIC就又把它们发送到CPU。这个特点被大多数中断处理程序使用，因为这允许中断处理程序逐次地处理同一类型的IRQ</p>
+<h3 id="高级可编程中断控制器"><a href="#高级可编程中断控制器" class="headerlink" title="高级可编程中断控制器"></a>高级可编程中断控制器</h3><p>如果系统只有一个单独的CPU，那么主 PIC的输出线以直截了当的方式连接到CPU的INTR引脚。然而，如果系统中包含两个 或多个CPU，那么这种方式不再有效，因而需要更复杂的PIC。</p>
+<p>为了充分发挥SMP体系结构的并行性，能够把中断传递给系统中的每个CPU至关重要。 基于此理由，Intel从Pentiun III开始引入了一种名为I&#x2F;O高级可编程控制器（I&#x2F;O Advanced Programmable Interrupt Controller，I&#x2F;O APIC）的新组件，用以代替老式的8259A可编程中断控制器。新近的主板为了支持以前的操作系统都包括两种芯片。此外，80x86微处理器当前所有的CPU都含有一个本地APIC。每个本地APIC都有32位的寄存器、一个内部时钟、一个本地定时设备及为本地APIC中断保留的两条额外的IRQ线 LINT0 和 LINT1。所有本地APIC都连接到一个外部 I&#x2F;O APIC，形成一个多APIC的系统。 </p>
+<p>下图以示意图的方式显示了一个多APIC系统的结构。一条APIC总线把“前端”I&#x2F;O APIC连接到本地APIC。来自设备的IRQ线连接到I&#x2F;O APIC，因此，相对于本地APIC， I&#x2F;O APIC起路由器的作用。在Pentium III和早期处理器的母板上，APIC总线是一个 串行三线总线；从Pentium4开始，APIC总线通过系统总线来实现。不过，因为APIC 总线及其信息对软件是不可见的，因此，我们不做进一步的详细讨论。</p>
+<img src="/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/a.png" srcset="/img/loading.gif" lazyload class title="a">
+
+<p>I&#x2F;O APIC的组成为：一组24条IRQ线、一张24项的中断重定向表（Interrupt Redirection Table）、可编程寄存器，以及通过APIC总线发送和接收APIC信息的一个信息单元。与8259A的IRQ引脚不同，中断优先级并不与引脚号相关联：中断重定向表中的每一项都可以被单独编程以指明中断向量和优先级，目标处理器及选择处理器的方式。重定向表中的信息用于把每个外部IRQ信号转换为一条消息，然后，通过APIC总线把消息发送给一个或多个本地APIC单元。</p>
+<p>来自外部硬件设备的中断请求以两种方式在可用的CPU之间分发：</p>
+<ol>
+<li><p>静态分发</p>
+<ul>
+<li><p>IRQ信号被直接发送到指定的CPU或CPU组（或者广播给所有CPU）。</p>
+</li>
+<li><p>哪个CPU响应中断由重定向表中预先设定，分发方式固定。</p>
+</li>
+</ul>
+</li>
+<li><p>动态分发</p>
+<ul>
+<li><p>IRQ信号优先分配给当前运行最低优先级进程的CPU（由本地APIC的TPR寄存器判断）。</p>
+</li>
+<li><p>每次进程切换时，操作系统应更新TPR寄存器，确保优先级信息准确。</p>
+</li>
+<li><p>如果有多个CPU优先级相同，则通过仲裁技术（arbitration）决定哪个CPU处理，仲裁优先级在本地APIC的仲裁优先级寄存器中管理（0~15）。</p>
+<ul>
+<li>某CPU响应中断后，其仲裁优先级归零，其它CPU的仲裁优先级+1。</li>
+<li>这样可以实现中断在多个CPU间轮流分配，避免某个CPU总是处理中断。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>处理在处理器之间分发中断外，多APIC系统还支持处理器间中断（IPI，Inter-Processor Interrupt），即一个CPU可以通过本地APIC的中断指令寄存器（Interrupt Command Register，ICR）发起中断，把中断向量和目标APIC的ID写入ICR后，通过APIC总线把中断信号发送给指定CPU，实现CPU之间的信息交换和协作。</p>
+<p>处理器间中断IPI在SMP（对称多处理器）系统中非常重要，操作系统（如Linux）广泛用它来同步多核CPU、调度和通信。</p>
+<p>单处理器系统一般有一个I&#x2F;O APIC芯片用于管理外部中断，有两种常见配置方式：</p>
+<ul>
+<li>第一种：本地APIC被禁止，IOAPIC作为外部8259A方式的PIC，LINT0和LINT1分别连接到CPU的INTR和NMI引脚。</li>
+<li>第二种：本地APIC被启用，所有外部中断通过IOAPIC传递到本地APIC，再进入CPU。这样为多核扩展和高级中断管理做准备。</li>
+</ul>
 <h3 id="中断描述符表"><a href="#中断描述符表" class="headerlink" title="中断描述符表"></a>中断描述符表</h3><p>​	中断描述符表（Interrupt Descriptor Table.IDT）是一个系统表，它与每一个中断或异常向量（异常向量是一组预定义的内存地址，用于存储处理器在发生异常时应该跳转到的位置）相联系，每一个向量在表中有相应的中断或异常处理程序的入口地址。内核在允许中断发生前，必须适当地初始化IDT.</p>
 <p>​	IDT包含三种类型的描述符：</p>
 <p>​		任务门：当中断信号发生时，必须取代当前进程的那个进程的TSS选择符存放在任务门中。</p>
@@ -380,7 +396,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/irq/" class="category-chain-item">irq</a>
+  <a href="/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3linux%E5%86%85%E6%A0%B8/" class="category-chain-item">深入理解linux内核</a>
   
   
 
@@ -426,7 +442,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年11月25日</div>
+          <div>2025年7月10日</div>
         </div>
       
       
@@ -467,8 +483,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/" title="进程">
-                        <span class="hidden-mobile">进程</span>
+                      <a href="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="scsi子系统">
+                        <span class="hidden-mobile">scsi子系统</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

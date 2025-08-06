@@ -19,20 +19,20 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="进程​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体 ​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）">
+    <meta name="description" content="进程进程是任何多道程序设计的操作系统中的基本概念。通常把进程定义为程序执行的一个实例，因此，如果16个用户同时运行vi，那么就有16个独立的进程（尽管它们共享同一个可执行代码）。在Linux源代码中，常把进程称为任务（task）或线程（thread）。 在这一章，我们将首先讨论进程的静态特性，然后描述内核如何进行进程切换。最后两节研究如何创建和撤消进程。这一章还将讲述Linux对多线程应用程序的支">
 <meta property="og:type" content="article">
 <meta property="og:title" content="进程">
 <meta property="og:url" content="https://tomwithkernel.github.io/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="进程​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体 ​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）">
+<meta property="og:description" content="进程进程是任何多道程序设计的操作系统中的基本概念。通常把进程定义为程序执行的一个实例，因此，如果16个用户同时运行vi，那么就有16个独立的进程（尽管它们共享同一个可执行代码）。在Linux源代码中，常把进程称为任务（task）或线程（thread）。 在这一章，我们将首先讨论进程的静态特性，然后描述内核如何进行进程切换。最后两节研究如何创建和撤消进程。这一章还将讲述Linux对多线程应用程序的支">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tomwithkernel.github.io/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/process1.png">
-<meta property="article:published_time" content="2024-10-31T05:45:28.000Z">
-<meta property="article:modified_time" content="2024-11-06T03:29:33.974Z">
+<meta property="og:image" content="https://tomwithkernel.github.io/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/a.png">
+<meta property="article:published_time" content="2025-07-01T05:45:28.000Z">
+<meta property="article:modified_time" content="2025-08-06T01:55:53.700Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="进程">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tomwithkernel.github.io/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/process1.png">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/a.png">
   
   
   
@@ -232,8 +232,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-31 13:45" pubdate>
-          2024年10月31日 下午
+        <time datetime="2025-07-01 13:45" pubdate>
+          2025年7月1日 下午
         </time>
       </span>
     
@@ -244,7 +244,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          6.1k 字
         
       </span>
     
@@ -255,7 +255,7 @@
         
         
         
-          42 分钟
+          203 分钟
         
       </span>
     
@@ -306,25 +306,324 @@
             
               <div class="markdown-body">
                 
-                <h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>​	进程是程序执行时的一个实例，从内核的观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体</p>
-<p>​	当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）</p>
-<p>​	Linux使用轻量级进程（lightweight process）对多线程应用程序提供更好的支持。两个轻量级进程基本上可以共享一些资源，诸如地址空间、打开的文件等等。只要其中一个修改共享资源，另一个就立即查看这种修改。当然，当两个线程访问共享资源时就必须同步它们自己。</p>
-<h3 id="进程描述符"><a href="#进程描述符" class="headerlink" title="进程描述符"></a>进程描述符</h3><img src="/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/process1.png" srcset="/img/loading.gif" lazyload class title="process1">
+                <h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>进程是任何多道程序设计的操作系统中的基本概念。通常把进程定义为程序执行的一个实例，因此，如果16个用户同时运行vi，那么就有16个独立的进程（尽管它们共享同一个可执行代码）。在Linux源代码中，常把进程称为任务（task）或线程（thread）。</p>
+<p>在这一章，我们将首先讨论进程的静态特性，然后描述内核如何进行进程切换。最后两节研究如何创建和撤消进程。这一章还将讲述Linux对多线程应用程序的支持，正如第一章中所提到的，它依赖所谓的轻量级进程（LWP）。</p>
+<h3 id="进程、轻量级进程和线程"><a href="#进程、轻量级进程和线程" class="headerlink" title="进程、轻量级进程和线程"></a>进程、轻量级进程和线程</h3><p>术语“进程”在使用中常有几个不同的含义。我们遵循OS教科书中的通常定义：<strong>进程是程序执行时的一个实例</strong>。<strong>你可以把它看作充分描述程序已经执行到何种程度的数据结构的汇集</strong>。</p>
+<p>进程类似于人类：它们被产生，有或多或少有效的生命，可以产生一个或多个子进程，最终都要死亡。一个微小的差异是进程之间没有性别差异——每个进程都只有一个父亲。</p>
+<p>从内核观点看，进程的目的就是担当分配系统资源（CPU时间、内存等）的实体。</p>
+<p>当一个进程创建时，它几乎与父进程相同。它接受父进程地址空间的一个（逻辑）拷贝，并从进程创建系统调用的下一条指令开始执行与父进程相同的代码。尽管父子进程可以共享含有程序代码（正文）的页，但是它们各自有独立的数据拷贝（栈和堆），因此子进程对一个内存单元的修改对父进程是不可见的（反之亦然）。</p>
+<h4 id="1-早期Unix的进程模型"><a href="#1-早期Unix的进程模型" class="headerlink" title="1. 早期Unix的进程模型"></a>1. 早期Unix的进程模型</h4><ul>
+<li>以前的Unix操作系统，一个进程里只有一个“执行流”（就是一条执行路线，也就是一个线程）。</li>
+<li>这样做很简单，但不适合现在复杂的软件需求。</li>
+</ul>
+<h4 id="2-现代Unix对多线程的支持"><a href="#2-现代Unix对多线程的支持" class="headerlink" title="2. 现代Unix对多线程的支持"></a>2. 现代Unix对多线程的支持</h4><ul>
+<li>现在的Unix系统（包括Linux）支持<strong>多线程</strong>，也就是<strong>一个进程里可以有多个线程</strong>，每个线程就像一个“小分身”，都能在同一个程序里独立工作。</li>
+<li>这些线程可以<strong>共享进程的大部分资源</strong>（比如内存、打开的文件），但每个线程有自己的执行流（比如自己的栈）。</li>
+</ul>
+<h4 id="3-pthread库"><a href="#3-pthread库" class="headerlink" title="3. pthread库"></a>3. pthread库</h4><ul>
+<li>现在大部分多线程程序会用POSIX标准的pthread库来写，这是一套专门用来处理线程的函数库。</li>
+</ul>
+<h4 id="4-早期Linux对多线程的不足"><a href="#4-早期Linux对多线程的不足" class="headerlink" title="4. 早期Linux对多线程的不足"></a>4. 早期Linux对多线程的不足</h4><ul>
+<li>早期Linux内核没有专门支持多线程。在内核看来，多线程程序就只是一个普通的进程，线程的创建和调度都在用户空间（应用层）由pthread库来做。</li>
+<li>这种方式有个大问题：<strong>如果一个线程因为要等某个操作（比如要等用户输入）而被阻塞，整个进程都会被卡住，其他线程也没法运行</strong>。</li>
+</ul>
+<h4 id="5-举例说明"><a href="#5-举例说明" class="headerlink" title="5. 举例说明"></a>5. 举例说明</h4><ul>
+<li>比如有一个象棋软件，用了两个线程：一个线程负责显示和等待玩家操作，另一个负责计算电脑下一步棋。</li>
+<li>如果第一个线程因为等玩家输入而阻塞，第二个线程也跟着“停住”，这样就浪费了时间和多线程的优势。</li>
+<li>为了避免这个问题，程序员只能用很复杂的办法（非阻塞技术）让进程能一直运行，但这样写程序非常麻烦。</li>
+</ul>
+<h4 id="6-Linux的改进：轻量级进程（LWP）"><a href="#6-Linux的改进：轻量级进程（LWP）" class="headerlink" title="6. Linux的改进：轻量级进程（LWP）"></a>6. Linux的改进：轻量级进程（LWP）</h4><ul>
+<li>为了解决上面的问题，Linux引入了<strong>轻量级进程（Lightweight Process，LWP）</strong>。</li>
+<li>每个线程都由一个LWP表示。<strong>多个LWP可以共享同一块内存、同一组打开的文件</strong>，只要有一个LWP修改了共享的内容，其他LWP马上就能看到。</li>
+<li>线程间共享资源时，需要做好同步（比如加锁），避免数据混乱。</li>
+</ul>
+<h4 id="7-线程的实现方式"><a href="#7-线程的实现方式" class="headerlink" title="7. 线程的实现方式"></a>7. 线程的实现方式</h4><ul>
+<li>多线程程序可以让每个线程都对应Linux的一个LWP，这样线程之间共享数据很方便。</li>
+<li><strong>每个线程都能被内核“独立调度”</strong>：一个线程在等输入的时候，其他线程还能继续运行，不会互相卡住。</li>
+</ul>
+<h4 id="8-Linux主流的多线程实现"><a href="#8-Linux主流的多线程实现" class="headerlink" title="8. Linux主流的多线程实现"></a>8. Linux主流的多线程实现</h4><ul>
+<li>现在Linux上有几个主流的多线程实现库，比如LinuxThreads、NPTL、NGPT等，都是用LWP机制实现的pthread库。</li>
+</ul>
+<h4 id="9-线程组"><a href="#9-线程组" class="headerlink" title="9. 线程组"></a>9. 线程组</h4><ul>
+<li>在Linux里，一组LWP可以组成一个“线程组”，对外表现为一个整体，比如调用getpid、kill、_exit等系统调用时，是对整个线程组生效。</li>
+</ul>
+<h3 id="进程描述符"><a href="#进程描述符" class="headerlink" title="进程描述符"></a>进程描述符</h3><p>为了管理进程，内核必须对每个进程所做的事情进行清楚的描述。例如，内核必须知道进程的优先级，它是正在CPU上运行还是因某些事件而被阻塞，给它分配了什么样的地址空间，允许它访问哪个文件等等。这正是进程描述符（process descriptor）的作用——进程描述符都是task_struct类型结构，它的字段包含了与一个进程相关的所有信息。因为进程描述符中存放了那么多信息，所以它是相当复杂的。它不仅包含了很多进程属性的字段，而且一些字段还包括了指向其他数据结构的指针，依此类推。下图示意性地描述了Linux的进程描述符。</p>
+<img src="/%E8%BF%9B%E7%A8%8B/%E8%BF%9B%E7%A8%8B/a.png" srcset="/img/loading.gif" lazyload class title="a">
 
-<h4 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h4><p>state字段描述了进程当前所处的状态</p>
-<p>可运行状态（TASK_RUNNING)<br>        进程要么在CPU上执行，要么准备执行。</p>
-<p>可中断的等待状态（TASK_INTERRUPTIBLE)<br>        进程被挂起（睡眠），直到某个条件变为真。产生一个硬件中断，释放进程正等待的系统资源，或传递一个信号都是可以唤醒进程的条件（把进程的状态放回到TASK_RUNNING).</p>
-<p>不可中断的等待状态（TASK_UNINTERRUPTIBLE)<br>        与可中断的等待状态类似，但有一个例外，把信号传递到睡眠进程不能改变它的状态。这种状态很少用到，但在一些特定的情况下（进程必须等待，直到一个不能被中断的事件发生），这种状态是很有用的。例如，当进程打开一个设备文件，其相应的设备驱动程序开始探测相应的硬件设备时会用到这种状态。探测完成以前，设备驱动程序不能被中断，否则，硬件设备会处于不可预知的状态。</p>
-<p>暂停状态（TASK_STOPPED)<br>        进程的执行被暂停。当进程接收到SIGSTOP、SIGTSTP、SIGTTIN或SIGTTOU信号后，进入暂停状态。</p>
-<p>跟踪状态（TASK_TRACED)<br>        进程的执行已由debugger程序暂停。当一个进程被另一个进程监控时（例如debugger执行ptrace（）系统调用监控一个测试程序），任何信号都可以把这个进程置于TASK_TRACED状态。</p>
+<h4 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h4><p>state字段描述了进程当前所处的状态。由一组标志组成，其中每个标志描述一种可能的进程状态</p>
+<h5 id="可运行状态（TASK-RUNNING"><a href="#可运行状态（TASK-RUNNING" class="headerlink" title="可运行状态（TASK_RUNNING)"></a>可运行状态（TASK_RUNNING)</h5><p>进程要么在CPU上执行，要么准备执行。</p>
+<h5 id="可中断的等待状态（TASK-INTERRUPTIBLE"><a href="#可中断的等待状态（TASK-INTERRUPTIBLE" class="headerlink" title="可中断的等待状态（TASK_INTERRUPTIBLE)"></a>可中断的等待状态（TASK_INTERRUPTIBLE)</h5><p>进程被挂起（睡眠），直到某个条件变为真。产生一个硬件中断，释放进程正等待的系统资源，或传递一个信号都是可以唤醒进程的条件（把进程的状态放回到TASK_RUNNING).</p>
+<h5 id="不可中断的等待状态（TASK-UNINTERRUPTIBLE"><a href="#不可中断的等待状态（TASK-UNINTERRUPTIBLE" class="headerlink" title="不可中断的等待状态（TASK_UNINTERRUPTIBLE)"></a>不可中断的等待状态（TASK_UNINTERRUPTIBLE)</h5><p>与可中断的等待状态类似，但有一个例外，把信号传递到睡眠进程不能改变它的状态。这种状态很少用到，但在一些特定的情况下（进程必须等待，直到一个不能被中断的事件发生），这种状态是很有用的。例如，当进程打开一个设备文件，其相应的设备驱动程序开始探测相应的硬件设备时会用到这种状态。探测完成以前，设备驱动程序不能被中断，否则，硬件设备会处于不可预知的状态。</p>
+<h5 id="暂停状态（TASK-STOPPED"><a href="#暂停状态（TASK-STOPPED" class="headerlink" title="暂停状态（TASK_STOPPED)"></a>暂停状态（TASK_STOPPED)</h5><p>进程的执行被暂停。当进程接收到SIGSTOP、SIGTSTP、SIGTTIN或SIGTTOU信号后，进入暂停状态。</p>
+<h5 id="跟踪状态（TASK-TRACED"><a href="#跟踪状态（TASK-TRACED" class="headerlink" title="跟踪状态（TASK_TRACED)"></a>跟踪状态（TASK_TRACED)</h5><p>进程的执行已由debugger程序暂停。当一个进程被另一个进程监控时（例如debugger执行ptrace（）系统调用监控一个测试程序），任何信号都可以把这个进程置于TASK_TRACED状态。</p>
 <p>还有两个进程状态是既可以存放在进程描述符的state字段中，也可以存放在exit_state字段中。从这两个字段的名称可以看出，只有当进程的执行被终止时，进程的状态才会变为这两种状态中的一种：</p>
-<p>僵死状态（EXIT_ZOMBIE）<br>        进程的执行被终止，但是，父进程还没有发布wait4（）或waitpid（）系统调用来返回有关死亡进程的信息。发布wait（）类系统调用前，内核不能丢弃包含在死进程描述符中的数据，因为父进程可能还需要它</p>
-<p>僵死撤消状态（EXIT_DEAD)<br>        最终状态：由于父进程刚发出 wait4（）或waitpid（）系统调用，因而进程由系统删除。为了防止其他执行线程在同一个进程上也执行wait（）类系统调用（这是一种竞争条件），而把进程的状态由優死（EXIT_ZOMBIE）状态改为死撤消状态(EXIT-DEAD）参见第五）。</p>
+<h5 id="僵死状态（EXIT-ZOMBIE）"><a href="#僵死状态（EXIT-ZOMBIE）" class="headerlink" title="僵死状态（EXIT_ZOMBIE）"></a>僵死状态（EXIT_ZOMBIE）</h5><p>进程的执行被终止，但是，父进程还没有发布wait4（）或waitpid（）系统调用来返回有关死亡进程的信息。发布wait（）类系统调用前，内核不能丢弃包含在死进程描述符中的数据，因为父进程可能还需要它。</p>
+<h5 id="僵死撤消状态（EXIT-DEAD"><a href="#僵死撤消状态（EXIT-DEAD" class="headerlink" title="僵死撤消状态（EXIT_DEAD)"></a>僵死撤消状态（EXIT_DEAD)</h5><p>最终状态：由于父进程刚发出 wait4（）或waitpid（）系统调用，因而进程由系统删除。为了防止其他执行线程在同一个进程上也执行wait（）类系统调用（这是一种竞争条件），而把进程的状态由優死（EXIT_ZOMBIE）状态改为死撤消状态(EXIT-DEAD）参见第五）。</p>
+<p>state字段的值通常用一个简单的赋值语句设置。例如：</p>
+<p><code>P-&gt;STATE = TASK_RUNNING:</code></p>
+<p>内核也使用<code>set_task_state</code>和<code>set_current_state</code>宏：它们分别设置指定进程的状态和当前执行进程的状态。此外，这些宏确保编译程序或CPU控制单元不把赋值操作与其他指令混合。混合指令的顺序有时会导致灾难性的后果。</p>
 <h3 id="进程切换"><a href="#进程切换" class="headerlink" title="进程切换"></a>进程切换</h3><p>为了控制进程的执行，内核必须有能力挂起正在CPU上运行的进程，并恢复以前挂起的某个进程的执行。这种行为被称为进程切换（process switch）、任务切换（task switch）或上下文切换（context switch）。</p>
 <h4 id="硬件上下文"><a href="#硬件上下文" class="headerlink" title="硬件上下文"></a>硬件上下文</h4><p>尽管每个进程可以拥有属于自己的地址空间，但所有进程必须共享CPU寄存器。因此，在恢复一个进程的执行之前，内核必须确保每个寄存器装入了挂起进程时的值。</p>
 <p>进程恢复执行前必须装入寄存器的一组数据称为硬件上下文。硬件上下文是进程可执行上下文的一个子集，因为可执行上下文包含进程执行时需要的所有信息。在Linux中，进程硬件上下文的一部分存放在TSS段，而剩余部分存放在内核态堆栈中。</p>
 <p>进程切换只发生在内核态。在执行进程切换之前，用户态进程使用的所有寄存器内容都已保存在内核态堆栈上，这也包括ss和esp这对寄存器的内容（存储用户态堆栈指针的地址）。</p>
-<h4 id="任务状态段（TSS）"><a href="#任务状态段（TSS）" class="headerlink" title="任务状态段（TSS）"></a>任务状态段（TSS）</h4><p>​	存放硬件上下文</p>
+<h4 id="任务状态段（TSS）"><a href="#任务状态段（TSS）" class="headerlink" title="任务状态段（TSS）"></a>任务状态段（TSS）</h4><p>80x86体系结构包括了一个特殊的段类型，叫<strong>任务状态段（Task State Segment，TSS）来存放硬件上下文</strong>。尽管Linux并不使用硬件上下文切换，但是强制它为系统中每个不同的CPU创建一个TSS。但 <strong>Linux 不使用 x86 提供的硬件任务切换机制</strong>，它使用软件方式进行进程切换。</p>
+<h5 id="Linux-虽然不用硬件任务切换，但仍然为每个-CPU-创建一个-TSS"><a href="#Linux-虽然不用硬件任务切换，但仍然为每个-CPU-创建一个-TSS" class="headerlink" title="Linux 虽然不用硬件任务切换，但仍然为每个 CPU 创建一个 TSS"></a>Linux 虽然不用硬件任务切换，但仍然为每个 CPU 创建一个 TSS</h5><ol>
+<li><p>切换到内核态时，需要内核栈的地址</p>
+<ul>
+<li><p>当 CPU 从用户态切换到内核态（例如发生中断或异常）时，必须知道内核栈的地址。</p>
+</li>
+<li><p>x86 架构规定，这个栈地址从 TSS 中获取。</p>
+</li>
+<li><p>所以，<strong>TSS 必须存在并正确设置 esp0 字段</strong>（即内核态堆栈的栈顶指针）。</p>
+</li>
+</ul>
+</li>
+<li><p>用户态访问 I&#x2F;O 端口时，需检查权限位图（I&#x2F;O Permission Bitmap）</p>
+<ul>
+<li>用户态程序如果执行 <code>in</code> 或 <code>out</code> 指令访问 I&#x2F;O 端口，CPU 会做权限检查。</li>
+<li>这个权限位图（bitmap）放在 TSS 的尾部。</li>
+<li>CPU 通过 <code>tr</code> 寄存器访问 TSS，从而查找对应位图判断是否允许访问。</li>
+<li>如果不允许，会触发 General Protection 异常。</li>
+</ul>
+</li>
+</ol>
+<h5 id="TSS-在-Linux-中的使用方式"><a href="#TSS-在-Linux-中的使用方式" class="headerlink" title="TSS 在 Linux 中的使用方式"></a>TSS 在 Linux 中的使用方式</h5><ul>
+<li>每个 CPU 维护一个自己的 TSS，保存在 <code>init_tss[]</code> 数组中。</li>
+<li>每次进程切换时，内核会 <strong>更新当前 CPU 的 TSS 中关键字段</strong>（比如 esp0 内核栈指针）。</li>
+<li>不像硬件机制那样，每个进程拥有自己的 TSS，Linux 只为每个 CPU 准备一个。</li>
+</ul>
+<h5 id="TSS-与-GDT-的关系（TSSD）"><a href="#TSS-与-GDT-的关系（TSSD）" class="headerlink" title="TSS 与 GDT 的关系（TSSD）"></a>TSS 与 GDT 的关系（TSSD）</h5><ul>
+<li>每个 TSS 都要有一个对应的<strong>任务段描述符</strong>（Task State Segment Descriptor，TSSD）放入 <strong>GDT（全局描述符表）</strong>。</li>
+<li>TSSD 包含：<ul>
+<li><strong>Base 地址（32位）</strong>：TSS 结构体的物理地址</li>
+<li><strong>Limit（20位）</strong>：TSS 的大小</li>
+<li><strong>S 位为 0</strong>：表示这是系统段（而非代码&#x2F;数据段）</li>
+<li><strong>Type 字段为 9 或 11</strong>：<ul>
+<li>9 &#x3D; 非繁忙的 TSS</li>
+<li>11 &#x3D; 繁忙的 TSS（Busy 位设为 1）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Linux 不使用任务切换功能，<strong>只用 Busy 状态&#x3D;1 的 TSS，每个 CPU 一个，不动态更换</strong>。</li>
+</ul>
+<h5 id="tr-寄存器（任务寄存器）"><a href="#tr-寄存器（任务寄存器）" class="headerlink" title="tr 寄存器（任务寄存器）"></a>tr 寄存器（任务寄存器）</h5><ul>
+<li><code>tr</code> 是 CPU 的任务寄存器，指向当前活动 TSS 的段选择符。</li>
+<li>加载后，它<strong>隐含保存了 TSS 的 Base 和 Limit</strong>，方便 CPU 快速访问 TSS，而无需每次从 GDT 查找。</li>
+</ul>
+<h4 id="thread字段"><a href="#thread字段" class="headerlink" title="thread字段"></a>thread字段</h4><ul>
+<li><p>在 进程切换（context switch）时，CPU寄存器的内容（硬件上下文）必须保存下来，以便之后这个进程能从中断的地方恢复继续执行。</p>
+</li>
+<li><p>Linux不使用Intel原始设计的每个进程一个TSS，而是<strong>每个CPU只分配一个TSS</strong>，所以不能靠TSS保存每个进程的上下文。</p>
+</li>
+<li><p>因此，Linux把上下文信息保存在进程描述符的 <code>thread</code> 字段中，这个字段类型是 <code>struct thread_struct</code>。这个数据结构包 含的字段涉及大部分CPU寄存器，但不包括诸如eax、ebx等等这些通用寄存器，它们的值保留在内核堆栈中。</p>
+</li>
+</ul>
+<h4 id="执行进程切换"><a href="#执行进程切换" class="headerlink" title="执行进程切换"></a>执行进程切换</h4><p>进程切换只能发生在特定位置：<code>schedule()</code> 函数内部。</p>
+<p>本质上说，每个进程切换由两步组成：</p>
+<ol>
+<li><p>切换地址空间（虚拟内存）</p>
+<ul>
+<li><p>Linux 为每个进程维护独立的地址空间（页表）。</p>
+</li>
+<li><p>在切换进程时，需要更换当前的 页全局目录（Page Global Directory, PGD），即页表的顶层结构。</p>
+</li>
+<li><p>这样做的结果是：CPU 的内存访问立刻变为新进程的虚拟内存视角。</p>
+</li>
+<li><p>具体做法通常是修改 <code>CR3</code> 寄存器（x86）或等效机制（ARM、LoongArch 也类似）。</p>
+</li>
+</ul>
+</li>
+<li><p>切换内核栈和硬件上下文</p>
+<ul>
+<li><p>每个进程都有自己的 内核栈，用来处理中断、系统调用等内核态任务。</p>
+</li>
+<li><p>在切换进程时，必须切换内核栈（即栈指针寄存器 <code>sp</code> 或 <code>rsp</code>）。</p>
+</li>
+<li><p>同时，还要恢复新进程保存的 硬件上下文，包括程序计数器、栈指针、段寄存器等。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h5 id="switch-to-宏"><a href="#switch-to-宏" class="headerlink" title="switch_to 宏"></a>switch_to 宏</h5><p><code>switch_to</code> 宏是 Linux 内核实现进程上下文切换的关键部分，负责切换当前 CPU 的执行进程。</p>
+<p>他有三个参数：</p>
+<ul>
+<li><strong>prev</strong>：当前要被切出的进程（A）的描述符地址（输入，当前进程）。</li>
+<li><strong>next</strong>：即将切入的新进程（B）的描述符地址（输入，下一个进程）。</li>
+<li><strong>last</strong>：输出参数，切换后会保存“刚刚被切出的进程”（例如 C）的描述符地址。</li>
+</ul>
+<p>关键流程：</p>
+<ol>
+<li><strong>保存现场</strong>：先保存 prev 进程的寄存器、栈等上下文信息。</li>
+<li><strong>切换栈</strong>：将 next 进程的内核栈指针切换到 CPU 的栈寄存器上。</li>
+<li><strong>恢复新进程</strong>：从 next 进程的栈中恢复寄存器等上下文，继续执行。</li>
+<li><strong>last参数赋值</strong>：当 A 恢复执行时，把“刚刚被切走的进程”C的描述符地址写入 last 指向的位置，这样调度器可以追踪谁被切换出去了。</li>
+</ol>
+<h3 id="创建进程"><a href="#创建进程" class="headerlink" title="创建进程"></a>创建进程</h3><p>Unix操作系统紧紧依赖进程创建来满足用户的需求。例如，只要用户输入一条命令， shell进程就创建一个新进程，新进程执行shell的另一个拷贝。</p>
+<p> 传统的Unix操作系统以统一的方式对待所有的进程：子进程复制父进程所拥有的资源。 这种方法使进程的创建非常慢且效率低，因为子进程需要拷贝父进程的整个地址空间。 实际上，子进程几乎不必读或修改父进程拥有的所有资源，在很多情况下，子进程立即调用execve（），并清除父进程仔细拷贝过来的地址空间。 </p>
+<p>现代Unix内核通过引入三种不同的机制解决了这个问题：</p>
+<ul>
+<li>写时复制（Copy-On-Write, COW）<ul>
+<li>父子进程初始共享物理内存页，只在某个进程尝试写入时才复制那一页。</li>
+<li>大幅减少了不必要的内存复制，提高了效率。</li>
+</ul>
+</li>
+<li>轻量级进程（线程）<ul>
+<li>父子进程（或者说主线程与新线程）可以共享内核中的很多数据结构（如页表、文件描述符、信号处理等）。</li>
+<li>允许多个执行流高效共享资源，减少资源消耗。</li>
+</ul>
+</li>
+<li>vfork()系统调用<ul>
+<li><code>vfork()</code>创建的子进程直接共享父进程的地址空间，直到子进程<code>exit()</code>或<code>exec()</code>。</li>
+<li>父进程被阻塞，直到子进程执行完毕，以避免父进程修改了子进程需要的数据。</li>
+<li>这种方式用于子进程只会立刻调用<code>exec()</code>的场景，进一步提升效率。</li>
+</ul>
+</li>
+</ul>
+<h4 id="内核线程"><a href="#内核线程" class="headerlink" title="内核线程"></a>内核线程</h4><p>传统的Unix系统把一些重要的任务委托给周期性执行的进程，这些任务包括刷新磁盘高速缓存，交换出不用的页框，维护网络连接等等。事实上，以严格线性的方式执行这些任务的确效率不高，如果把它们放在后台调度，不管是对它们的函数还是对终端用户进程都能得到较好的响应。因为一些系统进程只运行在内核态，所以现代操作系统把它们的函数委托给内核线程（kernel thread），内核线程不受不必要的用户态上下文的拖累。 在Linux中，内核线程在以下几方面不同于普通进程： </p>
+<ul>
+<li>内核线程只运行在内核态，而普通进程既可以运行在内核态，也可以运行在用户态。 </li>
+<li>因为内核线程只运行在内核态，它们只使用大于PAGE_OFFSET的线性地址空间。 另一方面，不管在用户态还是在内核态，普通进程可以用4GB的线性地址空间。</li>
+</ul>
+<h5 id="创建一个内核线程"><a href="#创建一个内核线程" class="headerlink" title="创建一个内核线程"></a>创建一个内核线程</h5><h6 id="1-传统方法：kernel-thread"><a href="#1-传统方法：kernel-thread" class="headerlink" title="1. 传统方法：kernel_thread()"></a>1. 传统方法：kernel_thread()</h6><ul>
+<li><p><code>kernel_thread()</code> 用于在内核空间创建线程，参数包括:</p>
+<ul>
+<li><code>fn</code>：要执行的内核函数地址</li>
+<li><code>arg</code>：传递给该函数的参数</li>
+<li><code>flags</code>：克隆标志</li>
+</ul>
+</li>
+<li><p>其本质实现是调用 <code>do_fork()</code>，常见形式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">do_fork(flags | CLONE_VM | CLONE_UNTRACED, <span class="hljs-number">0</span>, pregs, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>CLONE_VM</strong>：避免复制调用进程的页表（节省时间和空间）</li>
+<li><strong>CLONE_UNTRACED</strong>：保证新内核线程不会被进程跟踪</li>
+</ul>
+</li>
+<li><p><code>pregs</code> 参数表示新线程的内核栈地址，<code>copy_thread()</code> 会用它为新线程初始化CPU寄存器。</p>
+</li>
+<li><p><strong>注意：</strong></p>
+<ul>
+<li>传统方法在新版本 Linux 内核中已逐渐淘汰，推荐使用现代API。</li>
+</ul>
+</li>
+</ul>
+<h6 id="2-现代方法：kthread-推荐"><a href="#2-现代方法：kthread-推荐" class="headerlink" title="2. 现代方法：kthread (推荐)"></a>2. 现代方法：kthread (推荐)</h6><ul>
+<li><p><strong>推荐API：</strong> <code>kthread_create()</code> + <code>wake_up_process()</code></p>
+</li>
+<li><p>步骤如下：</p>
+<ol>
+<li>用 <code>kthread_create(fn, arg, name)</code> 创建线程对象，但不会立即运行。</li>
+<li>用 <code>wake_up_process()</code> 启动该线程。</li>
+</ol>
+</li>
+<li><p>示例代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">task_struct</span> *<span class="hljs-title">tsk</span>;</span><br>tsk = kthread_create(fn, arg, <span class="hljs-string">&quot;kthread_name&quot;</span>);<br><span class="hljs-keyword">if</span> (!IS_ERR(tsk))<br>    wake_up_process(tsk);<br></code></pre></td></tr></table></figure>
+</li>
+<li><p><strong>优势：</strong></p>
+<ul>
+<li>更安全、易用，自动处理所需的资源分配。</li>
+<li>可以直接用 <code>kthread_stop()</code> 停止线程。</li>
+<li>支持线程管理、信号处理等高级功能。</li>
+</ul>
+</li>
+</ul>
+<p><strong>实际开发或内核模块编程时，请优先使用 <code>kthread_create()</code> 等现代API来创建内核线程。<code>kernel_thread()</code> 仅用于参考早期内核实现。</strong></p>
+<h5 id="进程-0（PID-0）——-swapper-idle-进程"><a href="#进程-0（PID-0）——-swapper-idle-进程" class="headerlink" title="进程 0（PID 0）—— swapper &#x2F; idle 进程"></a>进程 0（PID 0）—— <code>swapper</code> &#x2F; <code>idle</code> 进程</h5><ul>
+<li><strong>作用</strong>：<ul>
+<li>在系统刚启动时，第一个被创建的进程。</li>
+<li>主要负责 <strong>启动内核初始化</strong>（内存管理、中断系统等）和 <strong>创建进程 1</strong>。</li>
+<li>启动之后，它会变成每个 CPU 的 <strong>idle 进程</strong>，即无其他进程可调度时 CPU 执行的循环。</li>
+</ul>
+</li>
+<li><strong>特点</strong>：<ul>
+<li>并不通过 <code>fork()</code> 创建，它是 <strong>手动构造</strong> 的内核任务。</li>
+<li>不会出现在用户空间的 <code>ps</code> 输出中（因为它不是用户空间进程）。</li>
+<li>不可杀、不可替换。</li>
+</ul>
+</li>
+<li><strong>代码位置（示意）</strong>：<ul>
+<li>初始化于 <code>init/main.c</code> 的 <code>start_kernel()</code> 中。</li>
+<li>创建方式为手动设置 task_struct，再作为当前进程执行。</li>
+</ul>
+</li>
+</ul>
+<h5 id="进程-1（PID-1）——-init-systemd"><a href="#进程-1（PID-1）——-init-systemd" class="headerlink" title="进程 1（PID 1）—— init &#x2F; systemd"></a>进程 1（PID 1）—— <code>init</code> &#x2F; <code>systemd</code></h5><ul>
+<li><strong>作用</strong>：<ul>
+<li><strong>由进程 0 通过 kernel_thread 创建</strong>，是用户空间的第一个进程。</li>
+<li>负责系统的初始化：挂载文件系统、执行用户空间初始化脚本、启动守护进程等。</li>
+<li>是所有用户进程的祖先进程。</li>
+</ul>
+</li>
+<li><strong>现代系统中的表现</strong>：<ul>
+<li><strong>旧系统（SysV）</strong> 中执行 <code>/sbin/init</code>。</li>
+<li><strong>现代 Linux（如 systemd 系统）</strong> 中执行 <code>/lib/systemd/systemd</code>，但 PID 仍是 1。</li>
+</ul>
+</li>
+<li><strong>特点</strong>：<ul>
+<li>如果一个孤儿进程的父进程退出了，它就会被进程 1 收养。</li>
+<li>是系统稳定运行的核心进程之一，<strong>不能崩溃</strong>，否则系统会崩溃（Kernel Panic）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="撤销进程"><a href="#撤销进程" class="headerlink" title="撤销进程"></a>撤销进程</h3><h4 id="进程终止及资源释放"><a href="#进程终止及资源释放" class="headerlink" title="进程终止及资源释放"></a>进程终止及资源释放</h4><ul>
+<li>进程终止时，内核必须回收和释放该进程占用的所有资源（内存、打开文件、信号量等）。</li>
+<li>一般通过**exit()**库函数终止进程：<ul>
+<li>该函数会释放C库分配的资源。</li>
+<li>调用用户注册的清理函数。</li>
+<li>最终发起系统调用，由内核完成进程资源清理与回收。</li>
+<li>即便程序员没写，C编译器也会在<code>main()</code>结束后自动插入<code>exit()</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="强制终止"><a href="#强制终止" class="headerlink" title="强制终止"></a>强制终止</h4><ul>
+<li>内核可以强制让一个进程（或线程组）终止，典型情况包括：<ul>
+<li>进程收到不可处理&#x2F;不可忽略的信号（如<code>SIGKILL</code>、<code>SIGSEGV</code>等）。</li>
+<li>进程在内核态发生不可恢复的CPU异常（如非法访问、段错误）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="相关系统调用（Linux-2-6）"><a href="#相关系统调用（Linux-2-6）" class="headerlink" title="相关系统调用（Linux 2.6）"></a>相关系统调用（Linux 2.6）</h4><ol>
+<li><strong>exit_group()</strong><ul>
+<li>作用：终止<strong>整个线程组</strong>（即整个多线程应用）。</li>
+<li>实现：<code>do_group_exit()</code>函数。</li>
+<li>触发场景：通常<code>exit()</code>库函数最终会调用它。</li>
+</ul>
+</li>
+<li><strong>exit()</strong><ul>
+<li>作用：只终止<strong>当前线程</strong>，不影响同组其他线程。</li>
+<li>实现：<code>do_exit()</code>函数。</li>
+<li>触发场景：比如<code>pthread_exit()</code>会调用它。</li>
+</ul>
+</li>
+</ol>
+<h4 id="进程删除机制"><a href="#进程删除机制" class="headerlink" title="进程删除机制"></a>进程删除机制</h4><ol>
+<li><strong>进程终止后的信息保留（僵尸进程）</strong><br>Unix 系统允许进程通过内核查询其父进程的 PID 或任何子进程的状态。比如，进程可以创建子进程去完成任务，然后通过 <code>wait()</code> 等库函数检测子进程是否结束，并获得其退出码。<br>为了让父进程能够获取这些信息，内核在进程终止后不会立即释放其进程描述符数据，而是将其置为“僵尸进程”，保留到父进程通过 <code>wait()</code> 类系统调用收集完信息为止。这种机制确保了父进程不会遗漏子进程的终止状态。</li>
+<li><strong>孤儿进程的处理与 init 进程的角色</strong><br>如果父进程在子进程之前结束，这些子进程变成“孤儿进程”。为防止这些孤儿进程的描述符永久占用内存，内核会自动将它们的父进程改为 init（或 systemd，PID 1）。init 进程会定期调用 <code>wait()</code> 类系统调用，回收所有孤儿进程的资源，避免系统中出现大量无法回收的僵尸进程。</li>
+<li><strong>进程删除的具体实现（release_task 函数的主要步骤）</strong><ul>
+<li>递减进程拥有者（user_struct）的进程计数。</li>
+<li>如果该进程正被调试（ptrace），则将其从调试器的子进程链表中删除，并重新挂到原始父进程下。</li>
+<li>调用 <code>__exit_signal()</code> 清理所有挂起信号，释放 <code>signal_struct</code> 数据结构。如果没有其他线程使用该结构，还要进一步释放。调用 <code>exit_itimers()</code> 清理进程的所有 POSIX 定时器。</li>
+<li>调用 <code>exit_sighand()</code> 删除进程的信号处理函数表。</li>
+<li>调用<code>__unhash_process()</code>，此函数会：<ul>
+<li>递减线程组内线程数（nr_threads）。</li>
+<li>从 PID 散列表中删除该进程的描述符（包括 PIDTYPE_PID、PIDTYPE_TGID），如果是线程组长，还要从 PIDTYPE_PGID 和 PIDTYPE_SID 类型的散列表中删除。</li>
+<li>通过 REMOVE_LINKS 宏将其从进程链表中解除。</li>
+</ul>
+</li>
+<li>如果该进程不是线程组长，而组长已死亡且当前进程是该组最后一个成员，则向组长的父进程发送信号，说明线程组彻底终结。</li>
+<li>调用 <code>sched_exit()</code> 调整父进程的调度信息和时间片。</li>
+<li>调用<code>put_task_struct()</code>，递减进程描述符的引用计数。若该计数归零，彻底释放相关结构体和内存，包括：<ul>
+<li>进程描述符（task_struct）</li>
+<li>thread_info 和内核栈</li>
+<li>owner 的 user_struct（如果其引用计数也归零）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>父进程与资源回收的配合</strong><br>如果父进程不需要子进程的终止信号，系统会直接调用 <code>do_exit()</code> 完成资源回收。如果父进程需要信号，且信号已发出，则会在 <code>wait4()</code> 或 <code>waitpid()</code> 等系统调用中进一步清理并释放内存空间。在某些情况下，最终的内存回收由调度程序负责完成。</li>
+</ol>
 
                 
               </div>
@@ -343,7 +642,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%BF%9B%E7%A8%8B/" class="category-chain-item">进程</a>
+  <a href="/categories/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3linux%E5%86%85%E6%A0%B8/" class="category-chain-item">深入理解linux内核</a>
   
   
 
@@ -383,13 +682,13 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年10月31日</div>
+          <div>2025年7月1日</div>
         </div>
       
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2024年11月6日</div>
+          <div>2025年8月6日</div>
         </div>
       
       
@@ -420,18 +719,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E4%B8%AD%E6%96%AD/%E4%B8%AD%E6%96%AD/" title="中断">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">中断</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/scsi/scsi%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="scsi子系统">
-                        <span class="hidden-mobile">scsi子系统</span>
+                      <a href="/bug/%E9%9B%B7%E6%9F%8F%E9%BC%A0%E6%A0%87%E6%8F%92%E5%85%A5%E5%90%8E%E5%BC%80%E6%9C%BA%E9%87%8D%E5%90%AF/" title="雷柏鼠标接电脑开机自动重启">
+                        <span class="hidden-mobile">雷柏鼠标接电脑开机自动重启</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
