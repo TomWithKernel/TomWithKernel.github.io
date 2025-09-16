@@ -19,18 +19,21 @@
   <meta name="author" content="Tom">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Perf工具编译安装下载download:    https:&#x2F;&#x2F;cdn.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F;tools&#x2F;perf&#x2F; 先下载对应内核版本的perf源码 编译安装1234567tar -xvf perf-5.10.0.tar.gz cd perf-5.10.0cd tools&#x2F;perf&#x2F;makesudo cp perf &#x2F;usr&#x2F;local&#x2F;bin&#x2F;usr&#x2F;loc">
+    <meta name="description" content="Perf工具安装下载先下载对应内核版本的perf源码：https:&#x2F;&#x2F;cdn.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F;tools&#x2F;perf&#x2F; 编译安装1234567tar -xvf perf-5.10.0.tar.gz cd perf-5.10.0cd tools&#x2F;perf&#x2F;makesudo cp perf &#x2F;usr&#x2F;local&#x2F;bin&#x2F;usr&#x2F;local&#x2F;bin&#x2F;perf --v">
 <meta property="og:type" content="article">
 <meta property="og:title" content="perf">
 <meta property="og:url" content="https://tomwithkernel.github.io/debug/perf/index.html">
 <meta property="og:site_name" content="TomWithKernel&#39;s Blog">
-<meta property="og:description" content="Perf工具编译安装下载download:    https:&#x2F;&#x2F;cdn.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F;tools&#x2F;perf&#x2F; 先下载对应内核版本的perf源码 编译安装1234567tar -xvf perf-5.10.0.tar.gz cd perf-5.10.0cd tools&#x2F;perf&#x2F;makesudo cp perf &#x2F;usr&#x2F;local&#x2F;bin&#x2F;usr&#x2F;loc">
+<meta property="og:description" content="Perf工具安装下载先下载对应内核版本的perf源码：https:&#x2F;&#x2F;cdn.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F;tools&#x2F;perf&#x2F; 编译安装1234567tar -xvf perf-5.10.0.tar.gz cd perf-5.10.0cd tools&#x2F;perf&#x2F;makesudo cp perf &#x2F;usr&#x2F;local&#x2F;bin&#x2F;usr&#x2F;local&#x2F;bin&#x2F;perf --v">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tomwithkernel.github.io/debug/perf/a.png">
+<meta property="og:image" content="https://tomwithkernel.github.io/debug/perf/b.png">
 <meta property="article:published_time" content="2024-05-10T02:09:00.000Z">
-<meta property="article:modified_time" content="2025-03-19T02:50:29.026Z">
+<meta property="article:modified_time" content="2025-09-16T09:18:09.090Z">
 <meta property="article:author" content="Tom">
 <meta property="article:tag" content="debug">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tomwithkernel.github.io/debug/perf/a.png">
   
   
   
@@ -242,7 +245,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          54 字
+          2.2k 字
         
       </span>
     
@@ -253,7 +256,7 @@
         
         
         
-          2 分钟
+          73 分钟
         
       </span>
     
@@ -304,9 +307,169 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Perf工具编译安装"><a href="#Perf工具编译安装" class="headerlink" title="Perf工具编译安装"></a>Perf工具编译安装</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><p>download:<br>    <a target="_blank" rel="noopener" href="https://cdn.kernel.org/pub/linux/kernel/tools/perf/">https://cdn.kernel.org/pub/linux/kernel/tools/perf/</a></p>
-<p>先下载对应内核版本的perf源码</p>
-<h3 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -xvf perf-5.10.0.tar.gz <br><span class="hljs-built_in">cd</span> perf-5.10.0<br><span class="hljs-built_in">cd</span> tools/perf/<br>make<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cp</span> perf /usr/local/bin<br><br>/usr/local/bin/perf --version<br></code></pre></td></tr></table></figure>
+                <h2 id="Perf工具"><a href="#Perf工具" class="headerlink" title="Perf工具"></a>Perf工具</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><h4 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h4><p>先下载对应内核版本的perf源码：<a target="_blank" rel="noopener" href="https://cdn.kernel.org/pub/linux/kernel/tools/perf/">https://cdn.kernel.org/pub/linux/kernel/tools/perf/</a></p>
+<h4 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -xvf perf-5.10.0.tar.gz <br><span class="hljs-built_in">cd</span> perf-5.10.0<br><span class="hljs-built_in">cd</span> tools/perf/<br>make<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cp</span> perf /usr/local/bin<br><br>/usr/local/bin/perf --version<br></code></pre></td></tr></table></figure>
+
+<h3 id="perf-使用"><a href="#perf-使用" class="headerlink" title="perf 使用"></a>perf 使用</h3><h4 id="perf-命令"><a href="#perf-命令" class="headerlink" title="perf 命令"></a>perf 命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs shell">annotate        读取perf.data（由perf record生成）并结合源代码展示详细的性能分析结果，包括CPU执行热点、函数调用栈等信息。<br>archive         使用perf.data文件中找到的带构建标识符的对象文件创建归档文件，便于后续对这些对象文件进行调试或者分析<br>bench           通用基准测试套件框架，允许用户定义和运行多种基准测试场景，用于评估系统在不同条件下的性能表现。<br>buildid-cache   管理perf用来关联二进制文件与其符号表信息的构建ID缓存，可以添加、删除或查看缓存内容。<br>buildid-list    列出perf.data文件中的构建标识符<br>c2c             共享数据C2C/HITM分析器：针对共享数据缓存一致性（Cache-to-Cache）和高速缓存命中（Hit in Translation）进行分析的工具，帮助诊断多核心间的缓存交互问题。<br>config          读取和设置perf配置文件中的变量，用于个性化perf的行为或指定默认参数。<br>data            提供一系列与perf.data文件相关联的操作，如检查文件内容、转换格式等。<br>diff            比较两个或多个perf.data文件，分析并展示它们之间的性能差异，常用于对比不同条件下系统的性能变化。<br>evlist          列出perf.data文件中的事件名称，这些事件可能包括硬件性能计数器事件、软件事件、tracepoint事件等。<br>ftrace          内核ftrace功能的简单包装器，允许实时追踪和分析内核函数调用路径。<br>inject          过滤器，用于向事件流中添加附加信息，增强事件的数据量和丰富度，便于更加深入地分析性能问题<br>iostat          显示I/O性能指标，如块设备读写速率、I/O操作延时等<br>kallsyms        在运行中的内核中搜索符号<br>kmem            用于跟踪/测量内核内存属性的工具，如分配、释放、碎片率等<br>kvm             用于跟踪/测量KVM虚拟机操作系统性能的工具<br>list            列出所有符号事件类型<br>lock            分析系统中锁的获取和释放行为，包括锁竞争、等待时间等，有助于发现潜在的并发瓶颈<br>mem             对内存访问模式进行分析，包括页错误、缓存未命中的次数、内存带宽使用等。<br>record          执行命令并将其性能概要记录到perf.data中<br>report          读取perf.data（由perf record创建）并显示概要<br>sched           用于跟踪/测量调度器属性（延迟）的工具，从而优化进程调度策略。<br>script          读取perf.data（由perf record创建）并显示跟踪输出<br>stat            执行命令并收集性能计数器统计信息<br>test            运行内置的一系列sanity测试，确保perf工具自身正确性和稳定性。<br>timechart       工具用于可视化工作负载期间的系统整体行为<br>top             系统性能分析工具，类似于Linux的top命令，但专注于性能分析，显示正在运行进程的实时性能统计数据。<br>version         显示perf二进制文件的版本信息<br>trace           类似strace的工具，用于跟踪系统调用和信号<br></code></pre></td></tr></table></figure>
+
+<h4 id="perf-基本语法"><a href="#perf-基本语法" class="headerlink" title="perf 基本语法"></a>perf 基本语法</h4><p>perf 命令的基本语法格式为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf [--version] [--<span class="hljs-built_in">help</span>] COMMAND [ARGS]<br></code></pre></td></tr></table></figure>
+
+<p>常用子命令包括：</p>
+<ul>
+<li><code>stat</code>：性能计数器统计</li>
+<li><code>record</code>：记录性能数据</li>
+<li><code>report</code>：分析记录的数据</li>
+<li><code>top</code>：实时性能监控</li>
+<li><code>list</code>：列出可用事件</li>
+<li><code>annotate</code>：源代码级分析</li>
+</ul>
+<h5 id="perf-stat"><a href="#perf-stat" class="headerlink" title="perf stat"></a>perf stat</h5><p>统计命令执行过程中的各种硬件和软件事件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">perf stat [options] command [command-options]<br></code></pre></td></tr></table></figure>
+
+<p>常用选项：</p>
+<ul>
+<li><code>-e</code>：指定要监控的事件</li>
+<li><code>-p</code>：监控指定进程ID</li>
+<li><code>-a</code>：监控所有CPU</li>
+<li><code>-r</code>：重复运行并显示平均值</li>
+<li><code>-d</code>：显示更多详细事件</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">统计 <span class="hljs-built_in">ls</span> 命令的执行情况*</span><br>perf stat ls<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">监控指定进程*</span><br>perf stat -p 1234<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">监控特定事件*</span><br>perf stat -e cycles,instructions,cache-misses ls<br></code></pre></td></tr></table></figure>
+
+<h5 id="perf-record"><a href="#perf-record" class="headerlink" title="perf record"></a>perf record</h5><p>记录性能数据到文件（默认 perf.data）。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">perf record [<span class="hljs-keyword">options</span>] <span class="hljs-keyword">command</span> [<span class="hljs-keyword">command</span>-<span class="hljs-keyword">options</span>]<br></code></pre></td></tr></table></figure>
+
+<p>常用选项：</p>
+<ul>
+<li><code>-g</code>：记录调用图（call graph）</li>
+<li><code>-a</code>：分析所有CPU的数据</li>
+<li><code>-C</code>：只采集指定 CPU 数据</li>
+<li><code>-F</code>：采样频率（Hz），即一秒钟采样多少次</li>
+<li><code>-p</code>：指定要采样的进程ID</li>
+<li><code>-o</code>：指定输出文件</li>
+<li><code>-e</code>：指定要记录的事件</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">记录 <span class="hljs-built_in">ls</span> 命令的执行情况</span><br>perf record ls<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">以1000Hz频率记录进程</span><br>perf record -F 1000 -p [进程pid] -g -- sleep 10<br><span class="hljs-meta prompt_"># </span><span class="language-bash">-F指定采样的频率为1000Hz，即一秒钟采样1000次</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">-p指定要采样的进程ID</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">-g表示记录调用栈信息</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">sleep</span> 10 表示持续10秒</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">perf会将采集到的性能数据写入当前目录下的perf.data文件中</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="perf-report"><a href="#perf-report" class="headerlink" title="perf report"></a>perf report</h5><p>分析 perf record 记录的数据。</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">perf</span> re<span class="hljs-keyword">port</span> [options]<br></code></pre></td></tr></table></figure>
+
+<p>常用选项：</p>
+<ul>
+<li><code>-i</code>：指定输入文件</li>
+<li><code>-n</code>：显示样本数量</li>
+<li><code>--stdio</code>：文本模式输出</li>
+<li><code>-g</code>：显示调用图</li>
+<li><code>-s</code>：按指定字段排序</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">分析默认的 perf.data 文件</span><br>perf report<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">分析指定文件并以文本模式输出</span><br>perf report -i perf.data.old --stdio<br></code></pre></td></tr></table></figure>
+
+<h5 id="perf-top"><a href="#perf-top" class="headerlink" title="perf top"></a>perf top</h5><p>实时显示系统中最消耗资源的函数。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">perf <span class="hljs-attribute">top</span> <span class="hljs-selector-attr">[options]</span><br></code></pre></td></tr></table></figure>
+
+<p>常用选项：</p>
+<ul>
+<li><code>-e</code>：指定监控事件</li>
+<li><code>-p</code>：监控指定进程</li>
+<li><code>-K</code>：隐藏内核符号</li>
+<li><code>-U</code>：隐藏用户空间符号</li>
+<li><code>-g</code>：显示调用图</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">实时监控系统性能</span><br>perf top<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">监控特定事件</span><br>perf top -e cache-misses<br></code></pre></td></tr></table></figure>
+
+<h5 id="perf-list"><a href="#perf-list" class="headerlink" title="perf list"></a>perf list</h5><p>列出所有可监控的事件。</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coq">perf list [hw|<span class="hljs-type">sw</span>|<span class="hljs-type">cache</span>|<span class="hljs-type">tracepoint</span>|<span class="hljs-type">pmu</span>|<span class="hljs-type">event_glob</span>]<br></code></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">列出所有事件</span><br>perf list<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">列出硬件缓存事件</span><br>perf list cache<br></code></pre></td></tr></table></figure>
+
+<h4 id="perf-事件类型"><a href="#perf-事件类型" class="headerlink" title="perf 事件类型"></a>perf 事件类型</h4><p>perf 可以监控多种类型的事件：</p>
+<table>
+<thead>
+<tr>
+<th align="left">事件类型</th>
+<th align="left">描述</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Hardware</td>
+<td align="left">CPU硬件事件</td>
+<td align="left">cycles, instructions</td>
+</tr>
+<tr>
+<td align="left">Software</td>
+<td align="left">内核软件事件</td>
+<td align="left">context-switches, page-faults</td>
+</tr>
+<tr>
+<td align="left">Cache</td>
+<td align="left">缓存相关事件</td>
+<td align="left">cache-references, cache-misses</td>
+</tr>
+<tr>
+<td align="left">Tracepoints</td>
+<td align="left">内核静态跟踪点</td>
+<td align="left">syscalls, block, sched</td>
+</tr>
+<tr>
+<td align="left">PMU</td>
+<td align="left">处理器特定事件</td>
+<td align="left">(vendor specific)</td>
+</tr>
+<tr>
+<td align="left">Breakpoints</td>
+<td align="left">断点事件</td>
+<td align="left">mem:[:access]</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="perf-实际应用示例"><a href="#perf-实际应用示例" class="headerlink" title="perf 实际应用示例"></a>perf 实际应用示例</h3><h4 id="分析程序性能瓶颈"><a href="#分析程序性能瓶颈" class="headerlink" title="分析程序性能瓶颈"></a>分析程序性能瓶颈</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">记录程序执行</span><br>perf record -g .**/**my_program<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">分析结果</span><br>perf report -g<br></code></pre></td></tr></table></figure>
+
+<h4 id="查找CPU热点函数"><a href="#查找CPU热点函数" class="headerlink" title="查找CPU热点函数"></a>查找CPU热点函数</h4><figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs scss">perf <span class="hljs-attribute">top</span> -<span class="hljs-selector-tag">p</span> $(pidof my_program)<br></code></pre></td></tr></table></figure>
+
+<h4 id="比较两次运行的性能差异"><a href="#比较两次运行的性能差异" class="headerlink" title="比较两次运行的性能差异"></a>比较两次运行的性能差异</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">第一次运行</span><br>perf record -o perf.data.1 ./my_program input1<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">第二次运行</span><br>perf record -o perf.data.2 ./my_program input2<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">比较差异</span><br>perf diff perf.data.1 perf.data.2<br></code></pre></td></tr></table></figure>
+
+<h4 id="分析系统调用"><a href="#分析系统调用" class="headerlink" title="分析系统调用"></a>分析系统调用</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">列出可用的系统调用跟踪点</span><br>perf list &#x27;syscalls:*&#x27;<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">跟踪open系统调用</span><br>perf stat -e &#x27;syscalls:sys_enter_open&#x27; -a sleep 10<br></code></pre></td></tr></table></figure>
+
+<h3 id="生成火焰图"><a href="#生成火焰图" class="headerlink" title="生成火焰图"></a>生成火焰图</h3><h4 id="获取火焰图生成脚本"><a href="#获取火焰图生成脚本" class="headerlink" title="获取火焰图生成脚本"></a>获取火焰图生成脚本</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/brendangregg/FlameGraph.git<br></code></pre></td></tr></table></figure>
+
+<h4 id="生成火焰图-1"><a href="#生成火焰图-1" class="headerlink" title="生成火焰图"></a>生成火焰图</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">stackcollapse-perf.pl 脚本只支持文本格式的调用栈数据，无法直接处理 perf 的二进制数据</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">把 perf.data 里的内容转换成可读的文本格式</span><br>sudo perf script -i perf.data &gt; perf.unfold<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">stackcollapse-perf.pl 是 FlameGraph 工具集里的 Perl 脚本，它会把每条调用链“折叠”成一行，并统计重复路径出现的次数</span><br>./stackcollapse-perf.pl perf.unfold &gt; perf.folded<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">最后生成 svg 图</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">flamegraph.pl 是 FlameGraph 的主脚本，专门将折叠数据转成火焰图（SVG矢量图）</span><br>./flamegraph.pl perf.folded &gt; perf.svg<br></code></pre></td></tr></table></figure>
+
+<h3 id="火焰图含义"><a href="#火焰图含义" class="headerlink" title="火焰图含义"></a>火焰图含义</h3><p>火焰图是基于perf结果产生的svg图片，用来展示cpu的调用栈</p>
+<img src="/debug/perf/a.png" srcset="/img/loading.gif" lazyload class title="a">
+
+<p>y 轴表示调用栈，每一层都是一个函数。调用栈越深，火焰就越高，顶部就是正在执行的函数，下方都是它的父函数。</p>
+<p>x 轴表示抽样数，如果一个函数在 x 轴占据的宽度越宽，就表示它被抽到的次数多，即执行的时间长。注意，x 轴不代表时间，而是所有的调用栈合并后，按字母顺序排列的。</p>
+<div class="note note-warning">
+            <p>火焰图就是看顶层的哪个函数占据的宽度最大。只要有”平顶”（plateaus），就表示该函数可能存在性能问题。</p>
+          </div>
+
+<h3 id="互动性"><a href="#互动性" class="headerlink" title="互动性"></a>互动性</h3><h4 id="鼠标悬浮"><a href="#鼠标悬浮" class="headerlink" title="鼠标悬浮"></a>鼠标悬浮</h4><p>火焰的每一层都会标注函数名，鼠标悬浮时会显示完整的函数名、抽样抽中的次数、占据总抽样次数的百分比</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tex">Function:reader<span class="hljs-built_in">_</span>loop (2,311 samples, 78.00<span class="hljs-comment">%)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="点击放大"><a href="#点击放大" class="headerlink" title="点击放大"></a>点击放大</h4><p>点击任何一层，火焰图会水平放大，该层会占据所有宽度，显示详细信息</p>
+<img src="/debug/perf/b.png" srcset="/img/loading.gif" lazyload class title="b">
+
+<p>左上角会同时显示”Reset Zoom”，点击该链接，图片就会恢复原样。</p>
+<h4 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h4><p>按下 Ctrl + F 会显示搜索框，用户可以输入关键词或正则表达式，所有符合条件的函数名会高亮显示</p>
+<h3 id="局限"><a href="#局限" class="headerlink" title="局限"></a>局限</h3><p>两种情况下，无法画出火焰图，需要修正系统行为。</p>
+<ul>
+<li><p>调用栈不完整：当调用栈过深时，某些系统只返回前面的一部分（比如前10层）</p>
+</li>
+<li><p>函数名缺失：有些函数没有名字，编译器只用内存地址来表示（比如匿名函数）</p>
+</li>
+</ul>
+<p>参考链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2017/09/flame-graph.html">https://www.ruanyifeng.com/blog/2017/09/flame-graph.html</a></li>
+</ul>
+
                 
               </div>
             
@@ -370,7 +533,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2025年3月19日</div>
+          <div>2025年9月16日</div>
         </div>
       
       
