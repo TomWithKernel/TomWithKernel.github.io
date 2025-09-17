@@ -677,67 +677,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/debug/crash/" target="_self">
-          crash
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/debug/crash/" target="_self">
-        <div>
-          Crash一个用于分析 Linux 内核转储文件的工具。它提供了一个交互式的环境，让用户能够检查内核转储文件中的信息，包括进程栈、内核数据结构等 进入crash环境12sudo -scrash /lib/debug/vmlinux dump.2    btbacktrace打印内核栈回溯信息，bt pid 打印指定进程栈信息 123456789101112131415161718192021222
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-05-10 10:09" pubdate>
-              2024-05-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/debug/" class="category-chain-item">debug</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/debug/">#debug</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/debug/gdb/" target="_self">
           gdb
         </a>
@@ -799,15 +738,76 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/debug/kdump/" target="_self">
-          kdump
+        <a href="/debug/perf/" target="_self">
+          perf
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/debug/kdump/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/perf/" target="_self">
         <div>
-          Kdumpkdump是在系统崩溃、死锁、或者死机的时候用来转储内存为vmcore保存到磁盘的一个工具和服务 相关配置12345678910111213CONFIG_KEXEC=yCONFIG_KEXEC_FILE=y   //两者选其一，或者都选也可以，对应两个版本的kexec接口CONFIG_CRASH_DUMP=y   //内核支持系统崩溃转储功能，即能够生成 vmcore 文件以便进行故障诊
+          Perf工具安装下载先下载对应内核版本的perf源码：https://cdn.kernel.org/pub/linux/kernel/tools/perf/ 编译安装1234567tar -xvf perf-5.10.0.tar.gz cd perf-5.10.0cd tools/perf/makesudo cp perf /usr/local/bin/usr/local/bin/perf --v
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-10 10:09" pubdate>
+              2024-05-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/debug/" class="category-chain-item">debug</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/debug/">#debug</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/debug/strace/" target="_self">
+          strace
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/debug/strace/" target="_self">
+        <div>
+          stracestrace会记录和解析命令进程的所有系统调用以及这个进程所接收到的所有的信号值  -c 统计每一系统调用的所执行的时间,次数和出错的次数等. -d 输出strace关于标准错误的调试信息. -f 跟踪由fork调用所产生的子进程. -ff 如果提供-o filename,则所有进程的跟踪结果输出到相应的filename.pid中,pid是各进程的进程号. -F 尝试跟踪vfork调用
         </div>
       </a>
 
